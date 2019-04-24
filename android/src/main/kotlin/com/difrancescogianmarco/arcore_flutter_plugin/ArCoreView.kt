@@ -47,10 +47,10 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     init {
         this.activity = (context.applicationContext as FlutterApplication).currentActivity
+        setupLifeCycle(context)
         methodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
         methodChannel.setMethodCallHandler(this)
         arSceneView = ArSceneView(context)
-        setupLifeCycle(context)
         // Set up a tap gesture detector.
         gestureDetector = GestureDetector(
                 context,
@@ -65,6 +65,31 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                     }
                 })
 
+        // Set an update listener on the Scene that will hide the loading message once a Plane is
+        // detected.
+        arSceneView?.scene
+                ?.addOnUpdateListener { frameTime ->
+
+                    val frame = arSceneView?.arFrame
+                    if (frame == null) {
+                        return@addOnUpdateListener
+                    }
+
+                    if (frame.camera.trackingState != TrackingState.TRACKING) {
+                        return@addOnUpdateListener
+                    }
+
+                    for (plane in frame.getUpdatedTrackables(Plane::class.java)) {
+                        if (plane.trackingState == TrackingState.TRACKING) {
+                            //TODO il piano è stato rilevato
+                            Log.i(TAG, "il piano è stato rilevato")
+                        }
+                    }
+                }
+
+        // Lastly request CAMERA permission which is required by ARCore.
+        ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
+
 
         MaterialFactory.makeOpaqueWithColor(activity.applicationContext, com.google.ar.sceneform.rendering.Color(Color.RED))
                 .thenAccept { material: Material? ->
@@ -75,7 +100,9 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     private fun setupLifeCycle(context: Context) {
         activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {}
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
+                Log.i(TAG, "onActivityCreated")
+            }
 
             override fun onActivityStarted(activity: Activity) {
                 Log.i(TAG, "onActivityStarted")
@@ -102,6 +129,8 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 Log.i(TAG, "onActivityDestroyed")
                 onDestroy()
             }
+
+
         }
 
         (context.getApplicationContext() as FlutterApplication).currentActivity.application
@@ -120,7 +149,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         }
     }
 
-    protected fun onResume() {
+    fun onResume() {
         if (arSceneView == null) {
             return
         }
@@ -197,7 +226,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     private fun arScenViewInit(call: MethodCall, result: MethodChannel.Result) {
         Log.i(TAG, "arScenViewInit")
         val enableTapRecognizer: Boolean? = call.argument("enableTapRecognizer")
-        Log.i(TAG, " enableTapRecognizer" + enableTapRecognizer)
+        Log.i(TAG, "enableTapRecognizer: " + enableTapRecognizer)
         if (enableTapRecognizer != null && enableTapRecognizer) {
             arSceneView
                     ?.scene
@@ -308,6 +337,9 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
             arSceneView?.destroy()
         }
     }
+
+
+
 
 
 }
