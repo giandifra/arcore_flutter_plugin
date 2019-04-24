@@ -47,38 +47,6 @@ class _CustomObjectState extends State<CustomObject> {
     controller.add(node);
   }
 
-  void _addCylindre(ArCoreController controller) {
-    final material = ArCoreMaterial(
-        color: Colors.red
-    );
-    final sphere = ArCoreCylinder(
-      materials: [material],
-      radius: 0.5,
-      height: 0.3,
-    );
-    final node = ArCoreNode(
-      geometry: sphere,
-      position: vector.Vector3(0.0, -0.5, -2.0),
-    );
-    controller.add(node);
-  }
-
-  void _addCube(ArCoreController controller) {
-    final material = ArCoreMaterial(
-      color: Colors.green,
-      materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR,
-    );
-    final sphere = ArCoreCube(
-      materials: [material],
-      size: vector.Vector3(0.5, 0.5, 0.5),
-    );
-    final node = ArCoreNode(
-      geometry: sphere,
-      position: vector.Vector3(-0.5, 0.5, -3.5),
-    );
-    controller.add(node);
-  }
-
   void onTapHandler(String name) {
     print("Flutter: onTap");
     showDialog<void>(

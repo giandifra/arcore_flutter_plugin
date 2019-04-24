@@ -8,30 +8,29 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.DecodableUtils.Companion.parseVector3
 import com.difrancescogianmarco.arcore_flutter_plugin.DecodableUtils.Companion.parseVector4
-import com.difrancescogianmarco.arcore_flutter_plugin.GeometryBuilder.Companion.createModelRenderable
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
 import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.ArSceneView
+import com.google.ar.sceneform.HitTestResult
+import com.google.ar.sceneform.Node
+import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.rendering.Material
+import com.google.ar.sceneform.rendering.MaterialFactory
+import com.google.ar.sceneform.rendering.ModelRenderable
+import com.google.ar.sceneform.rendering.ShapeFactory
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
-import com.google.ar.sceneform.ArSceneView
-import com.google.ar.sceneform.HitTestResult
-import com.google.ar.sceneform.Node
-import com.google.ar.sceneform.math.Vector3
-import com.google.ar.sceneform.rendering.*
-import com.google.ar.schemas.lull.MaterialTextureDef
 
 class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
     val methodChannel: MethodChannel
@@ -41,11 +40,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     val TAG: String = ArCoreView::class.java.name
     private var arSceneView: ArSceneView?
     val gestureDetector: GestureDetector
-    private var hasFinishedLoading = true //TODO quando completo il caricamento degli oggetti posso metterlo a true
-
     private val RC_PERMISSIONS = 0x123
-
-    lateinit var redSphereRenderable: ModelRenderable
 
     init {
         this.activity = (context.applicationContext as FlutterApplication).currentActivity
@@ -86,15 +81,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
         // Lastly request CAMERA permission which is required by ARCore.
         ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
-
-        Log.i(TAG, "makeOpaqueWithColor start")
-        MaterialFactory.makeOpaqueWithColor(activity.applicationContext, com.google.ar.sceneform.rendering.Color(Color.RED))
-                .thenAccept { material: Material? ->
-                    Log.i(TAG, "makeOpaqueWithColor then Accept")
-                    redSphereRenderable =
-                            ShapeFactory.makeSphere(0.1f, Vector3(0.0f, 0.15f, 0.0f), material);
-                }
-        Log.i(TAG, "setupLifeCycle")
         setupLifeCycle(context)
     }
 
@@ -243,9 +229,8 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     private fun arScenViewInit(call: MethodCall, result: MethodChannel.Result) {
         Log.i(TAG, "arScenViewInit")
-        onResume()
+        onResume() //TODO delete?
         val enableTapRecognizer: Boolean? = call.argument("enableTapRecognizer")
-        Log.i(TAG, "enableTapRecognizer: " + enableTapRecognizer)
         if (enableTapRecognizer != null && enableTapRecognizer) {
             arSceneView
                     ?.scene
@@ -266,7 +251,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                         false
                     }
         }
-        Log.i(TAG, "arSceneView init: COMPLETE")
 
         result.success(null)
     }
