@@ -42,10 +42,12 @@ class ArCoreNode {
 //  final ARKitPhysicsBody physicsBody;
 
   Map<String, dynamic> toMap() => <String, dynamic>{
+        'dartType': runtimeType.toString(),
         'geometry': geometry.toMap(),
         'position': convertVector3ToMap(position.value),
         'scale': convertVector3ToMap(scale.value),
         'rotation': convertVector4ToMap(rotation.value),
+//    'light': light?.toMap(),
 //        'physicsBody': physicsBody?.toMap(),
         'name': name,
       }..removeWhere((String k, dynamic v) => v == null);

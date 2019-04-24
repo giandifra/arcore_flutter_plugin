@@ -30,6 +30,8 @@ class _MyAppState extends State<MyApp> {
             IconButton(icon:Icon(Icons.add),
               onPressed: () {
                 _addSphere(arCoreController);
+                _addSphere2(arCoreController);
+                _addSphere3(arCoreController);
               },)
           ],
         ),
@@ -46,7 +48,9 @@ class _MyAppState extends State<MyApp> {
     arCoreController = controller;
     arCoreController.onTap = (name)=>onTapHandler(name);
 
-
+    _addSphere(arCoreController);
+    _addSphere2(arCoreController);
+    _addSphere3(arCoreController);
   }
 
   void _addSphere(ArCoreController controller) {
@@ -60,6 +64,37 @@ class _MyAppState extends State<MyApp> {
     final node = ArCoreNode(
       geometry: sphere,
       position: vector.Vector3(0, 0, -0.5),
+    );
+    controller.add(node);
+  }
+
+  void _addSphere2(ArCoreController controller) {
+    final material = ArCoreMaterial(
+        color: Colors.red
+    );
+    final sphere = ArCoreSphere(
+      materials: [material],
+      radius: 0.3,
+    );
+    final node = ArCoreNode(
+      geometry: sphere,
+      position: vector.Vector3(0.4, 0.4, -1.5),
+    );
+    controller.add(node);
+  }
+
+  void _addSphere3(ArCoreController controller) {
+    final material = ArCoreMaterial(
+        color: Colors.green,
+      materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR,
+    );
+    final sphere = ArCoreSphere(
+      materials: [material],
+      radius: 0.3,
+    );
+    final node = ArCoreNode(
+      geometry: sphere,
+      position: vector.Vector3(-0.2, 0.7, -1.5),
     );
     controller.add(node);
   }

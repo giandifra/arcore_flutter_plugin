@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.util.Log
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.*
+import com.google.ar.schemas.sceneform.MaterialDef
 import java.util.concurrent.CompletableFuture
 
 class GeometryBuilder {
@@ -13,18 +14,28 @@ class GeometryBuilder {
 
         fun createModelRenderable(activity: Activity, map: HashMap<String, Any>): ModelRenderable {
             val type = map["dartType"] as String
-
             val materials = map["materials"] as ArrayList<HashMap<String, Any>>
             val materialType: Int = (materials[0] as HashMap<String, Any>)["materialType"] as Int
             val rgb = materials[0]["color"] as ArrayList<Int>
             Log.i("GeometryBuilder", rgb.toString())
             val color = com.google.ar.sceneform.rendering.Color(Color.argb(255,rgb[0],rgb[1],rgb[2]))
-            Log.i("GeometryBuilder",  rgb[0].toFloat().toString())
-            Log.i("GeometryBuilder",  rgb[1].toFloat().toString())
-            Log.i("GeometryBuilder",  rgb[2].toFloat().toString())
-            val materialFactory = getMaterialFactory(activity, materialType, color)
-            val material = materialFactory?.get()!!
-            val renderable = getShapeType(type, map, material)!!
+//            val materialFactory = getMaterialFactory(activity, materialType, color)
+//            Log.i("GeometryBuilder",  "start get materialFactory")
+//            val material = materialFactory?.get()!!
+//            Log.i("GeometryBuilder",  "complete get materialFactory")
+//            Log.i("GeometryBuilder",  rgb[0].toFloat().toString())
+
+
+            val radius: Float = (map["radius"] as Double).toFloat()
+            lateinit var renderable : ModelRenderable
+            MaterialFactory.makeOpaqueWithColor(activity.applicationContext, color).thenAccept {
+                material ->
+                renderable = ShapeFactory.makeSphere(radius, Vector3(0.0f, 0.15f, 0.0f),material);
+            }
+
+
+//          val renderable = getShapeType(type, map, material)!!
+
             return renderable
 
         }
@@ -35,7 +46,7 @@ class GeometryBuilder {
 
             when (materialType) {
                 0 -> {
-                    return MaterialFactory.makeOpaqueWithColor(activity.applicationContext, color);
+                    return MaterialFactory.makeOpaqueWithColor(activity.applicationContext, color)
                 }
                 1 -> {
                     return MaterialFactory.makeTransparentWithColor(activity.applicationContext, color);

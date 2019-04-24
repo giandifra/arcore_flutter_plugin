@@ -30,6 +30,7 @@ import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.*
+import com.google.ar.schemas.lull.MaterialTextureDef
 
 class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
     val methodChannel: MethodChannel
@@ -47,7 +48,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     init {
         this.activity = (context.applicationContext as FlutterApplication).currentActivity
-        setupLifeCycle(context)
         methodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
         methodChannel.setMethodCallHandler(this)
         arSceneView = ArSceneView(context)
@@ -65,15 +65,13 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                     }
                 })
 
+
         // Set an update listener on the Scene that will hide the loading message once a Plane is
         // detected.
         arSceneView?.scene
                 ?.addOnUpdateListener { frameTime ->
 
-                    val frame = arSceneView?.arFrame
-                    if (frame == null) {
-                        return@addOnUpdateListener
-                    }
+                    val frame = arSceneView?.arFrame ?: return@addOnUpdateListener
 
                     if (frame.camera.trackingState != TrackingState.TRACKING) {
                         return@addOnUpdateListener
@@ -82,7 +80,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                     for (plane in frame.getUpdatedTrackables(Plane::class.java)) {
                         if (plane.trackingState == TrackingState.TRACKING) {
                             //TODO il piano è stato rilevato
-                            Log.i(TAG, "il piano è stato rilevato")
                         }
                     }
                 }
@@ -90,12 +87,15 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         // Lastly request CAMERA permission which is required by ARCore.
         ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
 
-
+        Log.i(TAG, "makeOpaqueWithColor start")
         MaterialFactory.makeOpaqueWithColor(activity.applicationContext, com.google.ar.sceneform.rendering.Color(Color.RED))
                 .thenAccept { material: Material? ->
+                    Log.i(TAG, "makeOpaqueWithColor then Accept")
                     redSphereRenderable =
                             ShapeFactory.makeSphere(0.1f, Vector3(0.0f, 0.15f, 0.0f), material);
                 }
+        Log.i(TAG, "setupLifeCycle")
+        setupLifeCycle(context)
     }
 
     private fun setupLifeCycle(context: Context) {
@@ -225,6 +225,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     private fun arScenViewInit(call: MethodCall, result: MethodChannel.Result) {
         Log.i(TAG, "arScenViewInit")
+        onResume()
         val enableTapRecognizer: Boolean? = call.argument("enableTapRecognizer")
         Log.i(TAG, "enableTapRecognizer: " + enableTapRecognizer)
         if (enableTapRecognizer != null && enableTapRecognizer) {
@@ -247,6 +248,8 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                         false
                     }
         }
+        Log.i(TAG, "arSceneView init: COMPLETE")
+
         result.success(null)
     }
 
@@ -273,34 +276,15 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         return false
     }
 
-
     fun onAddNode(call: MethodCall, result: MethodChannel.Result) {
-
-
         //TODO crea geometry
-        addNodeToSceneWithGeometry(call, result)
-    }
+//        addNodeToSceneWithGeometry(call, result)
 
-    fun addNodeToSceneWithGeometry(call: MethodCall, result: MethodChannel.Result) {
-        val node = getNodeWithGeometry(call.arguments as HashMap<String, Any>)
-
-        if (call.argument<String>("parentNodeName") != null) {
-            val parentNode: Node? = arSceneView?.scene?.findByName(call.argument<String>("parentNodeName") as String)
-            parentNode?.addChild(node)
-        } else {
-            arSceneView?.scene?.addChild(node)
-        }
-        result.success(null);
-    }
-
-
-    fun getNodeWithGeometry(map: HashMap<String, Any>): Node {
+        val map = call.arguments as HashMap<String, Any>
         val geometryArguments: HashMap<String, Any> = map["geometry"] as HashMap<String, Any>
 
-
         //TODO manca geometry
-        val node: Node = Node()
-        node.renderable = redSphereRenderable
+        val node = Node()
         node.localPosition = parseVector3(map["position"] as HashMap<String, Any>)
 
         if (map["scale"] != null) {
@@ -320,16 +304,94 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
             //TODO
         }
 
-        //       if (dict[@"physicsBody"] != nil) {
-//           NSDictionary *physics = dict[@"physicsBody"];
-//           node.physicsBody = [self getPhysicsBodyFromDict:physics];
-//       }
+        val materials = geometryArguments["materials"] as ArrayList<HashMap<String, Any>>
+        val rgb = materials[0]["color"] as ArrayList<Int>
+        val color = com.google.ar.sceneform.rendering.Color(Color.argb(255, rgb[0], rgb[1], rgb[2]))
+//        val radius: Float = (geometryArguments["radius"] as Double).toFloat()
 
-        val modelRenderable = createModelRenderable(activity, geometryArguments)
+        Log.i(TAG, "makeOpaqueWithColor then Accept")
+        MaterialFactory.makeOpaqueWithColor(activity.applicationContext, color)
+                .thenAccept { material: Material? ->
+                    Log.i(TAG, "makeOpaqueWithColor then Accept")
 
-        node.renderable = modelRenderable
-        return node
+                    val type = geometryArguments["dartType"] as String
+                    Log.i(TAG, "type: $type")
+
+                    if(type == "ArCoreSphere"){
+                        val radius: Float = (geometryArguments["radius"] as Double).toFloat()
+                        node.renderable = ShapeFactory.makeSphere(radius, Vector3(0.0f, 0.15f, 0.0f), material);
+                    }
+
+                    if (call.argument<String>("parentNodeName") != null) {
+                        Log.i(TAG, call.argument<String>("parentNodeName"));
+                        val parentNode: Node? = arSceneView?.scene?.findByName(call.argument<String>("parentNodeName") as String)
+                        parentNode?.addChild(node)
+                    } else {
+                        Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENt_NODE_NAME")
+                        arSceneView?.scene?.addChild(node)
+                    }
+                }
+
+        Log.i(TAG, "addNodeToSceneWithGeometry: COMPLETE")
+        result.success(null)
     }
+//
+//    fun addNodeToSceneWithGeometry(call: MethodCall, result: MethodChannel.Result) {
+//        Log.i(TAG,"addNodeToSceneWithGeometry")
+//        val node = getNodeWithGeometry(call.arguments as HashMap<String, Any>)
+//        Log.i(TAG,"getNodeWithGeometry complete")
+//        if (call.argument<String>("parentNodeName") != null) {
+//            Log.i(TAG,call.argument<String>("parentNodeName"));
+//            val parentNode: Node? = arSceneView?.scene?.findByName(call.argument<String>("parentNodeName") as String)
+//            parentNode?.addChild(node)
+//        } else {
+//            Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENt_NODE_NAME")
+//            arSceneView?.scene?.addChild(node)
+//        }
+//        Log.i(TAG, "addNodeToSceneWithGeometry: COMPLETE")
+//        result.success(null)
+//    }
+//
+//
+//    fun getNodeWithGeometry(map: HashMap<String, Any>): Node {
+//        Log.i(TAG, "getNodeWithGeometry")
+//        val geometryArguments: HashMap<String, Any> = map["geometry"] as HashMap<String, Any>
+//
+//        //TODO manca geometry
+//        val node = Node()
+//        node.localPosition = parseVector3(map["position"] as HashMap<String, Any>)
+//
+//        if (map["scale"] != null) {
+//            node.localScale = parseVector3(map["scale"] as HashMap<String, Any>)
+//        }
+//
+//        if (map["rotation"] != null) {
+//            node.localRotation = parseVector4(map["rotation"] as HashMap<String, Any>)
+//        }
+//
+//        if (map["name"] != null) {
+//            node.name = map["name"] as String
+//        }
+//
+//        if (map["physicsBody"] != null) {
+//            val physics: HashMap<String, Any> = map["physicsBody"] as HashMap<String, Any>
+//            //TODO
+//        }
+//
+//        //       if (dict[@"physicsBody"] != nil) {
+////           NSDictionary *physics = dict[@"physicsBody"];
+////           node.physicsBody = [self getPhysicsBodyFromDict:physics];
+////       }
+//
+////        val modelRenderable = createModelRenderable(activity, geometryArguments)
+//        Log.i(TAG, "createModelRenderable COMPLETE")
+////        val materials = geometryArguments["materials"] as ArrayList<HashMap<String, Any>>
+////        val rgb = materials[0]["color"] as ArrayList<Int>
+////        val color = com.google.ar.sceneform.rendering.Color(Color.argb(255,rgb[0],rgb[1],rgb[2]))
+////        redSphereRenderable.material.setFloat3(MaterialFactory.MATERIAL_COLOR, color)
+//        node.renderable = redSphereRenderable
+//        return node
+//    }
 
 
     override fun dispose() {
@@ -337,11 +399,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
             arSceneView?.destroy()
         }
     }
-
-
-
-
-
 }
 
 
