@@ -317,7 +317,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         val materials = geometryArguments["materials"] as ArrayList<HashMap<String, Any>>
         val rgb = materials[0]["color"] as ArrayList<Int>
         val color = com.google.ar.sceneform.rendering.Color(Color.argb(255, rgb[0], rgb[1], rgb[2]))
-//        val radius: Float = (geometryArguments["radius"] as Double).toFloat()
 
         Log.i(TAG, "makeOpaqueWithColor then Accept")
         MaterialFactory.makeOpaqueWithColor(activity.applicationContext, color)
@@ -330,6 +329,14 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                     if (type == "ArCoreSphere") {
                         val radius: Float = (geometryArguments["radius"] as Double).toFloat()
                         node.renderable = ShapeFactory.makeSphere(radius, Vector3(0.0f, 0.15f, 0.0f), material);
+                    } else if (type == "ArCoreCube") {
+                        val sizeMap = geometryArguments["size"] as HashMap<String, Any>
+                        val size = parseVector3(sizeMap)
+                        node.renderable = ShapeFactory.makeCube(size, Vector3(0.0f, 0.15f, 0.0f), material);
+                    } else if (type == "ArCoreCylinder") {
+                        val radius: Float = (geometryArguments["radius"] as Double).toFloat()
+                        val height: Float = (geometryArguments["height"] as Double).toFloat()
+                        node.renderable = ShapeFactory.makeCylinder(radius, height, Vector3(0.0f, 0.15f, 0.0f), material);
                     }
 
                     if (call.argument<String>("parentNodeName") != null) {
@@ -337,7 +344,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                         val parentNode: Node? = arSceneView?.scene?.findByName(call.argument<String>("parentNodeName") as String)
                         parentNode?.addChild(node)
                     } else {
-                        Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENt_NODE_NAME")
+                        Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
                         arSceneView?.scene?.addChild(node)
                     }
                 }

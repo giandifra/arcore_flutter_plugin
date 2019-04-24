@@ -1,105 +1,35 @@
+import 'package:arcore_flutter_plugin_example/hello_world.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
-import 'package:vector_math/vector_math_64.dart' as vector;
-import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
+void main() => runApp(App());
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  ArCoreController arCoreController;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-          actions: <Widget>[
-            IconButton(icon:Icon(Icons.add),
-              onPressed: () {
-                _addSphere(arCoreController);
-                _addSphere2(arCoreController);
-                _addSphere3(arCoreController);
-              },)
-          ],
-        ),
+      home: HomeScreen(),
+    );
+  }
+}
 
-        body: ArCoreView(
-          onArCoreViewCreated: _onArCoreViewCreated,
-//          enableTapRecognizer: true,
-        ),
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ArCore Demo'),
+      ),
+      body: ListView(
+        children: <Widget>[
+          ListTile(
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => HelloWorld()));
+            },
+            title: Text("Hello World"),
+          )
+        ],
       ),
     );
-  }
-
-  void _onArCoreViewCreated(ArCoreController controller) {
-    arCoreController = controller;
-    arCoreController.onTap = (name)=>onTapHandler(name);
-
-    _addSphere(arCoreController);
-    _addSphere2(arCoreController);
-    _addSphere3(arCoreController);
-  }
-
-  void _addSphere(ArCoreController controller) {
-    final material = ArCoreMaterial(
-      color: Colors.yellow
-    );
-    final sphere = ArCoreSphere(
-      materials: [material],
-      radius: 0.1,
-    );
-    final node = ArCoreNode(
-      geometry: sphere,
-      position: vector.Vector3(0, 0, -0.5),
-    );
-    controller.add(node);
-  }
-
-  void _addSphere2(ArCoreController controller) {
-    final material = ArCoreMaterial(
-        color: Colors.red
-    );
-    final sphere = ArCoreSphere(
-      materials: [material],
-      radius: 0.3,
-    );
-    final node = ArCoreNode(
-      geometry: sphere,
-      position: vector.Vector3(0.4, 0.4, -1.5),
-    );
-    controller.add(node);
-  }
-
-  void _addSphere3(ArCoreController controller) {
-    final material = ArCoreMaterial(
-        color: Colors.green,
-      materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR,
-    );
-    final sphere = ArCoreSphere(
-      materials: [material],
-      radius: 0.3,
-    );
-    final node = ArCoreNode(
-      geometry: sphere,
-      position: vector.Vector3(-0.2, 0.7, -1.5),
-    );
-    controller.add(node);
-  }
-
-  void onTapHandler(String name) {
-   print("Flutter: onTap");
   }
 }
