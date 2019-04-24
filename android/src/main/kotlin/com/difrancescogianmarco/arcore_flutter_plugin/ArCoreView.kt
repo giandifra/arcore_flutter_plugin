@@ -218,6 +218,16 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 onAddNode(call, result)
 
             }
+            "positionChanged" -> {
+                Log.i(TAG, " addArCoreNode")
+                updatePosition(call, result)
+
+            }
+            "rotationChanged" -> {
+                Log.i(TAG, " addArCoreNode")
+                updateRotation(call, result)
+
+            }
             else -> {
             }
         }
@@ -317,7 +327,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                     val type = geometryArguments["dartType"] as String
                     Log.i(TAG, "type: $type")
 
-                    if(type == "ArCoreSphere"){
+                    if (type == "ArCoreSphere") {
                         val radius: Float = (geometryArguments["radius"] as Double).toFloat()
                         node.renderable = ShapeFactory.makeSphere(radius, Vector3(0.0f, 0.15f, 0.0f), material);
                     }
@@ -392,6 +402,21 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 //        node.renderable = redSphereRenderable
 //        return node
 //    }
+
+
+    fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
+        val name = call.argument<String>("name")
+        val node = arSceneView?.scene?.findByName(name)
+        node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
+        result.success(null)
+    }
+
+    fun updateRotation(call: MethodCall, result: MethodChannel.Result) {
+        val name = call.argument<String>("name")
+        val node = arSceneView?.scene?.findByName(name)
+        node?.localRotation = parseVector4(call.arguments as HashMap<String, Any>)
+        result.success(null)
+    }
 
 
     override fun dispose() {

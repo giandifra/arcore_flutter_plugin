@@ -77,7 +77,7 @@ class ArCoreController {
   Future<void> add(ArCoreNode node, {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
-//    _subsribeToChanges(node);
+    _subsribeToChanges(node);
     return _channel.invokeMethod('addArCoreNode', params);
   }
 
@@ -92,7 +92,7 @@ class ArCoreController {
     node.position.addListener(() => _handlePositionChanged(node));
     node.rotation.addListener(() => _handleRotationChanged(node));
 
-    node.geometry.materials.addListener(() => _updateMaterials(node));
+//    node.geometry.materials.addListener(() => _updateMaterials(node));
     if (node.geometry is ArCorePlane) {
       final ArCorePlane plane = node.geometry;
       plane.width.addListener(() =>
