@@ -1,13 +1,14 @@
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
-class HelloWorld extends StatefulWidget {
+
+class CustomObject extends StatefulWidget {
 
   @override
-  _HelloWorldState createState() => _HelloWorldState();
+  _CustomObjectState createState() => _CustomObjectState();
 }
 
-class _HelloWorldState extends State<HelloWorld> {
+class _CustomObjectState extends State<CustomObject> {
   ArCoreController arCoreController;
 
   @override
@@ -15,17 +16,12 @@ class _HelloWorldState extends State<HelloWorld> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Hello World'),
-          actions: <Widget>[
-            IconButton(icon:Icon(Icons.add),
-              onPressed: () {
-              },)
-          ],
+          title: const Text('Custom Object'),
         ),
 
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
-//          enableTapRecognizer: true,
+          enableTapRecognizer: true,
         ),
       ),
     );
@@ -34,10 +30,6 @@ class _HelloWorldState extends State<HelloWorld> {
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
     arCoreController.onTap = (name)=>onTapHandler(name);
-
-    _addSphere(arCoreController);
-    _addCylindre(arCoreController);
-    _addCube(arCoreController);
   }
 
   void _addSphere(ArCoreController controller) {
@@ -89,6 +81,11 @@ class _HelloWorldState extends State<HelloWorld> {
 
   void onTapHandler(String name) {
     print("Flutter: onTap");
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) =>
+          AlertDialog(content: Text('onTap on $name')),
+    );
   }
 
   @override
