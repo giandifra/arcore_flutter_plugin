@@ -33,7 +33,6 @@ class _CustomObjectState extends State<CustomObject> {
   void _addSphere(ArCoreController controller) {
     final material = ArCoreMaterial(
       color: Colors.yellow,
-      materialFactory: MaterialFactory.OPAQUE_WITH_COLOR,
     );
     final sphere = ArCoreSphere(
       materials: [material],

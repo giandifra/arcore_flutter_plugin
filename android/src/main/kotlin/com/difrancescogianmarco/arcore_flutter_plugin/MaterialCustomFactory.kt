@@ -24,10 +24,8 @@ class MaterialCustomFactory {
         val TAG: String = MaterialCustomFactory::class.java.name
 
 
-        fun make(context: Context, map: HashMap<String, *>): CompletableFuture<Material>? {
-            if (map[MATERIAL_TEXTURE] != null) {
-                return null
-            } else if (map[MATERIAL_COLOR] != null) {
+        fun makeWithColor(context: Context, map: HashMap<String, *>): CompletableFuture<Material>? {
+            if (map[MATERIAL_COLOR] != null) {
                 val color = map[MATERIAL_COLOR] as ArrayList<Int>
                 if(color[0] < 255){
                     return makeTransparentWithColor(context,map)
@@ -36,6 +34,11 @@ class MaterialCustomFactory {
             }
             return null
         }
+
+        fun makeWithTexture(context: Context, texture: Texture): CompletableFuture<Material>? {
+            return makeOpaqueWithTexture(context,texture)
+        }
+
 
         fun makeOpaqueWithColor(context: Context, map: HashMap<String, *>): CompletableFuture<Material> {
             val materialFuture = Material.builder().setSource(context, R.raw.sceneform_opaque_colored_material).build()

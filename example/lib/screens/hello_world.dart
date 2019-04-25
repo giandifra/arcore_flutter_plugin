@@ -39,7 +39,7 @@ class _HelloWorldState extends State<HelloWorld> {
   void _addSphere(ArCoreController controller) {
     final material = ArCoreMaterial(
       color: Color.fromARGB(120, 66, 134, 244),
-      materialFactory: MaterialFactory.OPAQUE_WITH_COLOR,
+      texture: "earth.jpg"
     );
     final sphere = ArCoreSphere(
       materials: [material],
@@ -56,7 +56,7 @@ class _HelloWorldState extends State<HelloWorld> {
     final material = ArCoreMaterial(
         color: Colors.red,
         reflectance: 1.0,
-        materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR);
+    );
     final cylindre = ArCoreCylinder(
       materials: [material],
       radius: 0.5,
@@ -73,7 +73,6 @@ class _HelloWorldState extends State<HelloWorld> {
     final material = ArCoreMaterial(
       color: Color.fromARGB(120, 66, 134, 244),
       metallic: 1.0,
-      materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR,
     );
     final cube = ArCoreCube(
       materials: [material],

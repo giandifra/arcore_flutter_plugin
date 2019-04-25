@@ -295,13 +295,9 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     }
 
     fun onAddNode(call: MethodCall, result: MethodChannel.Result) {
-        //TODO crea geometry
-//        addNodeToSceneWithGeometry(call, result)
-
         val map = call.arguments as HashMap<String, Any>
         val geometryArguments: HashMap<String, Any> = map["geometry"] as HashMap<String, Any>
 
-        //TODO manca geometry
         val node = Node()
         node.localPosition = parseVector3(map["position"] as HashMap<String, Any>)
 
@@ -319,9 +315,14 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
         val materials = geometryArguments["materials"] as ArrayList<HashMap<String, *>>
 
-        MaterialCustomFactory.make(activity.applicationContext, materials[0])
-                ?.thenAccept { material: Material ->
-                    Log.i(TAG, "makeOpaqueWithColor then Accept")
+        val textureName = materials[0][MaterialCustomFactory.MATERIAL_TEXTURE] as? String
+        val color = materials[0][MaterialCustomFactory.MATERIAL_COLOR] as? ArrayList<Int>
+        if (textureName != null) {
+            Log.i(TAG, "textureName: $textureName")
+            val builder = com.google.ar.sceneform.rendering.Texture.builder();
+            builder.setSource(activity.applicationContext, Uri.parse(textureName))
+            builder.build().thenAccept { texture ->
+                MaterialCustomFactory.makeWithTexture(activity.applicationContext, texture)?.thenAccept { material ->
 
                     node.renderable = getBasicModelRenderable(material, geometryArguments)
                     if (call.argument<String>("parentNodeName") != null) {
@@ -337,32 +338,36 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                     return@exceptionally null
                 }
 
+            }
+
+        } else if (color != null) {
+            MaterialCustomFactory.makeWithColor(activity.applicationContext, materials[0])
+                    ?.thenAccept { material: Material ->
+                        Log.i(TAG, "makeOpaqueWithColor then Accept")
+
+                        node.renderable = getBasicModelRenderable(material, geometryArguments)
+                        if (call.argument<String>("parentNodeName") != null) {
+                            Log.i(TAG, call.argument<String>("parentNodeName"));
+                            val parentNode: Node? = arSceneView?.scene?.findByName(call.argument<String>("parentNodeName") as String)
+                            parentNode?.addChild(node)
+                        } else {
+                            Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
+                            arSceneView?.scene?.addChild(node)
+                        }
+                    }?.exceptionally { throwable ->
+                        Log.e(TAG, "Unable to load Renderable.", throwable);
+                        return@exceptionally null
+                    }
+
+        }
+
+
         Log.i(TAG, "addNodeToSceneWithGeometry: COMPLETE")
         result.success(null)
     }
 
-    fun getMaterialCustomFactory(context: Context, map: HashMap<String, *>): CompletableFuture<Material>? {
-        when (map["materialType"]) {
-            0 -> {
-                return MaterialCustomFactory.makeOpaqueWithColor(context, map)
-            }
-            1 -> {
-                return MaterialCustomFactory.makeTransparentWithColor(context, map)
-            }
-//            2->{
-//                return MaterialCustomFactory.makeOpaqueWithTexture(context, map)
-//            }
-//            3->{
-//                return MaterialCustomFactory.makeTransparentWithTexture(context, map)
-//            }
-            else -> {
-                return MaterialCustomFactory.makeOpaqueWithColor(context, map)
-            }
 
-        }
-    }
-
-    fun getBasicModelRenderable(material: Material, map: HashMap<String, Any>): ModelRenderable? {
+    private fun getBasicModelRenderable(material: Material, map: HashMap<String, Any>): ModelRenderable? {
         val type = map["dartType"] as String
         if (type == "ArCoreSphere") {
             val radius: Float = (map["radius"] as Double).toFloat()
@@ -473,7 +478,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         val materials = call.argument<ArrayList<HashMap<String, *>>>("materials")!!
         val node = arSceneView?.scene?.findByName(name)
         val oldMaterial = node?.renderable?.material?.makeCopy()
-        if(oldMaterial != null){
+        if (oldMaterial != null) {
             val material = MaterialCustomFactory.updateMaterial(oldMaterial, materials[0])
             node.renderable?.material = material
         }
