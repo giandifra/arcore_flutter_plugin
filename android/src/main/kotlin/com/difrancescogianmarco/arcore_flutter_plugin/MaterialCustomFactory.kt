@@ -27,16 +27,19 @@ class MaterialCustomFactory {
         fun makeWithColor(context: Context, map: HashMap<String, *>): CompletableFuture<Material>? {
             if (map[MATERIAL_COLOR] != null) {
                 val color = map[MATERIAL_COLOR] as ArrayList<Int>
-                if(color[0] < 255){
-                    return makeTransparentWithColor(context,map)
+                if (color[0] < 255) {
+                    return makeTransparentWithColor(context, map)
                 }
                 return makeOpaqueWithColor(context, map)
             }
             return null
         }
 
-        fun makeWithTexture(context: Context, texture: Texture): CompletableFuture<Material>? {
-            return makeOpaqueWithTexture(context,texture)
+        fun makeWithTexture(context: Context, texture: Texture, isPng: Boolean): CompletableFuture<Material>? {
+            if (isPng) {
+                return makeTransparentWithTexture(context, texture)
+            }
+            return makeOpaqueWithTexture(context, texture)
         }
 
 

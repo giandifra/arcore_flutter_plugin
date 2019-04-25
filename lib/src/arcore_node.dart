@@ -11,10 +11,10 @@ class ArCoreNode {
   ArCoreNode({
     this.geometry,
 //    this.physicsBody,
+    String name,
     Vector3 position,
     Vector3 scale,
     Vector4 rotation,
-    String name,
   })  : name = name ?? random_string.randomString(),
         position = ValueNotifier(position),
         scale = ValueNotifier(scale),

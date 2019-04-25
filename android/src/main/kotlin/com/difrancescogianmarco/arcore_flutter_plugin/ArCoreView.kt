@@ -3,7 +3,6 @@ package com.difrancescogianmarco.arcore_flutter_plugin
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -27,12 +26,12 @@ import com.google.ar.sceneform.rendering.Material
 import com.google.ar.sceneform.rendering.MaterialFactory
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.ShapeFactory
+import com.google.ar.sceneform.ux.TransformableNode
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
-import java.util.concurrent.CompletableFuture
 
 class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
     val methodChannel: MethodChannel
@@ -297,8 +296,19 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     fun onAddNode(call: MethodCall, result: MethodChannel.Result) {
         val map = call.arguments as HashMap<String, Any>
         val geometryArguments: HashMap<String, Any> = map["geometry"] as HashMap<String, Any>
+        val dartType = map["dartType"] as String
+        lateinit var node: Node
 
-        val node = Node()
+        if (dartType == "ArCoreRotatingNode") {
+            Log.i(TAG, "YESSSSS")
+            val degreesPerSecond = (map["degreesPerSecond"] as Double).toFloat()
+            node = RotatingNode(degreesPerSecond, true, 0.0f)
+
+        } else {
+            node = Node()
+        }
+
+
         node.localPosition = parseVector3(map["position"] as HashMap<String, Any>)
 
         if (map["scale"] != null) {
@@ -306,7 +316,8 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         }
 
         if (map["rotation"] != null) {
-            node.localRotation = parseVector4(map["rotation"] as HashMap<String, Any>)
+            Log.i(TAG, "rotation: ${map["rotation"]}")
+            node.localRotation = parseVector4(map["rotation"] as HashMap<String, Double>)
         }
 
         if (map["name"] != null) {
@@ -314,15 +325,19 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         }
 
         val materials = geometryArguments["materials"] as ArrayList<HashMap<String, *>>
-
         val textureName = materials[0][MaterialCustomFactory.MATERIAL_TEXTURE] as? String
         val color = materials[0][MaterialCustomFactory.MATERIAL_COLOR] as? ArrayList<Int>
         if (textureName != null) {
             Log.i(TAG, "textureName: $textureName")
+
+            val isPng = textureName.endsWith("png")
+            if (textureName.endsWith("png")) {
+                Log.i(TAG, "texture is a png image")
+            }
             val builder = com.google.ar.sceneform.rendering.Texture.builder();
             builder.setSource(activity.applicationContext, Uri.parse(textureName))
             builder.build().thenAccept { texture ->
-                MaterialCustomFactory.makeWithTexture(activity.applicationContext, texture)?.thenAccept { material ->
+                MaterialCustomFactory.makeWithTexture(activity.applicationContext, texture, isPng)?.thenAccept { material ->
 
                     node.renderable = getBasicModelRenderable(material, geometryArguments)
                     if (call.argument<String>("parentNodeName") != null) {
@@ -467,9 +482,22 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     }
 
     fun updateRotation(call: MethodCall, result: MethodChannel.Result) {
+//        Log.i(TAG, "rotating")
+//        Log.i(TAG, call.arguments.toString())
+//        val name = call.argument<String>("name")
+//        val node = arSceneView?.scene?.findByName(name)
+//        node?.localRotation = parseVector4(call.arguments as HashMap<String, Double>)
+//        Log.i(TAG, node?.localRotation.toString())
+
         val name = call.argument<String>("name")
-        val node = arSceneView?.scene?.findByName(name)
-        node?.localRotation = parseVector4(call.arguments as HashMap<String, Any>)
+        val node = arSceneView?.scene?.findByName(name) as RotatingNode
+        Log.i(TAG, "rotating node:  $node")
+        val degreesPerSecond = call.argument<Double?>("degreesPerSecond")
+        Log.i(TAG, "rotating value:  $degreesPerSecond")
+        if (degreesPerSecond != null) {
+            Log.i(TAG, "rotating value:  ${node.degreesPerSecond}")
+            node.degreesPerSecond = degreesPerSecond.toFloat()
+        }
         result.success(null)
     }
 

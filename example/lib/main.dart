@@ -1,6 +1,7 @@
 import 'package:arcore_flutter_plugin_example/screens/custom_object.dart';
 import 'package:arcore_flutter_plugin_example/screens/hello_world.dart';
 import 'package:arcore_flutter_plugin_example/screens/runtime_materials.dart';
+import 'package:arcore_flutter_plugin_example/screens/texture_and_rotation.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(App());
@@ -43,6 +44,13 @@ class HomeScreen extends StatelessWidget {
                   .push(MaterialPageRoute(builder: (context) => RuntimeMaterials()));
             },
             title: Text("Change Materials Property in runtime"),
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => ObjectWithTextureAndRotation()));
+            },
+            title: Text("Custom object with texture and rotation listener "),
           )
         ],
       ),

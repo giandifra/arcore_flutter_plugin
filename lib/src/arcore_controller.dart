@@ -1,5 +1,6 @@
 import 'package:arcore_flutter_plugin/src/arcore_anchor.dart';
 import 'package:arcore_flutter_plugin/src/arcore_plane.dart';
+import 'package:arcore_flutter_plugin/src/arcore_rotating_node.dart';
 import 'package:arcore_flutter_plugin/src/vector_utils.dart';
 import 'package:flutter/services.dart';
 
@@ -90,7 +91,11 @@ class ArCoreController {
 
   void _subsribeToChanges(ArCoreNode node) {
     node.position.addListener(() => _handlePositionChanged(node));
-    node.rotation.addListener(() => _handleRotationChanged(node));
+
+    if (node is ArCoreRotatingNode) {
+      node.degreesPerSecond.addListener(() => _handleRotationChanged(node));
+    }
+
     node.geometry.materials.addListener(() => _updateMaterials(node));
 
 //    if (node.geometry is ArCorePlane) {
@@ -107,9 +112,9 @@ class ArCoreController {
         _getHandlerParams(node, convertVector3ToMap(node.position.value)));
   }
 
-  void _handleRotationChanged(ArCoreNode node) {
+  void _handleRotationChanged(ArCoreRotatingNode node) {
     _channel.invokeMethod<void>('rotationChanged',
-        _getHandlerParams(node, convertVector4ToMap(node.rotation.value)));
+        {'name': node.name, 'degreesPerSecond': node.degreesPerSecond.value});
   }
 
   void _updateMaterials(ArCoreNode node) {

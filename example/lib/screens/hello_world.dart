@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
@@ -28,19 +26,15 @@ class _HelloWorldState extends State<HelloWorld> {
 
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
-    arCoreController.onTap = (name) => onTapHandler(name);
 
     _addSphere(arCoreController);
     _addCylindre(arCoreController);
     _addCube(arCoreController);
   }
 
-
   void _addSphere(ArCoreController controller) {
     final material = ArCoreMaterial(
-      color: Color.fromARGB(120, 66, 134, 244),
-      texture: "earth.jpg"
-    );
+        color: Color.fromARGB(120, 66, 134, 244), texture: "earth.jpg");
     final sphere = ArCoreSphere(
       materials: [material],
       radius: 0.1,
@@ -54,8 +48,8 @@ class _HelloWorldState extends State<HelloWorld> {
 
   void _addCylindre(ArCoreController controller) {
     final material = ArCoreMaterial(
-        color: Colors.red,
-        reflectance: 1.0,
+      color: Colors.red,
+      reflectance: 1.0,
     );
     final cylindre = ArCoreCylinder(
       materials: [material],
@@ -83,10 +77,6 @@ class _HelloWorldState extends State<HelloWorld> {
       position: vector.Vector3(-0.5, 0.5, -3.5),
     );
     controller.add(node);
-  }
-
-  void onTapHandler(String name) {
-    print("Flutter: onTap");
   }
 
   @override
