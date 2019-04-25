@@ -1,5 +1,6 @@
 import 'package:arcore_flutter_plugin_example/screens/custom_object.dart';
 import 'package:arcore_flutter_plugin_example/screens/hello_world.dart';
+import 'package:arcore_flutter_plugin_example/screens/runtime_materials.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(App());
@@ -35,6 +36,13 @@ class HomeScreen extends StatelessWidget {
                   .push(MaterialPageRoute(builder: (context) => CustomObject()));
             },
             title: Text("Custom Anchored Object with onTap"),
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => RuntimeMaterials()));
+            },
+            title: Text("Change Materials Property in runtime"),
           )
         ],
       ),

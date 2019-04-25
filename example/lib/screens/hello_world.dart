@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
@@ -18,8 +20,19 @@ class _HelloWorldState extends State<HelloWorld> {
           title: const Text('Hello World'),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {},
+              icon: Icon(Icons.update),
+              onPressed: () {
+                if(sphereNode == null){
+                  return;
+                }
+                final material = ArCoreMaterial(
+                  color: Colors.accents[Random().nextInt(14)],
+                  metallic: 1.0,
+                  roughness: 1.0,
+                  reflectance: 0.0,
+                );
+                sphereNode.geometry.materials.value = [material];
+              },
             )
           ],
         ),
@@ -40,21 +53,27 @@ class _HelloWorldState extends State<HelloWorld> {
     _addCube(arCoreController);
   }
 
+  ArCoreNode sphereNode;
   void _addSphere(ArCoreController controller) {
-    final material = ArCoreMaterial(color: Colors.yellow);
+    final material = ArCoreMaterial(
+      color: Colors.yellow,
+    );
     final sphere = ArCoreSphere(
       materials: [material],
       radius: 0.1,
     );
-    final node = ArCoreNode(
+    sphereNode = ArCoreNode(
       geometry: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
-    controller.add(node);
+    controller.add(sphereNode);
   }
 
   void _addCylindre(ArCoreController controller) {
-    final material = ArCoreMaterial(color: Colors.red);
+    final material = ArCoreMaterial(
+        color: Colors.red,
+        reflectance: 1.0,
+        materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR);
     final sphere = ArCoreCylinder(
       materials: [material],
       radius: 0.5,
@@ -70,7 +89,7 @@ class _HelloWorldState extends State<HelloWorld> {
   void _addCube(ArCoreController controller) {
     final material = ArCoreMaterial(
       color: Colors.green,
-      materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR,
+      metallic: 1.0,
     );
     final sphere = ArCoreCube(
       materials: [material],

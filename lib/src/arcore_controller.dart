@@ -13,7 +13,7 @@ class ArCoreController {
     int id,
 //      bool showStatistics,
 //      bool autoenablesDefaultLighting,
-      bool enableTapRecognizer,
+    bool enableTapRecognizer,
 //      bool showFeaturePoints,
 //      bool showWorldOrigin,
 //      ARPlaneDetection planeDetection,
@@ -91,15 +91,15 @@ class ArCoreController {
   void _subsribeToChanges(ArCoreNode node) {
     node.position.addListener(() => _handlePositionChanged(node));
     node.rotation.addListener(() => _handleRotationChanged(node));
+    node.geometry.materials.addListener(() => _updateMaterials(node));
 
-//    node.geometry.materials.addListener(() => _updateMaterials(node));
-    if (node.geometry is ArCorePlane) {
-      final ArCorePlane plane = node.geometry;
-      plane.width.addListener(() =>
-          _updateSingleGeometryProperty(node, 'width', plane.width.value));
-      plane.height.addListener(() =>
-          _updateSingleGeometryProperty(node, 'height', plane.height.value));
-    }
+//    if (node.geometry is ArCorePlane) {
+//      final ArCorePlane plane = node.geometry;
+//      plane.width.addListener(() =>
+//          _updateSingleGeometryProperty(node, 'width', plane.width.value));
+//      plane.height.addListener(() =>
+//          _updateSingleGeometryProperty(node, 'height', plane.height.value));
+//    }
   }
 
   void _handlePositionChanged(ArCoreNode node) {
@@ -120,11 +120,15 @@ class ArCoreController {
   void _updateSingleGeometryProperty(
       ArCoreNode node, String propertyName, dynamic value) {
     _channel.invokeMethod<void>(
-        'updateSingleGeometryProperty',
-        _getHandlerParams(node, <String, dynamic>{
+      'updateSingleGeometryProperty',
+      _getHandlerParams(
+        node,
+        <String, dynamic>{
           'propertyName': propertyName,
           'propertyValue': value,
-        }));
+        },
+      ),
+    );
   }
 
   Map<String, dynamic> _getHandlerParams(
