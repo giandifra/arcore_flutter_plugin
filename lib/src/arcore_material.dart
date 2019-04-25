@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:meta/meta.dart';
+
 class ArCoreMaterial {
   final MaterialFactory materialFactory;
   final Color color;
@@ -24,21 +26,23 @@ class ArCoreMaterial {
   /// reflectance. The default value is 0.5.
   final double reflectance; //between 0 and 1
 
-  ArCoreMaterial(
-      {this.metallic,
-      this.roughness,
-      this.reflectance,
-      this.color,
-      this.texture,
-      this.materialFactory = MaterialFactory.OPAQUE_WITH_COLOR});
+  ArCoreMaterial({this.metallic,
+    this.roughness,
+    this.reflectance,
+    this.color,
+    this.texture,
+    this.materialFactory});
 
-  Map<String, dynamic> toMap() => <String, dynamic>{
-        'color': [color.red, color.green, color.blue],
+  Map<String, dynamic> toMap() =>
+      <String, dynamic>{
+        'color': [color.alpha, color.red, color.green, color.blue],
+        'texture': this.texture,
         'metallic': this.metallic,
         'roughness': this.roughness,
         'reflectance': this.reflectance,
         'materialType': materialFactory.index
-      }..removeWhere((String k, dynamic v) => v == null);
+      }
+        ..removeWhere((String k, dynamic v) => v == null);
 }
 
 enum MaterialFactory {

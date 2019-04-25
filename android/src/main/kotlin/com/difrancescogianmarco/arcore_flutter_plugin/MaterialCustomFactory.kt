@@ -23,6 +23,20 @@ class MaterialCustomFactory {
         private val DEFAULT_REFLECTANCE_PROPERTY = 0.5f
         val TAG: String = MaterialCustomFactory::class.java.name
 
+
+        fun make(context: Context, map: HashMap<String, *>): CompletableFuture<Material>? {
+            if (map[MATERIAL_TEXTURE] != null) {
+                return null
+            } else if (map[MATERIAL_COLOR] != null) {
+                val color = map[MATERIAL_COLOR] as ArrayList<Int>
+                if(color[0] < 255){
+                    return makeTransparentWithColor(context,map)
+                }
+                return makeOpaqueWithColor(context, map)
+            }
+            return null
+        }
+
         fun makeOpaqueWithColor(context: Context, map: HashMap<String, *>): CompletableFuture<Material> {
             val materialFuture = Material.builder().setSource(context, R.raw.sceneform_opaque_colored_material).build()
             return materialFuture.thenApply { material ->
@@ -82,7 +96,7 @@ class MaterialCustomFactory {
         }
 
         private fun getColor(rgb: ArrayList<Int>): Color {
-            return Color(android.graphics.Color.argb(255, rgb[0], rgb[1], rgb[2]))
+            return Color(android.graphics.Color.argb(rgb[0], rgb[1], rgb[2], rgb[3]))
         }
 
         private fun applyCustomPbrParams(material: Material, map: HashMap<String, Double>) {

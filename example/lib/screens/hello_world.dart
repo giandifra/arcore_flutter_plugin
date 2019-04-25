@@ -18,27 +18,9 @@ class _HelloWorldState extends State<HelloWorld> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Hello World'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.update),
-              onPressed: () {
-                if(sphereNode == null){
-                  return;
-                }
-                final material = ArCoreMaterial(
-                  color: Colors.accents[Random().nextInt(14)],
-                  metallic: 1.0,
-                  roughness: 1.0,
-                  reflectance: 0.0,
-                );
-                sphereNode.geometry.materials.value = [material];
-              },
-            )
-          ],
         ),
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
-//          enableTapRecognizer: true,
         ),
       ),
     );
@@ -53,20 +35,21 @@ class _HelloWorldState extends State<HelloWorld> {
     _addCube(arCoreController);
   }
 
-  ArCoreNode sphereNode;
+
   void _addSphere(ArCoreController controller) {
     final material = ArCoreMaterial(
-      color: Colors.yellow,
+      color: Color.fromARGB(120, 66, 134, 244),
+      materialFactory: MaterialFactory.OPAQUE_WITH_COLOR,
     );
     final sphere = ArCoreSphere(
       materials: [material],
       radius: 0.1,
     );
-    sphereNode = ArCoreNode(
+    final node = ArCoreNode(
       geometry: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
-    controller.add(sphereNode);
+    controller.add(node);
   }
 
   void _addCylindre(ArCoreController controller) {
@@ -74,13 +57,13 @@ class _HelloWorldState extends State<HelloWorld> {
         color: Colors.red,
         reflectance: 1.0,
         materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR);
-    final sphere = ArCoreCylinder(
+    final cylindre = ArCoreCylinder(
       materials: [material],
       radius: 0.5,
       height: 0.3,
     );
     final node = ArCoreNode(
-      geometry: sphere,
+      geometry: cylindre,
       position: vector.Vector3(0.0, -0.5, -2.0),
     );
     controller.add(node);
@@ -88,15 +71,16 @@ class _HelloWorldState extends State<HelloWorld> {
 
   void _addCube(ArCoreController controller) {
     final material = ArCoreMaterial(
-      color: Colors.green,
+      color: Color.fromARGB(120, 66, 134, 244),
       metallic: 1.0,
+      materialFactory: MaterialFactory.TRANSPARENT_WITH_COLOR,
     );
-    final sphere = ArCoreCube(
+    final cube = ArCoreCube(
       materials: [material],
       size: vector.Vector3(0.5, 0.5, 0.5),
     );
     final node = ArCoreNode(
-      geometry: sphere,
+      geometry: cube,
       position: vector.Vector3(-0.5, 0.5, -3.5),
     );
     controller.add(node);

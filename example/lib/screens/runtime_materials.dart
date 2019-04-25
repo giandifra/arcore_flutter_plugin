@@ -63,6 +63,7 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
   void _addSphere(ArCoreController controller) {
     final material = ArCoreMaterial(
       color: Colors.yellow,
+      materialFactory: MaterialFactory.OPAQUE_WITH_COLOR,
     );
     final sphere = ArCoreSphere(
       materials: [material],
@@ -114,6 +115,7 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
       metallic: metallic,
       roughness: roughness,
       reflectance: reflectance,
+      materialFactory: MaterialFactory.OPAQUE_WITH_COLOR,
     );
     sphereNode.geometry.materials.value = [material];
   }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 class CustomObject extends StatefulWidget {
-
   @override
   _CustomObjectState createState() => _CustomObjectState();
 }
@@ -18,7 +17,6 @@ class _CustomObjectState extends State<CustomObject> {
         appBar: AppBar(
           title: const Text('Custom Object'),
         ),
-
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
           enableTapRecognizer: true,
@@ -29,12 +27,13 @@ class _CustomObjectState extends State<CustomObject> {
 
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
-    arCoreController.onTap = (name)=>onTapHandler(name);
+    arCoreController.onTap = (name) => onTapHandler(name);
   }
 
   void _addSphere(ArCoreController controller) {
     final material = ArCoreMaterial(
-        color: Colors.yellow
+      color: Colors.yellow,
+      materialFactory: MaterialFactory.OPAQUE_WITH_COLOR,
     );
     final sphere = ArCoreSphere(
       materials: [material],

@@ -319,7 +319,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
         val materials = geometryArguments["materials"] as ArrayList<HashMap<String, *>>
 
-        getMaterialCustomFactory(activity.applicationContext, materials[0])
+        MaterialCustomFactory.make(activity.applicationContext, materials[0])
                 ?.thenAccept { material: Material ->
                     Log.i(TAG, "makeOpaqueWithColor then Accept")
 
@@ -356,7 +356,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 //                return MaterialCustomFactory.makeTransparentWithTexture(context, map)
 //            }
             else -> {
-                return null
+                return MaterialCustomFactory.makeOpaqueWithColor(context, map)
             }
 
         }
