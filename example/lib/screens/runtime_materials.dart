@@ -69,7 +69,7 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
       radius: 0.1,
     );
     sphereNode = ArCoreNode(
-      geometry: sphere,
+      shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
     controller.add(sphereNode);
@@ -115,7 +115,7 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
       roughness: roughness,
       reflectance: reflectance,
     );
-    sphereNode.geometry.materials.value = [material];
+    sphereNode.shape.materials.value = [material];
   }
 
   @override

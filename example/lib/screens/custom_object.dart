@@ -39,7 +39,7 @@ class _CustomObjectState extends State<CustomObject> {
       radius: 0.1,
     );
     final node = ArCoreNode(
-      geometry: sphere,
+      shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
     controller.add(node);

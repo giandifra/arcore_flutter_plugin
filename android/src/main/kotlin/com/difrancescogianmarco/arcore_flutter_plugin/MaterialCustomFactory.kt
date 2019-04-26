@@ -3,6 +3,8 @@ package com.difrancescogianmarco.arcore_flutter_plugin
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreMaterial
+import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.google.ar.sceneform.rendering.Color
 import com.google.ar.sceneform.rendering.Material
 import com.google.ar.sceneform.rendering.R
@@ -23,58 +25,55 @@ class MaterialCustomFactory {
         private val DEFAULT_REFLECTANCE_PROPERTY = 0.5f
         val TAG: String = MaterialCustomFactory::class.java.name
 
-
-        fun makeWithColor(context: Context, map: HashMap<String, *>): CompletableFuture<Material>? {
-            if (map[MATERIAL_COLOR] != null) {
-                val color = map[MATERIAL_COLOR] as ArrayList<Int>
-                if (color[0] < 255) {
-                    return makeTransparentWithColor(context, map)
+        fun makeWithColor(context: Context, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material>? {
+            if (flutterArCoreMaterial.argb != null) {
+                if (flutterArCoreMaterial.argb[0] < 255) {
+                    return makeTransparentWithColor(context, flutterArCoreMaterial)
                 }
-                return makeOpaqueWithColor(context, map)
+                return makeOpaqueWithColor(context, flutterArCoreMaterial)
             }
             return null
         }
 
-        fun makeWithTexture(context: Context, texture: Texture, isPng: Boolean): CompletableFuture<Material>? {
+        fun makeWithTexture(context: Context, texture: Texture, isPng: Boolean, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material>? {
             if (isPng) {
-                return makeTransparentWithTexture(context, texture)
+                return makeTransparentWithTexture(context, texture, flutterArCoreMaterial)
             }
-            return makeOpaqueWithTexture(context, texture)
+            return makeOpaqueWithTexture(context, texture, flutterArCoreMaterial)
         }
 
-
-        fun makeOpaqueWithColor(context: Context, map: HashMap<String, *>): CompletableFuture<Material> {
+        fun makeOpaqueWithColor(context: Context, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material> {
             val materialFuture = Material.builder().setSource(context, R.raw.sceneform_opaque_colored_material).build()
             return materialFuture.thenApply { material ->
-                material.setFloat3(MATERIAL_COLOR, getColor(map[MATERIAL_COLOR] as ArrayList<Int>))
-                applyCustomPbrParams(material, map as HashMap<String, Double>)
+                material.setFloat3(MATERIAL_COLOR, Color(flutterArCoreMaterial.color!!))
+                applyCustomPbrParams2(material, flutterArCoreMaterial)
                 material
             }
         }
 
-        fun makeTransparentWithColor(context: Context, map: HashMap<String, *>): CompletableFuture<Material> {
+        fun makeTransparentWithColor(context: Context, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material> {
             val materialFuture = Material.builder().setSource(context, R.raw.sceneform_transparent_colored_material).build()
             return materialFuture.thenApply { material ->
-                material.setFloat4(MATERIAL_COLOR, getColor(map[MATERIAL_COLOR] as ArrayList<Int>))
-                applyCustomPbrParams(material, map as HashMap<String, Double>)
+                material.setFloat4(MATERIAL_COLOR, Color(flutterArCoreMaterial.color!!))
+                applyCustomPbrParams2(material, flutterArCoreMaterial)
                 material
             }
         }
 
-        fun makeOpaqueWithTexture(context: Context, texture: Texture): CompletableFuture<Material> {
+        fun makeOpaqueWithTexture(context: Context, texture: Texture, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material> {
             val materialFuture = Material.builder().setSource(context, R.raw.sceneform_opaque_textured_material).build()
             return materialFuture.thenApply { material ->
                 material.setTexture(MATERIAL_TEXTURE, texture)
-                applyDefaultPbrParams(material)
+                applyCustomPbrParams2(material, flutterArCoreMaterial)
                 material
             }
         }
 
-        fun makeTransparentWithTexture(context: Context, texture: Texture): CompletableFuture<Material> {
+        fun makeTransparentWithTexture(context: Context, texture: Texture, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material> {
             val materialFuture = Material.builder().setSource(context, R.raw.sceneform_transparent_textured_material).build()
             return materialFuture.thenApply { material ->
                 material.setTexture(MATERIAL_TEXTURE, texture)
-                applyDefaultPbrParams(material)
+                applyCustomPbrParams2(material, flutterArCoreMaterial)
                 material
             }
         }
@@ -105,24 +104,14 @@ class MaterialCustomFactory {
             return Color(android.graphics.Color.argb(rgb[0], rgb[1], rgb[2], rgb[3]))
         }
 
-        private fun applyCustomPbrParams(material: Material, map: HashMap<String, Double>) {
+        private fun applyCustomPbrParams2(material: Material, flutterArCoreMaterial: FlutterArCoreMaterial) {
 
-            Log.i(TAG, "MATERIAL_METALLIC: ${map[MATERIAL_METALLIC]}")
-            val metallic = map[MATERIAL_METALLIC]?.toFloat()
-            Log.i(TAG, "MATERIAL_ROUGHNESS: ${map[MATERIAL_ROUGHNESS]}")
-            val roughness = map[MATERIAL_ROUGHNESS]?.toFloat()
-            Log.i(TAG, "MATERIAL_REFLECTANCE: ${map[MATERIAL_REFLECTANCE]}")
-            val reflectance = map[MATERIAL_REFLECTANCE]?.toFloat()
-
-            material.setFloat(MATERIAL_METALLIC, metallic ?: DEFAULT_METALLIC_PROPERTY)
-            material.setFloat(MATERIAL_ROUGHNESS, roughness ?: DEFAULT_ROUGHNESS_PROPERTY)
-            material.setFloat(MATERIAL_REFLECTANCE, reflectance ?: DEFAULT_REFLECTANCE_PROPERTY)
-        }
-
-        private fun applyDefaultPbrParams(material: Material) {
-            material.setFloat("metallic", 0.0f)
-            material.setFloat("roughness", 0.4f)
-            material.setFloat("reflectance", 0.5f)
+            material.setFloat(MATERIAL_METALLIC, flutterArCoreMaterial.metallic
+                    ?: DEFAULT_METALLIC_PROPERTY)
+            material.setFloat(MATERIAL_ROUGHNESS, flutterArCoreMaterial.roughness
+                    ?: DEFAULT_ROUGHNESS_PROPERTY)
+            material.setFloat(MATERIAL_REFLECTANCE, flutterArCoreMaterial.reflectance
+                    ?: DEFAULT_REFLECTANCE_PROPERTY)
         }
     }
 }

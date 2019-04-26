@@ -40,7 +40,7 @@ class _HelloWorldState extends State<HelloWorld> {
       radius: 0.1,
     );
     final node = ArCoreNode(
-      geometry: sphere,
+      shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
     controller.add(node);
@@ -57,7 +57,7 @@ class _HelloWorldState extends State<HelloWorld> {
       height: 0.3,
     );
     final node = ArCoreNode(
-      geometry: cylindre,
+      shape: cylindre,
       position: vector.Vector3(0.0, -0.5, -2.0),
     );
     controller.add(node);
@@ -73,7 +73,7 @@ class _HelloWorldState extends State<HelloWorld> {
       size: vector.Vector3(0.5, 0.5, 0.5),
     );
     final node = ArCoreNode(
-      geometry: cube,
+      shape: cube,
       position: vector.Vector3(-0.5, 0.5, -3.5),
     );
     controller.add(node);

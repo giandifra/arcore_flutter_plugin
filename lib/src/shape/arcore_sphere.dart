@@ -1,8 +1,8 @@
-import 'arcore_geometry.dart';
-import 'arcore_material.dart';
+import 'package:arcore_flutter_plugin/src/arcore_material.dart';
+import 'package:arcore_flutter_plugin/src/shape/arcore_shape.dart';
 
 /// Represents a sphere with controllable radius
-class ArCoreSphere extends ArCoreGeometry {
+class ArCoreSphere extends ArCoreShape {
   ArCoreSphere({
     this.radius = 0.5,
     List<ArCoreMaterial> materials,

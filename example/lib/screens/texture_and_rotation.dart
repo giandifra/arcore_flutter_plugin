@@ -55,7 +55,7 @@ class _ObjectWithTextureAndRotationState
       radius: 0.1,
     );
     node = ArCoreRotatingNode(
-      geometry: sphere,
+      shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
       rotation: vector.Vector4(0, 0, 0, 0),
     );

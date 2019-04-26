@@ -1,4 +1,4 @@
-package com.difrancescogianmarco.arcore_flutter_plugin
+package com.difrancescogianmarco.arcore_flutter_plugin.utils
 
 import android.Manifest
 import android.app.Activity

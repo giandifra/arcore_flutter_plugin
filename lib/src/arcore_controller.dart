@@ -1,43 +1,26 @@
-import 'package:arcore_flutter_plugin/src/arcore_anchor.dart';
-import 'package:arcore_flutter_plugin/src/arcore_plane.dart';
 import 'package:arcore_flutter_plugin/src/arcore_rotating_node.dart';
-import 'package:arcore_flutter_plugin/src/vector_utils.dart';
+import 'package:arcore_flutter_plugin/src/utils/vector_utils.dart';
 import 'package:flutter/services.dart';
 
 import 'arcore_node.dart';
 
 typedef StringResultHandler = void Function(String text);
-//typedef AnchorEventHandler = void Function(ARKitAnchor anchor);
 
 class ArCoreController {
   ArCoreController(
     int id,
-//      bool showStatistics,
-//      bool autoenablesDefaultLighting,
     bool enableTapRecognizer,
-//      bool showFeaturePoints,
-//      bool showWorldOrigin,
-//      ARPlaneDetection planeDetection,
-//      String detectionImagesGroupName,
   ) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
     _channel.setMethodCallHandler(_handleMethodCalls);
     _channel.invokeMethod<void>('init', {
-//      'showStatistics': showStatistics,
-//      'autoenablesDefaultLighting': autoenablesDefaultLighting,
       'enableTapRecognizer': enableTapRecognizer,
-//      'planeDetection': planeDetection.index,
-//      'showFeaturePoints': showFeaturePoints,
-//      'showWorldOrigin': showWorldOrigin,
-//      'detectionImagesGroupName': detectionImagesGroupName,
     });
   }
 
   MethodChannel _channel;
   StringResultHandler onError;
   StringResultHandler onTap;
-
-//  Matrix4ResultHandler onPlaneTap;
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
     print('_platformCallHandler call ${call.method} ${call.arguments}');
@@ -52,23 +35,6 @@ class ArCoreController {
           onTap(call.arguments);
         }
         break;
-//      case 'onPlaneTap':
-//        if (onPlaneTap != null) {
-//          onPlaneTap(getMatrixFromString(call.arguments));
-//        }
-//        break;
-//      case 'didAddNodeForAnchor':
-//        if (onAddNodeForAnchor != null) {
-//          final anchor = _buildAnchor(call.arguments);
-//          onAddNodeForAnchor(anchor);
-//        }
-//        break;
-//      case 'didUpdateNodeForAnchor':
-//        if (onUpdateNodeForAnchor != null) {
-//          final anchor = _buildAnchor(call.arguments);
-//          onUpdateNodeForAnchor(anchor);
-//        }
-//        break;
       default:
         print('Unknowm method ${call.method} ');
     }
@@ -96,15 +62,8 @@ class ArCoreController {
       node.degreesPerSecond.addListener(() => _handleRotationChanged(node));
     }
 
-    node.geometry.materials.addListener(() => _updateMaterials(node));
+    node.shape.materials.addListener(() => _updateMaterials(node));
 
-//    if (node.geometry is ArCorePlane) {
-//      final ArCorePlane plane = node.geometry;
-//      plane.width.addListener(() =>
-//          _updateSingleGeometryProperty(node, 'width', plane.width.value));
-//      plane.height.addListener(() =>
-//          _updateSingleGeometryProperty(node, 'height', plane.height.value));
-//    }
   }
 
   void _handlePositionChanged(ArCoreNode node) {
@@ -119,7 +78,7 @@ class ArCoreController {
 
   void _updateMaterials(ArCoreNode node) {
     _channel.invokeMethod<void>(
-        'updateMaterials', _getHandlerParams(node, node.geometry.toMap()));
+        'updateMaterials', _getHandlerParams(node, node.shape.toMap()));
   }
 
   void _updateSingleGeometryProperty(
@@ -141,18 +100,6 @@ class ArCoreController {
     final Map<String, dynamic> values = <String, dynamic>{'name': node.name}
       ..addAll(params);
     return values;
-  }
-
-  ArCoreAnchor _buildAnchor(Map arguments) {
-    final type = arguments['anchorType'].toString();
-    final map = arguments.cast<String, String>();
-    switch (type) {
-      case 'planeAnchor':
-        return ArCorePlaneAnchor.fromMap(map);
-      case 'imageAnchor':
-        return ArCoreImageAnchor.fromMap(map);
-    }
-    return ArCoreAnchor.fromMap(map);
   }
 
   void dispose() {

@@ -3,8 +3,8 @@ import 'package:arcore_flutter_plugin/src/arcore_material.dart';
 import 'package:flutter/widgets.dart';
 
 /// ARKitGeometry is an abstract class that represents the geometry that can be attached to a SCNNode.
-abstract class ArCoreGeometry {
-  ArCoreGeometry({@required List<ArCoreMaterial> materials})
+abstract class ArCoreShape {
+  ArCoreShape({@required List<ArCoreMaterial> materials})
       : materials = ValueNotifier(materials);
 
   /// Specifies the receiver's materials array.
