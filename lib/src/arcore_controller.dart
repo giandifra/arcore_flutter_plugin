@@ -44,7 +44,7 @@ class ArCoreController {
   Future<void> add(ArCoreNode node, {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
-    _subsribeToChanges(node);
+    _addListeners(node);
     return _channel.invokeMethod('addArCoreNode', params);
   }
 
@@ -55,15 +55,13 @@ class ArCoreController {
     return geometryMap;
   }
 
-  void _subsribeToChanges(ArCoreNode node) {
+  void _addListeners(ArCoreNode node) {
     node.position.addListener(() => _handlePositionChanged(node));
+    node.shape.materials.addListener(() => _updateMaterials(node));
 
     if (node is ArCoreRotatingNode) {
       node.degreesPerSecond.addListener(() => _handleRotationChanged(node));
     }
-
-    node.shape.materials.addListener(() => _updateMaterials(node));
-
   }
 
   void _handlePositionChanged(ArCoreNode node) {
@@ -79,20 +77,6 @@ class ArCoreController {
   void _updateMaterials(ArCoreNode node) {
     _channel.invokeMethod<void>(
         'updateMaterials', _getHandlerParams(node, node.shape.toMap()));
-  }
-
-  void _updateSingleGeometryProperty(
-      ArCoreNode node, String propertyName, dynamic value) {
-    _channel.invokeMethod<void>(
-      'updateSingleGeometryProperty',
-      _getHandlerParams(
-        node,
-        <String, dynamic>{
-          'propertyName': propertyName,
-          'propertyValue': value,
-        },
-      ),
-    );
   }
 
   Map<String, dynamic> _getHandlerParams(

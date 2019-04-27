@@ -8,8 +8,6 @@ typedef void ArCoreViewCreatedCallback(ArCoreController controller);
 class ArCoreView extends StatefulWidget {
   final ArCoreViewCreatedCallback onArCoreViewCreated;
 
-  /// Determines whether the receiver should recognize taps.
-  /// The default is false.
   final bool enableTapRecognizer;
 
   const ArCoreView({

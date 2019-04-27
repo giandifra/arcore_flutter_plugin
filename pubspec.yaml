@@ -1,8 +1,8 @@
 name: arcore_flutter_plugin
-description: A new Flutter plugin.
+description: Flutter plugin for ARCore SDK, Android platform to build new augmented reality experiences
 version: 0.0.1
-author:
-homepage:
+author: Gian Marco Di Francesco <difrancescogianmarco@gmail.com>
+homepage: https://github.com/giandifra/arcore_flutter_plugin
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
