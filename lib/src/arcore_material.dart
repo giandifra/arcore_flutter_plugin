@@ -23,20 +23,19 @@ class ArCoreMaterial {
   /// reflectance. The default value is 0.5.
   final double reflectance;
 
-  ArCoreMaterial({this.metallic,
+  ArCoreMaterial({
+    this.metallic,
     this.roughness,
     this.reflectance,
     this.color,
     this.texture,
   });
 
-  Map<String, dynamic> toMap() =>
-      <String, dynamic>{
+  Map<String, dynamic> toMap() => <String, dynamic>{
         'color': [color.alpha, color.red, color.green, color.blue],
         'texture': this.texture,
         'metallic': this.metallic,
         'roughness': this.roughness,
         'reflectance': this.reflectance,
-      }
-        ..removeWhere((String k, dynamic v) => v == null);
+      }..removeWhere((String k, dynamic v) => v == null);
 }

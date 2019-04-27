@@ -9,13 +9,13 @@ class ArCoreCube extends ArCoreShape {
     this.size,
     List<ArCoreMaterial> materials,
   }) : super(
-    materials: materials,
-  );
+          materials: materials,
+        );
 
   final Vector3 size;
 
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{
-    'size': convertVector3ToMap(this.size),
-  }..addAll(super.toMap());
+        'size': convertVector3ToMap(this.size),
+      }..addAll(super.toMap());
 }

@@ -6,4 +6,3 @@ export 'package:arcore_flutter_plugin/src/shape/arcore_cube.dart';
 export 'package:arcore_flutter_plugin/src/arcore_node.dart';
 export 'package:arcore_flutter_plugin/src/arcore_material.dart';
 export 'package:arcore_flutter_plugin/src/arcore_rotating_node.dart';
-

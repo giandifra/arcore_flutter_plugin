@@ -1,7 +1,8 @@
 import 'package:arcore_flutter_plugin/src/utils/vector_utils.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vector_math/vector_math_64.dart';
-import 'package:arcore_flutter_plugin/src/utils/random_string.dart' as random_string;
+import 'package:arcore_flutter_plugin/src/utils/random_string.dart'
+    as random_string;
 import 'package:arcore_flutter_plugin/src/shape/arcore_shape.dart';
 
 class ArCoreNode {
