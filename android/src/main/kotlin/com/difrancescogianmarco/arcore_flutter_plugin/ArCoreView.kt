@@ -18,10 +18,7 @@ import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
-import com.google.ar.sceneform.AnchorNode
-import com.google.ar.sceneform.ArSceneView
-import com.google.ar.sceneform.HitTestResult
-import com.google.ar.sceneform.Node
+import com.google.ar.sceneform.*
 import com.google.ar.sceneform.rendering.ModelRenderable
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.BinaryMessenger
@@ -38,6 +35,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     private var arSceneView: ArSceneView?
     val gestureDetector: GestureDetector
     private val RC_PERMISSIONS = 0x123
+    private lateinit var sceneUpdateListener: Scene.OnUpdateListener
 
     init {
         this.activity = (context.applicationContext as FlutterApplication).currentActivity
@@ -57,24 +55,23 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                         return true
                     }
                 })
+        sceneUpdateListener = Scene.OnUpdateListener { frameTime ->
 
+            val frame = arSceneView?.arFrame ?: return@OnUpdateListener
+
+            if (frame.camera.trackingState != TrackingState.TRACKING) {
+                return@OnUpdateListener
+            }
+
+            for (plane in frame.getUpdatedTrackables(Plane::class.java)) {
+                if (plane.trackingState == TrackingState.TRACKING) {
+                    //TODO il piano è stato rilevato
+                }
+            }
+        }
         // Set an update listener on the Scene that will hide the loading message once a Plane is
         // detected.
-        arSceneView?.scene
-                ?.addOnUpdateListener { frameTime ->
-
-                    val frame = arSceneView?.arFrame ?: return@addOnUpdateListener
-
-                    if (frame.camera.trackingState != TrackingState.TRACKING) {
-                        return@addOnUpdateListener
-                    }
-
-                    for (plane in frame.getUpdatedTrackables(Plane::class.java)) {
-                        if (plane.trackingState == TrackingState.TRACKING) {
-                            //TODO il piano è stato rilevato
-                        }
-                    }
-                }
+        arSceneView?.scene?.addOnUpdateListener(sceneUpdateListener)
 
         // Lastly request CAMERA permission which is required by ARCore.
         ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
@@ -133,7 +130,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
             }
             "positionChanged" -> {
                 Log.i(TAG, " positionChanged")
-                updatePosition(call, result)
+//                updatePosition(call, result)
 
             }
             "rotationChanged" -> {
@@ -145,6 +142,10 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 Log.i(TAG, " updateMaterials")
                 updateMaterials(call, result)
 
+            }
+            "dispose" -> {
+                Log.i(TAG, " updateMaterials")
+                dispose()
             }
             else -> {
             }
@@ -261,7 +262,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     fun onAddNode(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result, map: HashMap<String, *>) {
 
         Log.i(TAG, flutterArCoreNode.toString())
-//        val node = flutterArCoreNode.buildNode()
         NodeFactory.makeNode(activity.applicationContext, flutterArCoreNode) { node, throwable ->
 
             if (flutterArCoreNode.parentNodeName != null) {
@@ -284,13 +284,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     }
 
     fun updateRotation(call: MethodCall, result: MethodChannel.Result) {
-//        Log.i(TAG, "rotating")
-//        Log.i(TAG, call.arguments.toString())
-//        val name = call.argument<String>("name")
-//        val node = arSceneView?.scene?.findByName(name)
-//        node?.localRotation = parseVector4(call.arguments as HashMap<String, Double>)
-//        Log.i(TAG, node?.localRotation.toString())
-
         val name = call.argument<String>("name")
         val node = arSceneView?.scene?.findByName(name) as RotatingNode
         Log.i(TAG, "rotating node:  $node")
@@ -321,7 +314,8 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     override fun dispose() {
         if (arSceneView != null) {
-            arSceneView?.destroy()
+            onPause()
+            onDestroy()
         }
     }
 
@@ -333,7 +327,9 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     fun onDestroy() {
         if (arSceneView != null) {
+            arSceneView?.scene?.removeOnUpdateListener(sceneUpdateListener)
             arSceneView?.destroy()
+            arSceneView = null
         }
     }
 }

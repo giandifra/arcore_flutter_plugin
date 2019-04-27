@@ -15,7 +15,7 @@ class _CustomObjectState extends State<CustomObject> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Custom Object'),
+          title: const Text('Custom Object on plane detected'),
         ),
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
