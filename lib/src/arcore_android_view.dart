@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 typedef PlatformViewCreatedCallback = void Function(int id);
 

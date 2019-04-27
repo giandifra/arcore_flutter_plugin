@@ -1,7 +1,5 @@
 import 'dart:ui';
 
-import 'package:meta/meta.dart';
-
 class ArCoreMaterial {
   final Color color;
   final String texture;
