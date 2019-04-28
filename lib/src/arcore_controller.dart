@@ -72,6 +72,7 @@ class ArCoreController {
   Future<void> addArCoreNode(ArCoreNode node, {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
+    print(params.toString());
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNode', params);
   }
@@ -80,6 +81,7 @@ class ArCoreController {
       {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
+    print(params.toString());
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNodeWithAnchor', params);
   }

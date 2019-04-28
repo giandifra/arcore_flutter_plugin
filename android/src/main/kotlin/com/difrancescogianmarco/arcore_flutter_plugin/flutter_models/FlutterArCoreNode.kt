@@ -18,7 +18,14 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
     val rotation: Quaternion = parseQuaternion(map["rotation"] as? HashMap<String, Double>)
             ?: Quaternion()
     val degreesPerSecond: Float? = getDegreesPerSecond((map["degreesPerSecond"] as? Double))
-    val parentNodeName: String? = map["parentNodeName"] as? String
+    var parentNodeName: String? = map["parentNodeName"] as? String
+
+    val children : ArrayList<FlutterArCoreNode> = getChildrenFromMap(map["children"] as ArrayList<HashMap<String, *>>)
+
+
+    private fun getChildrenFromMap(list: ArrayList<HashMap<String, *>>): ArrayList<FlutterArCoreNode> {
+        return ArrayList(list.map { map -> FlutterArCoreNode(map) })
+    }
 
 
     fun buildNode(): Node {
@@ -62,7 +69,7 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
     }
 
     override fun toString(): String {
-        return "dartType: $dartType\nname: $name\nshape: ${shape.toString()}\nposition: $position\nscale: $scale\nrotation: $rotation"
+        return "dartType: $dartType\nname: $name\nshape: ${shape.toString()}\nposition: $position\nscale: $scale\nrotation: $rotation\nparentNodeName: $parentNodeName"
     }
 
 }

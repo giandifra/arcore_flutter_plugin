@@ -300,40 +300,60 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         RenderableCustomFactory.makeRenderable(activity.applicationContext, flutterArCoreNode) { renderable, t ->
             if (renderable != null) {
                 val myAnchor = arSceneView?.session?.createAnchor(Pose(flutterArCoreNode.getPosition(), flutterArCoreNode.getRotation()))
-                val anchorNode = AnchorNode(myAnchor)
-                anchorNode.name = flutterArCoreNode.name
-                anchorNode.renderable = renderable
+                if (myAnchor != null) {
+                    val anchorNode = AnchorNode(myAnchor)
+                    anchorNode.name = flutterArCoreNode.name
+                    anchorNode.renderable = renderable
 
-                Log.i(TAG, "inserted ${anchorNode.name}")
-                if (flutterArCoreNode.parentNodeName != null) {
-                    Log.i(TAG, flutterArCoreNode.parentNodeName);
-                    val parentNode: Node? = arSceneView?.scene?.findByName(flutterArCoreNode.parentNodeName)
-                    parentNode?.addChild(anchorNode)
-                } else {
-                    Log.i(TAG, "addNodeWithAnchor: NOT PARENT_NODE_NAME")
-                    arSceneView?.scene?.addChild(anchorNode)
+                    Log.i(TAG, "inserted ${anchorNode.name}")
+                    attachNodeToParent(anchorNode, flutterArCoreNode.parentNodeName)
+
+                    for (node in flutterArCoreNode.children) {
+                        node.parentNodeName = flutterArCoreNode.name
+                        onAddNode(node, null)
+                    }
                 }
-
             }
         }
         result.success(null)
     }
 
-    fun onAddNode(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result) {
+    fun onAddNode(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result?) {
 
         Log.i(TAG, flutterArCoreNode.toString())
         NodeFactory.makeNode(activity.applicationContext, flutterArCoreNode) { node, throwable ->
 
-            if (flutterArCoreNode.parentNodeName != null) {
+            Log.i(TAG, "inserted ${node?.name}")
+
+/*            if (flutterArCoreNode.parentNodeName != null) {
                 Log.i(TAG, flutterArCoreNode.parentNodeName);
                 val parentNode: Node? = arSceneView?.scene?.findByName(flutterArCoreNode.parentNodeName)
                 parentNode?.addChild(node)
             } else {
                 Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
                 arSceneView?.scene?.addChild(node)
+            }*/
+            if (node != null) {
+                attachNodeToParent(node, flutterArCoreNode.parentNodeName)
+                for (n in flutterArCoreNode.children) {
+                    n.parentNodeName = flutterArCoreNode.name
+                    onAddNode(n, null)
+                }
             }
+
         }
-        result.success(null)
+        result?.success(null)
+    }
+
+    fun attachNodeToParent(node: Node?, parentNodeName: String?) {
+        if (parentNodeName != null) {
+            Log.i(TAG, parentNodeName);
+            val parentNode: Node? = arSceneView?.scene?.findByName(parentNodeName)
+            parentNode?.addChild(node)
+        } else {
+            Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
+            arSceneView?.scene?.addChild(node)
+        }
     }
 
     fun removeNode(name: String, result: MethodChannel.Result) {

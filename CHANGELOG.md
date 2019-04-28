@@ -1,3 +1,7 @@
+## 0.0.2+1
+
+* Now you can define children property for node (see example custom_object.dart) 
+
 ## 0.0.2
 
 * Add onPlaneDetect handler

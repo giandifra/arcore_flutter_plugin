@@ -12,10 +12,13 @@ class ArCoreNode {
     Vector3 position,
     Vector3 scale,
     Vector4 rotation,
+    this.children = const [],
   })  : name = name ?? random_string.randomString(),
         position = ValueNotifier(position),
         scale = ValueNotifier(scale),
         rotation = ValueNotifier(rotation);
+
+  final List<ArCoreNode> children;
 
   final ArCoreShape shape;
 
@@ -34,5 +37,7 @@ class ArCoreNode {
         'scale': convertVector3ToMap(scale.value),
         'rotation': convertVector4ToMap(rotation.value),
         'name': name,
+        'children':
+            this.children.map((arCoreNode) => arCoreNode.toMap()).toList(),
       }..removeWhere((String k, dynamic v) => v == null);
 }

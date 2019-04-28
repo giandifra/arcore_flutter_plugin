@@ -31,23 +31,38 @@ class _CustomObjectState extends State<CustomObject> {
     arCoreController.onPlaneTap = _handleOnPlaneTap;
   }
 
-  void _addSphere(ArCoreController controller, ArCoreHitTestResult plane) {
+  void _addSphere(ArCoreHitTestResult plane) {
+    final m2 = ArCoreMaterial(color: Colors.grey);
+    final s2 = ArCoreSphere(
+      materials: [m2],
+      radius: 0.03,
+    );
+    final moon = ArCoreNode(
+      name: "moon",
+      shape: s2,
+      position: vector.Vector3(0.2, 0, 0),
+      rotation: vector.Vector4(0, 0, 0, 0),
+    );
+
     final material = ArCoreMaterial(
         color: Color.fromARGB(120, 66, 134, 244), texture: "earth.jpg");
     final sphere = ArCoreSphere(
       materials: [material],
       radius: 0.1,
     );
-    final node = ArCoreNode(
+    final earth = ArCoreNode(
+        name: "earht",
         shape: sphere,
+        children: [moon],
         position: plane.pose.translation + vector.Vector3(0.0, 1.0, 0.0),
         rotation: plane.pose.rotation);
-    controller.addArCoreNodeWithAnchor(node);
+
+    arCoreController.addArCoreNodeWithAnchor(earth);
   }
 
   void _handleOnPlaneTap(List<ArCoreHitTestResult> hits) {
     final hit = hits.first;
-    _addSphere(arCoreController, hit);
+    _addSphere(hit);
   }
 
   void onTapHandler(String name) {
