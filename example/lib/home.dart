@@ -3,6 +3,7 @@ import 'screens/hello_world.dart';
 import 'screens/custom_object.dart';
 import 'screens/runtime_materials.dart';
 import 'screens/texture_and_rotation.dart';
+import 'screens/auto_detect_plane.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -40,6 +41,13 @@ class HomeScreen extends StatelessWidget {
                   builder: (context) => ObjectWithTextureAndRotation()));
             },
             title: Text("Custom object with texture and rotation listener "),
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => AutoDetectPlane()));
+            },
+            title: Text("Plane detect handler"),
           ),
         ],
       ),
