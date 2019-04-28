@@ -1,3 +1,9 @@
+## 0.0.2
+
+* Add onPlaneDetect handler
+* Add onPlaneTap handler
+* Split addNode in addArCoreNode and addArCodeNodeWithAnchor (for detected plane)
+
 ## 0.0.1
 
 * Add ArCoreNode

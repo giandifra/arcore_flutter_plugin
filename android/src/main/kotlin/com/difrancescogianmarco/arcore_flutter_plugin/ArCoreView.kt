@@ -11,7 +11,6 @@ import android.view.MotionEvent
 import android.view.View
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreHitTestResult
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
-import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePlane
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
@@ -120,8 +119,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 Log.i(TAG, "onActivityDestroyed")
                 onDestroy()
             }
-
-
         }
 
         (context.getApplicationContext() as FlutterApplication).currentActivity.application
@@ -177,7 +174,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         if (arSceneView == null) {
             return
         }
-
         // request camera permission if not already requested
         if (!ArCoreUtils.hasCameraPermission(activity)) {
             ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
@@ -229,34 +225,12 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                         val distance: Float = hit.distance
                         val translation = hit.hitPose.translation
                         val rotation = hit.hitPose.rotationQuaternion
-
-                        Log.i(TAG, "distance: $distance")
-
-                        for (r in rotation) {
-                            Log.i(TAG, "rotation: $r");
-                        }
-                        for (t in translation) {
-                            Log.i(TAG, "translation: $t");
-                        }
-                        for (x in hit.hitPose.xAxis) {
-                            Log.i(TAG, "x: $x");
-                        }
-
-                        for (y in hit.hitPose.yAxis) {
-                            Log.i(TAG, "y: $y");
-                        }
-
-                        for (z in hit.hitPose.zAxis) {
-                            Log.i(TAG, "z: $z");
-                        }
-
                         val flutterArCoreHitTestResult = FlutterArCoreHitTestResult(distance, translation, rotation)
                         val arguments = flutterArCoreHitTestResult.toHashMap()
                         list.add(arguments)
                     }
                 }
                 methodChannel.invokeMethod("onPlaneTap", list)
-
             }
         }
     }
@@ -330,7 +304,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 anchorNode.name = flutterArCoreNode.name
                 anchorNode.renderable = renderable
 
-                Log.i(TAG,"inserted ${anchorNode.name}")
+                Log.i(TAG, "inserted ${anchorNode.name}")
                 if (flutterArCoreNode.parentNodeName != null) {
                     Log.i(TAG, flutterArCoreNode.parentNodeName);
                     val parentNode: Node? = arSceneView?.scene?.findByName(flutterArCoreNode.parentNodeName)
@@ -366,7 +340,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         val node = arSceneView?.scene?.findByName(name)
         if (node != null) {
             arSceneView?.scene?.removeChild(node);
-            Log.i(TAG,"removed ${node.name}")
+            Log.i(TAG, "removed ${node.name}")
         }
 
         result.success(null)
