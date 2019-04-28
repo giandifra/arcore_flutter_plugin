@@ -21,7 +21,6 @@ class _AutoDetectPlaneState extends State<AutoDetectPlane> {
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
           enableUpdateListener: true,
-
         ),
       ),
     );

@@ -44,8 +44,8 @@ class HomeScreen extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => AutoDetectPlane()));
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => AutoDetectPlane()));
             },
             title: Text("Plane detect handler"),
           ),

@@ -1,9 +1,7 @@
-
 import 'package:vector_math/vector_math_64.dart';
 import 'arcore_pose.dart';
 
 class ArCoreHitTestResult {
-
   double distance;
 
   Vector3 translation;
