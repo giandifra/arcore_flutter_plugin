@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                   builder: (context) => ObjectWithTextureAndRotation()));
             },
             title: Text("Custom object with texture and rotation listener "),
-          )
+          ),
         ],
       ),
     );

@@ -9,12 +9,14 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreHitTestResult
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
+import com.google.ar.core.Pose
 import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
@@ -26,6 +28,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
+
 class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
     val methodChannel: MethodChannel
     val activity: Activity
@@ -35,7 +38,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     private var arSceneView: ArSceneView?
     val gestureDetector: GestureDetector
     private val RC_PERMISSIONS = 0x123
-    private lateinit var sceneUpdateListener: Scene.OnUpdateListener
+    private var sceneUpdateListener: Scene.OnUpdateListener
 
     init {
         this.activity = (context.applicationContext as FlutterApplication).currentActivity
@@ -65,13 +68,10 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
             for (plane in frame.getUpdatedTrackables(Plane::class.java)) {
                 if (plane.trackingState == TrackingState.TRACKING) {
-                    //TODO il piano è stato rilevato
+
                 }
             }
         }
-        // Set an update listener on the Scene that will hide the loading message once a Plane is
-        // detected.
-        arSceneView?.scene?.addOnUpdateListener(sceneUpdateListener)
 
         // Lastly request CAMERA permission which is required by ARCore.
         ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
@@ -126,11 +126,16 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 Log.i(TAG, " addArCoreNode")
                 val map = call.arguments as HashMap<String, Any>
                 val flutterNode = FlutterArCoreNode(map);
-                onAddNode(flutterNode, result, map)
+                onAddNode(flutterNode, result)
+            }
+            "addArCoreNodeWithAnchor" -> {
+                Log.i(TAG, " addArCoreNode")
+                val map = call.arguments as HashMap<String, Any>
+                val flutterNode = FlutterArCoreNode(map);
+                addNodeWithAnchor(flutterNode, result)
             }
             "positionChanged" -> {
                 Log.i(TAG, " positionChanged")
-//                updatePosition(call, result)
 
             }
             "rotationChanged" -> {
@@ -193,6 +198,83 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         }
     }
 
+    private fun onSingleTap(tap: MotionEvent?) {
+
+        Log.i(TAG, " onSingleTap")
+        val frame = arSceneView?.arFrame
+        if (frame != null) {
+            if (tap != null && frame.camera.trackingState == TrackingState.TRACKING) {
+                val hitList = frame.hitTest(tap)
+                val list = ArrayList<HashMap<String, Any>>()
+                for (hit in hitList) {
+                    val trackable = hit.trackable
+                    if (trackable is Plane && trackable.isPoseInPolygon(hit.hitPose)) {
+                        hit.hitPose
+                        val distance: Float = hit.distance
+                        val translation = hit.hitPose.translation
+                        val rotation = hit.hitPose.rotationQuaternion
+
+                        Log.i(TAG, "distance: $distance")
+
+                        for (r in rotation) {
+                            Log.i(TAG, "rotation: $r");
+                        }
+                        for (t in translation) {
+                            Log.i(TAG, "translation: $t");
+                        }
+                        for (x in hit.hitPose.xAxis) {
+                            Log.i(TAG, "x: $x");
+                        }
+
+                        for (y in hit.hitPose.yAxis) {
+                            Log.i(TAG, "y: $y");
+                        }
+
+                        for (z in hit.hitPose.zAxis) {
+                            Log.i(TAG, "z: $z");
+                        }
+
+                        val flutterArCoreHitTestResult = FlutterArCoreHitTestResult(distance, translation, rotation)
+                        val arguments = flutterArCoreHitTestResult.toHashMap()
+                        list.add(arguments)
+                    }
+                }
+                methodChannel.invokeMethod("onPlaneTap", list)
+
+            }
+        }
+    }
+
+    private fun arScenViewInit(call: MethodCall, result: MethodChannel.Result) {
+        Log.i(TAG, "arScenViewInit")
+        onResume() //TODO delete?
+        val enableTapRecognizer: Boolean? = call.argument("enableTapRecognizer")
+        if (enableTapRecognizer != null && enableTapRecognizer) {
+            arSceneView
+                    ?.scene
+                    ?.setOnTouchListener { hitTestResult: HitTestResult, event: MotionEvent? ->
+
+                        if (hitTestResult.node != null) {
+                            Log.i(TAG, " onNodeTap " + hitTestResult.node?.name)
+                            Log.i(TAG, hitTestResult.node?.localPosition.toString())
+                            Log.i(TAG, hitTestResult.node?.worldPosition.toString())
+
+                            methodChannel.invokeMethod("onNodeTap", hitTestResult.node?.name)
+                            return@setOnTouchListener true
+                        }
+                        return@setOnTouchListener gestureDetector.onTouchEvent(event)
+                    }
+        }
+        val enableUpdateListener: Boolean? = call.argument("enableUpdateListener")
+        if (enableUpdateListener != null && enableUpdateListener) {
+            // Set an update listener on the Scene that will hide the loading message once a Plane is
+            // detected.
+            arSceneView?.scene?.addOnUpdateListener(sceneUpdateListener)
+        }
+
+        result.success(null)
+    }
+
     private fun tryPlaceNode(tap: MotionEvent?, frame: Frame) {
         if (tap != null && frame.camera.trackingState == TrackingState.TRACKING) {
             for (hit in frame.hitTest(tap)) {
@@ -219,47 +301,34 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     }
 
-    private fun onSingleTap(tap: MotionEvent) {
-//        if (!hasFinishedLoading) {
-//            // We can't do anything yet.
-//            return
-//        }
-        Log.i(TAG, " onSingleTap")
-        val frame = arSceneView?.arFrame
-        if (frame != null) {
-            tryPlaceNode(tap, frame)
-        }
-    }
+    fun addNodeWithAnchor(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result) {
 
-    private fun arScenViewInit(call: MethodCall, result: MethodChannel.Result) {
-        Log.i(TAG, "arScenViewInit")
-        onResume() //TODO delete?
-        val enableTapRecognizer: Boolean? = call.argument("enableTapRecognizer")
-        if (enableTapRecognizer != null && enableTapRecognizer) {
-            arSceneView
-                    ?.scene
-                    ?.setOnTouchListener { hitTestResult: HitTestResult, event: MotionEvent ->
-
-                        if (hitTestResult.node != null) {
-                            Log.i(TAG, " onTap " + hitTestResult.node?.name)
-                            methodChannel.invokeMethod("onTap", hitTestResult.node?.name)
-                            return@setOnTouchListener true
-                        }
-
-                        //TODO se l'oggetto non è stato inserito
-                        if (true) {
-                            return@setOnTouchListener gestureDetector.onTouchEvent(event)
-                        }
-
-                        // Otherwise return false so that the touch event can propagate to the scene.
-                        false
-                    }
+        if (arSceneView == null) {
+            return
         }
 
+        RenderableCustomFactory.makeRenderable(activity.applicationContext, flutterArCoreNode) { renderable, t ->
+            if (renderable != null) {
+                val myAnchor = arSceneView?.session?.createAnchor(Pose(flutterArCoreNode.getPosition(), flutterArCoreNode.getRotation()))
+                val anchorNode = AnchorNode(myAnchor)
+                anchorNode.name = flutterArCoreNode.name
+                anchorNode.renderable = renderable
+
+                if (flutterArCoreNode.parentNodeName != null) {
+                    Log.i(TAG, flutterArCoreNode.parentNodeName);
+                    val parentNode: Node? = arSceneView?.scene?.findByName(flutterArCoreNode.parentNodeName)
+                    parentNode?.addChild(anchorNode)
+                } else {
+                    Log.i(TAG, "addNodeWithAnchor: NOT PARENT_NODE_NAME")
+                    arSceneView?.scene?.addChild(anchorNode)
+                }
+
+            }
+        }
         result.success(null)
     }
 
-    fun onAddNode(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result, map: HashMap<String, *>) {
+    fun onAddNode(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result) {
 
         Log.i(TAG, flutterArCoreNode.toString())
         NodeFactory.makeNode(activity.applicationContext, flutterArCoreNode) { node, throwable ->

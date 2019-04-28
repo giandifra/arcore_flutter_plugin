@@ -3,6 +3,8 @@ package com.difrancescogianmarco.arcore_flutter_plugin.flutter_models
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseQuaternion
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
+import com.google.ar.core.Anchor
+import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
@@ -13,11 +15,12 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
     val name: String = map["name"] as String
     val shape: FlutterArCoreShape? = getShape(map["shape"] as? HashMap<String, *>)
     val position: Vector3 = parseVector3(map["position"] as? HashMap<String, *>) ?: Vector3()
-    val scale: Vector3 = parseVector3(map["scale"] as? HashMap<String, *>) ?: Vector3(1.0F, 1.0F, 1.0F)
+    val scale: Vector3 = parseVector3(map["scale"] as? HashMap<String, *>)
+            ?: Vector3(1.0F, 1.0F, 1.0F)
     val rotation: Quaternion = parseQuaternion(map["rotation"] as? HashMap<String, Double>)
             ?: Quaternion()
     val degreesPerSecond: Float? = getDegreesPerSecond((map["degreesPerSecond"] as? Double))
-    val parentNodeName : String? = map["parentNodeName"] as? String
+    val parentNodeName: String? = map["parentNodeName"] as? String
 
 
     fun buildNode(): Node {
@@ -34,6 +37,15 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         node.localRotation = rotation
 
         return node
+    }
+
+
+    fun getPosition(): FloatArray {
+        return floatArrayOf(position.x, position.y, position.z)
+    }
+
+    fun getRotation(): FloatArray {
+        return floatArrayOf(rotation.x, rotation.y, rotation.z, rotation.w)
     }
 
 

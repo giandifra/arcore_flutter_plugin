@@ -43,7 +43,7 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
-    controller.add(node);
+    controller.addArCoreNode(node);
   }
 
   void _addCylindre(ArCoreController controller) {
@@ -60,7 +60,7 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: cylindre,
       position: vector.Vector3(0.0, -0.5, -2.0),
     );
-    controller.add(node);
+    controller.addArCoreNode(node);
   }
 
   void _addCube(ArCoreController controller) {
@@ -76,7 +76,7 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: cube,
       position: vector.Vector3(-0.5, 0.5, -3.5),
     );
-    controller.add(node);
+    controller.addArCoreNode(node);
   }
 
   @override

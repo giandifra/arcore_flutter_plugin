@@ -1,26 +1,31 @@
 import 'package:arcore_flutter_plugin/src/arcore_rotating_node.dart';
 import 'package:arcore_flutter_plugin/src/utils/vector_utils.dart';
 import 'package:flutter/services.dart';
+import 'arcore_hit_test_result.dart';
 
 import 'arcore_node.dart';
 
 typedef StringResultHandler = void Function(String text);
+typedef ArCoreHitResultHandler = void Function(List<ArCoreHitTestResult> hits);
 
 class ArCoreController {
   ArCoreController(
     int id,
     bool enableTapRecognizer,
+    bool enableUpdateListener,
   ) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
     _channel.setMethodCallHandler(_handleMethodCalls);
     _channel.invokeMethod<void>('init', {
       'enableTapRecognizer': enableTapRecognizer,
+      'enableUpdateListener': enableUpdateListener,
     });
   }
 
   MethodChannel _channel;
   StringResultHandler onError;
-  StringResultHandler onTap;
+  StringResultHandler onNodeTap;
+  ArCoreHitResultHandler onPlaneTap;
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
     print('_platformCallHandler call ${call.method} ${call.arguments}');
@@ -30,9 +35,20 @@ class ArCoreController {
           onError(call.arguments);
         }
         break;
-      case 'onTap':
-        if (onTap != null) {
-          onTap(call.arguments);
+      case 'onNodeTap':
+        if (onNodeTap != null) {
+          onNodeTap(call.arguments);
+        }
+        break;
+      case 'onPlaneTap':
+        if (onPlaneTap != null) {
+          final List<dynamic> input = call.arguments;
+          final objects = input
+              .cast<Map<dynamic, dynamic>>()
+              .map<ArCoreHitTestResult>(
+                  (Map<dynamic, dynamic> h) => ArCoreHitTestResult.fromMap(h))
+              .toList();
+          onPlaneTap(objects);
         }
         break;
       default:
@@ -41,11 +57,19 @@ class ArCoreController {
     return Future.value();
   }
 
-  Future<void> add(ArCoreNode node, {String parentNodeName}) {
+  Future<void> addArCoreNode(ArCoreNode node, {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNode', params);
+  }
+
+  Future<void> addArCoreNodeWithAnchor(ArCoreNode node,
+      {String parentNodeName}) {
+    assert(node != null);
+    final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
+    _addListeners(node);
+    return _channel.invokeMethod('addArCoreNodeWithAnchor', params);
   }
 
   Map<String, dynamic> _addParentNodeNameToParams(

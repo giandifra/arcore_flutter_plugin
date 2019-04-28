@@ -27,30 +27,35 @@ class _CustomObjectState extends State<CustomObject> {
 
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
-    arCoreController.onTap = (name) => onTapHandler(name);
+    arCoreController.onNodeTap = (name) => onTapHandler(name);
+    arCoreController.onPlaneTap = _handleOnPlaneTap;
   }
 
-  void _addSphere(ArCoreController controller) {
+  void _addSphere(ArCoreController controller, ArCoreHitTestResult plane) {
     final material = ArCoreMaterial(
-      color: Colors.yellow,
-    );
+        color: Color.fromARGB(120, 66, 134, 244), texture: "earth.jpg");
     final sphere = ArCoreSphere(
       materials: [material],
       radius: 0.1,
     );
     final node = ArCoreNode(
-      shape: sphere,
-      position: vector.Vector3(0, 0, -1.5),
-    );
-    controller.add(node);
+        shape: sphere,
+        position: plane.arCorePose.translation + vector.Vector3(0.0, 1.0, 0.0),
+        rotation: plane.arCorePose.rotation);
+    controller.addArCoreNodeWithAnchor(node);
+  }
+
+  void _handleOnPlaneTap(List<ArCoreHitTestResult> hits) {
+    final hit = hits.first;
+    _addSphere(arCoreController, hit);
   }
 
   void onTapHandler(String name) {
-    print("Flutter: onTap");
+    print("Flutter: onNodeTap");
     showDialog<void>(
       context: context,
       builder: (BuildContext context) =>
-          AlertDialog(content: Text('onTap on $name')),
+          AlertDialog(content: Text('onNodeTap on $name')),
     );
   }
 

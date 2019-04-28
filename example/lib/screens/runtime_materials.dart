@@ -72,7 +72,7 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
       shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
-    controller.add(sphereNode);
+    controller.addArCoreNode(sphereNode);
   }
 
   onColorChange(Color newColor) {

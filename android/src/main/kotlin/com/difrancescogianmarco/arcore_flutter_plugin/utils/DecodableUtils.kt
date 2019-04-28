@@ -7,7 +7,6 @@ import java.util.*
 
 class DecodableUtils {
 
-
     companion object {
         fun parseVector3(vector: HashMap<String, *>?): Vector3? {
             if (vector != null) {
