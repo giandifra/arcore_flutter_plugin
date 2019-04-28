@@ -1,19 +1,22 @@
 import 'package:arcore_flutter_plugin/src/arcore_rotating_node.dart';
 import 'package:arcore_flutter_plugin/src/utils/vector_utils.dart';
 import 'package:flutter/services.dart';
+import 'package:meta/meta.dart';
 import 'arcore_hit_test_result.dart';
 
 import 'arcore_node.dart';
+import 'arcore_plane.dart';
 
 typedef StringResultHandler = void Function(String text);
 typedef ArCoreHitResultHandler = void Function(List<ArCoreHitTestResult> hits);
+typedef ArCorePlaneHandler = void Function(ArCorePlane plane);
 
 class ArCoreController {
-  ArCoreController(
+  ArCoreController({
     int id,
-    bool enableTapRecognizer,
-    bool enableUpdateListener,
-  ) {
+    this.enableTapRecognizer,
+    this.enableUpdateListener,
+  }) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
     _channel.setMethodCallHandler(_handleMethodCalls);
     _channel.invokeMethod<void>('init', {
@@ -22,10 +25,13 @@ class ArCoreController {
     });
   }
 
+  final bool enableUpdateListener;
+  final bool enableTapRecognizer;
   MethodChannel _channel;
   StringResultHandler onError;
   StringResultHandler onNodeTap;
   ArCoreHitResultHandler onPlaneTap;
+  ArCorePlaneHandler onPlaneDetected;
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
     print('_platformCallHandler call ${call.method} ${call.arguments}');
@@ -51,6 +57,12 @@ class ArCoreController {
           onPlaneTap(objects);
         }
         break;
+      case 'onPlaneDetected':
+        if (enableUpdateListener && onPlaneDetected != null) {
+          final plane = ArCorePlane.fromMap(call.arguments);
+          onPlaneDetected(plane);
+        }
+        break;
       default:
         print('Unknowm method ${call.method} ');
     }
@@ -70,6 +82,11 @@ class ArCoreController {
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNodeWithAnchor', params);
+  }
+
+  Future<void> removeNode({@required String nodeName}) {
+    assert(nodeName != null);
+    return _channel.invokeMethod('removeARCoreNode', {'nodeName': nodeName});
   }
 
   Map<String, dynamic> _addParentNodeNameToParams(

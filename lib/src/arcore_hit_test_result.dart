@@ -12,10 +12,10 @@ class ArCoreHitTestResult {
 
   String nodeName;
 
-  ArCorePose arCorePose;
+  ArCorePose pose;
 
   ArCoreHitTestResult.fromMap(Map<dynamic, dynamic> map) {
     this.distance = map['distance'];
-    this.arCorePose = ArCorePose.fromMap(map);
+    this.pose = ArCorePose.fromMap(map['pose']);
   }
 }

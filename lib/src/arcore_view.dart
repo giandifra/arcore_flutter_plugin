@@ -9,11 +9,13 @@ class ArCoreView extends StatefulWidget {
   final ArCoreViewCreatedCallback onArCoreViewCreated;
 
   final bool enableTapRecognizer;
+  final bool enableUpdateListener;
 
   const ArCoreView({
     Key key,
     this.onArCoreViewCreated,
     this.enableTapRecognizer = false,
+    this.enableUpdateListener = false,
   }) : super(key: key);
 
   @override
@@ -47,8 +49,10 @@ class _ArCoreViewState extends State<ArCoreView> with WidgetsBindingObserver {
     if (widget.onArCoreViewCreated == null) {
       return;
     }
-    widget
-        .onArCoreViewCreated(ArCoreController(id, widget.enableTapRecognizer));
+    widget.onArCoreViewCreated(ArCoreController(
+        id: id,
+        enableTapRecognizer: widget.enableTapRecognizer,
+        enableUpdateListener: widget.enableUpdateListener));
   }
 
   @override

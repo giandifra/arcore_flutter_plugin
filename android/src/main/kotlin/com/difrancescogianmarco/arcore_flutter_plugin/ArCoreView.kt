@@ -11,6 +11,8 @@ import android.view.MotionEvent
 import android.view.View
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreHitTestResult
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
+import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePlane
+import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
@@ -68,6 +70,15 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
             for (plane in frame.getUpdatedTrackables(Plane::class.java)) {
                 if (plane.trackingState == TrackingState.TRACKING) {
+
+                    val pose = plane.centerPose
+                    val map: HashMap<String, Any> = HashMap<String, Any>()
+                    map["type"] = plane.type.ordinal
+                    map["centerPose"] = FlutterArCorePose(pose.translation, pose.rotationQuaternion).toHashMap()
+                    map["extentX"] = plane.extentX
+                    map["extentZ"] = plane.extentZ
+
+                    methodChannel.invokeMethod("onPlaneDetected", map)
 
                 }
             }
@@ -133,6 +144,11 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 val map = call.arguments as HashMap<String, Any>
                 val flutterNode = FlutterArCoreNode(map);
                 addNodeWithAnchor(flutterNode, result)
+            }
+            "removeARCoreNode" -> {
+                Log.i(TAG, " removeARCoreNode")
+                val map = call.arguments as HashMap<String, Any>
+                removeNode(map["nodeName"] as String, result)
             }
             "positionChanged" -> {
                 Log.i(TAG, " positionChanged")
@@ -314,6 +330,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 anchorNode.name = flutterArCoreNode.name
                 anchorNode.renderable = renderable
 
+                Log.i(TAG,"inserted ${anchorNode.name}")
                 if (flutterArCoreNode.parentNodeName != null) {
                     Log.i(TAG, flutterArCoreNode.parentNodeName);
                     val parentNode: Node? = arSceneView?.scene?.findByName(flutterArCoreNode.parentNodeName)
@@ -342,6 +359,16 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 arSceneView?.scene?.addChild(node)
             }
         }
+        result.success(null)
+    }
+
+    fun removeNode(name: String, result: MethodChannel.Result) {
+        val node = arSceneView?.scene?.findByName(name)
+        if (node != null) {
+            arSceneView?.scene?.removeChild(node);
+            Log.i(TAG,"removed ${node.name}")
+        }
+
         result.success(null)
     }
 

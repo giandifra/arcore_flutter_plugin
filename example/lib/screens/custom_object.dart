@@ -40,8 +40,8 @@ class _CustomObjectState extends State<CustomObject> {
     );
     final node = ArCoreNode(
         shape: sphere,
-        position: plane.arCorePose.translation + vector.Vector3(0.0, 1.0, 0.0),
-        rotation: plane.arCorePose.rotation);
+        position: plane.pose.translation + vector.Vector3(0.0, 1.0, 0.0),
+        rotation: plane.pose.rotation);
     controller.addArCoreNodeWithAnchor(node);
   }
 
