@@ -4,9 +4,11 @@ Thanks to [Oleksandr Leuschenko](https://github.com/olexale) for inspiration and
 
 ## Usage
 
-To use this plugin, add arcore_flutter_plugin as a [dependency in your pubspec.yaml file](https://pub.dartlang.org/packages/arcore_flutter_plugin#-installing-tab-).
+You can read step-by-step setup [HERE](https://medium.com/@difrancescogianmarco/arcore-flutter-plugin-configurations-3ee53f2dc749)
 
 ### Configure your app
+
+To use this plugin, add arcore_flutter_plugin as a [dependency in your pubspec.yaml file](https://pub.dartlang.org/packages/arcore_flutter_plugin#-installing-tab-).
 
 1. Follow [official guide](https://developers.google.com/ar/develop/java/enable-arcore) to enable ArCore
 
