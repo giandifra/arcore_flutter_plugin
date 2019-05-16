@@ -1,5 +1,9 @@
 # arcore_flutter_plugin
 
+<a href="https://github.com/Solido/awesome-flutter">
+   <img alt="Awesome Flutter" src="https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square" />
+</a>
+
 Thanks to [Oleksandr Leuschenko](https://github.com/olexale) for inspiration and his precious code: [arkit_flutter_plugin](https://github.com/olexale/arkit_flutter_plugin)
 
 ## Usage
