@@ -3,7 +3,9 @@ import 'screens/hello_world.dart';
 import 'screens/custom_object.dart';
 import 'screens/runtime_materials.dart';
 import 'screens/texture_and_rotation.dart';
+import 'screens/assets_object.dart';
 import 'screens/auto_detect_plane.dart';
+import 'screens/remote_object.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -48,6 +50,20 @@ class HomeScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => AutoDetectPlane()));
             },
             title: Text("Plane detect handler"),
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => AssetsObject()));
+            },
+            title: Text("Custom sfb object"),
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => RemoteObject()));
+            },
+            title: Text("Remote object"),
           ),
         ],
       ),

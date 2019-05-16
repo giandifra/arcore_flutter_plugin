@@ -32,7 +32,7 @@ class ArCoreNode {
 
   Map<String, dynamic> toMap() => <String, dynamic>{
         'dartType': runtimeType.toString(),
-        'shape': shape.toMap(),
+        'shape': shape?.toMap(),
         'position': convertVector3ToMap(position.value),
         'scale': convertVector3ToMap(scale.value),
         'rotation': convertVector4ToMap(rotation.value),

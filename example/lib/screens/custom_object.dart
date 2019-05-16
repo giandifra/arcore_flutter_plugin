@@ -32,25 +32,29 @@ class _CustomObjectState extends State<CustomObject> {
   }
 
   void _addSphere(ArCoreHitTestResult plane) {
-    final m2 = ArCoreMaterial(color: Colors.grey);
-    final s2 = ArCoreSphere(
-      materials: [m2],
+    final moonMaterial = ArCoreMaterial(color: Colors.grey);
+
+    final moonShape = ArCoreSphere(
+      materials: [moonMaterial],
       radius: 0.03,
     );
+
     final moon = ArCoreNode(
-      shape: s2,
+      shape: moonShape,
       position: vector.Vector3(0.2, 0, 0),
       rotation: vector.Vector4(0, 0, 0, 0),
     );
 
-    final material = ArCoreMaterial(
+    final earthMaterial = ArCoreMaterial(
         color: Color.fromARGB(120, 66, 134, 244), texture: "earth.jpg");
-    final sphere = ArCoreSphere(
-      materials: [material],
+
+    final earthShape = ArCoreSphere(
+      materials: [earthMaterial],
       radius: 0.1,
     );
+
     final earth = ArCoreNode(
-        shape: sphere,
+        shape: earthShape,
         children: [moon],
         position: plane.pose.translation + vector.Vector3(0.0, 1.0, 0.0),
         rotation: plane.pose.rotation);

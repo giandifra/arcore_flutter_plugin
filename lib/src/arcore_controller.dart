@@ -100,7 +100,7 @@ class ArCoreController {
 
   void _addListeners(ArCoreNode node) {
     node.position.addListener(() => _handlePositionChanged(node));
-    node.shape.materials.addListener(() => _updateMaterials(node));
+    node?.shape?.materials?.addListener(() => _updateMaterials(node));
 
     if (node is ArCoreRotatingNode) {
       node.degreesPerSecond.addListener(() => _handleRotationChanged(node));

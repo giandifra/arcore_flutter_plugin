@@ -12,7 +12,7 @@
         <!-- Indicates that app requires ARCore ("AR Required"). Causes Google
              Play Store to download and install ARCore when the app is installed.
         -->
-        <meta-data android:name="com.google.ar.core" android:value="optional" />
+        <meta-data android:name="com.google.ar.core" android:value="required" />
     </application>
 
 </manifest>

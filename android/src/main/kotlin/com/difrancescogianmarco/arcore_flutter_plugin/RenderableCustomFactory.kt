@@ -8,9 +8,16 @@ import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.google.ar.sceneform.rendering.Material
 import com.google.ar.sceneform.rendering.ModelRenderable
+import com.google.ar.sceneform.assets.RenderableSource
+import androidx.core.view.accessibility.AccessibilityRecordCompat.setSource
+import com.google.ar.sceneform.Node
+import android.view.Gravity
+import androidx.core.view.accessibility.AccessibilityRecordCompat.setSource
+import com.google.ar.sceneform.rendering.Renderable
+
 
 typealias MaterialHandler = (Material?, Throwable?) -> Unit
-typealias RenderableHandler = (ModelRenderable?, Exception?) -> Unit
+typealias RenderableHandler = (ModelRenderable?, Throwable?) -> Unit
 
 class RenderableCustomFactory {
 
@@ -19,19 +26,64 @@ class RenderableCustomFactory {
         val TAG = RenderableCustomFactory::class.java.name
         @SuppressLint("ShowToast")
         fun makeRenderable(context: Context, flutterArCoreNode: FlutterArCoreNode, handler: RenderableHandler) {
-            makeMaterial(context, flutterArCoreNode) { material, throwable ->
-                if (material != null) {
-                    Log.i(TAG, "material not null")
-                    try {
-                        val renderable = flutterArCoreNode.shape?.buildShape(material)
+
+
+            if (flutterArCoreNode.dartType == "ArCoreReferenceNode") {
+
+                val url = flutterArCoreNode.objectUrl
+
+                val localObject = flutterArCoreNode.obcject3DFileName
+
+                if (localObject != null) {
+                    val builder = ModelRenderable.builder()
+                    builder.setSource(context, Uri.parse(localObject))
+                    builder.build().thenAccept { renderable ->
                         handler(renderable, null)
-                    } catch (ex: Exception) {
-                        Log.i(TAG, "renderable error ${ex}")
-                        handler(null, ex)
-                        Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG)
+                    }.exceptionally { throwable ->
+                        Log.e(TAG, "Unable to load Renderable.", throwable);
+                        handler(null, throwable)
+                        return@exceptionally null
+                    }
+                } else if (url != null) {
+                    val modelRenderableBuilder = ModelRenderable.builder()
+                    val renderableSourceBuilder = RenderableSource.builder()
+
+                    renderableSourceBuilder
+                            .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLTF2)
+                            .setScale(0.5f)
+                            .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+
+                    modelRenderableBuilder
+                            .setSource(context, renderableSourceBuilder.build())
+                            .setRegistryId(url)
+                            .build()
+                            .thenAccept { renderable ->
+                                handler(renderable, null)
+                            }
+                            .exceptionally { throwable ->
+                                handler(null, throwable)
+                                Log.i(TAG, "renderable error ${throwable.localizedMessage}")
+                                null
+                            }
+                }
+
+            } else {
+                makeMaterial(context, flutterArCoreNode) { material, throwable ->
+                    if (material != null) {
+                        Log.i(TAG, "material not null")
+                        try {
+                            val renderable = flutterArCoreNode.shape?.buildShape(material)
+                            handler(renderable, null)
+                        } catch (ex: Exception) {
+                            Log.i(TAG, "renderable error ${ex}")
+                            handler(null, ex)
+                            Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG)
+                        }
                     }
                 }
             }
+
+
         }
 
         private fun makeMaterial(context: Context, flutterArCoreNode: FlutterArCoreNode, handler: MaterialHandler) {

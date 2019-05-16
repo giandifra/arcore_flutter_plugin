@@ -1,0 +1,49 @@
+{
+  materials: [
+    {
+      name: 'initialShadingGroup',
+      parameters: [
+        {
+          baseColor: 'Andy_Diffuse',
+        },
+        {
+          baseColorTint: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          metallic: 0,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/Andy.obj',
+    name: 'Andy',
+    recenter: 'root',
+  },
+  samplers: [
+    {
+      file: 'sampledata/Andy_Diffuse.png',
+      name: 'Andy_Diffuse',
+      pipeline_name: 'Andy_Diffuse.png',
+    },
+  ],
+  version: '0.54:2',
+}

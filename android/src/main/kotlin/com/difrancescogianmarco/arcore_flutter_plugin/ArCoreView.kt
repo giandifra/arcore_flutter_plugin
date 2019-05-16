@@ -29,7 +29,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
-
 class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
     val methodChannel: MethodChannel
     val activity: Activity
@@ -212,6 +211,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
 
     private fun onSingleTap(tap: MotionEvent?) {
 
+
         Log.i(TAG, " onSingleTap")
         val frame = arSceneView?.arFrame
         if (frame != null) {
@@ -248,7 +248,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                             Log.i(TAG, " onNodeTap " + hitTestResult.node?.name)
                             Log.i(TAG, hitTestResult.node?.localPosition.toString())
                             Log.i(TAG, hitTestResult.node?.worldPosition.toString())
-
                             methodChannel.invokeMethod("onNodeTap", hitTestResult.node?.name)
                             return@setOnTouchListener true
                         }
@@ -276,8 +275,9 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                     anchorNode.setParent(arSceneView?.scene)
 
                     ModelRenderable.builder()
-                            .setSource(activity.applicationContext, Uri.parse("Andy.sfb"))
-                            .build().thenAccept { renderable ->
+                            .setSource(activity.applicationContext, Uri.parse("TocoToucan.sfb"))
+                            .build()
+                            .thenAccept { renderable ->
                                 val node = Node()
                                 node.renderable = renderable
                                 anchorNode.addChild(node)
