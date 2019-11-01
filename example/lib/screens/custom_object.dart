@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 class CustomObject extends StatefulWidget {
@@ -31,7 +34,7 @@ class _CustomObjectState extends State<CustomObject> {
     arCoreController.onPlaneTap = _handleOnPlaneTap;
   }
 
-  void _addSphere(ArCoreHitTestResult plane) {
+  Future _addSphere(ArCoreHitTestResult plane) async {
     final moonMaterial = ArCoreMaterial(color: Colors.grey);
 
     final moonShape = ArCoreSphere(
@@ -45,8 +48,11 @@ class _CustomObjectState extends State<CustomObject> {
       rotation: vector.Vector4(0, 0, 0, 0),
     );
 
+    final ByteData textureBytes = await rootBundle.load('assets/earth.jpg');
+
     final earthMaterial = ArCoreMaterial(
-        color: Color.fromARGB(120, 66, 134, 244), texture: "earth.jpg");
+        color: Color.fromARGB(120, 66, 134, 244),
+        textureBytes: textureBytes.buffer.asUint8List());
 
     final earthShape = ArCoreSphere(
       materials: [earthMaterial],

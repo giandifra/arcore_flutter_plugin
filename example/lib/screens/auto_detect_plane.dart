@@ -1,6 +1,6 @@
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:flutter/material.dart';
-import 'package:vector_math/vector_math_64.dart' as vector;
+import 'package:flutter/services.dart';
 
 class AutoDetectPlane extends StatefulWidget {
   @override
@@ -38,9 +38,12 @@ class _AutoDetectPlaneState extends State<AutoDetectPlane> {
     _addSphere(arCoreController, plane);
   }
 
-  void _addSphere(ArCoreController controller, ArCorePlane plane) {
+  Future _addSphere(ArCoreController controller, ArCorePlane plane) async {
+    final ByteData textureBytes = await rootBundle.load('assets/earth.jpg');
+
     final material = ArCoreMaterial(
-        color: Color.fromARGB(120, 66, 134, 244), texture: "earth.jpg");
+        color: Color.fromARGB(120, 66, 134, 244),
+        textureBytes: textureBytes.buffer.asUint8List());
     final sphere = ArCoreSphere(
       materials: [material],
       radius: 0.1,

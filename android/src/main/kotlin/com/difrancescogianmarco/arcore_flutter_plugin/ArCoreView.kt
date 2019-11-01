@@ -3,46 +3,52 @@ package com.difrancescogianmarco.arcore_flutter_plugin
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.net.Uri
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreHitTestResult
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
-import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
-import com.google.ar.core.Frame
-import com.google.ar.core.Plane
-import com.google.ar.core.Pose
-import com.google.ar.core.TrackingState
+import com.google.ar.core.*
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
+import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 import com.google.ar.sceneform.*
 import com.google.ar.sceneform.rendering.ModelRenderable
+import com.google.ar.sceneform.rendering.Texture
+import com.google.ar.sceneform.ux.AugmentedFaceNode
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
-class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
-    val methodChannel: MethodChannel
-    val activity: Activity
+class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int, private val isAugmentedFaces: Boolean) : PlatformView, MethodChannel.MethodCallHandler {
+    private val methodChannel: MethodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
+    private val activity: Activity = (context.applicationContext as FlutterApplication).currentActivity
     lateinit var activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks
-    var installRequested: Boolean = false
-    val TAG: String = ArCoreView::class.java.name
-    private var arSceneView: ArSceneView?
-    val gestureDetector: GestureDetector
+    private var installRequested: Boolean = false
+    private var mUserRequestedInstall = true
+    private val TAG: String = ArCoreView::class.java.name
+    private var arSceneView: ArSceneView? = null
+    private val gestureDetector: GestureDetector
     private val RC_PERMISSIONS = 0x123
     private var sceneUpdateListener: Scene.OnUpdateListener
+    private var faceSceneUpdateListener: Scene.OnUpdateListener
+    
+    //AUGMENTEDFACE
+    private var faceRegionsRenderable: ModelRenderable? = null
+    private var faceMeshTexture: Texture? = null
+    private val faceNodeMap = HashMap<AugmentedFace, AugmentedFaceNode>()
 
     init {
-        this.activity = (context.applicationContext as FlutterApplication).currentActivity
-        methodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
         methodChannel.setMethodCallHandler(this)
         arSceneView = ArSceneView(context)
         // Set up a tap gesture detector.
@@ -58,6 +64,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                         return true
                     }
                 })
+
         sceneUpdateListener = Scene.OnUpdateListener { frameTime ->
 
             val frame = arSceneView?.arFrame ?: return@OnUpdateListener
@@ -77,7 +84,42 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                     map["extentZ"] = plane.extentZ
 
                     methodChannel.invokeMethod("onPlaneDetected", map)
+                }
+            }
+        }
 
+        faceSceneUpdateListener = Scene.OnUpdateListener { frameTime ->
+            run {
+                //                if (faceRegionsRenderable == null || faceMeshTexture == null) {
+                if (faceMeshTexture == null) {
+                    return@OnUpdateListener
+                }
+
+                val faceList = arSceneView?.session?.getAllTrackables(AugmentedFace::class.java)
+
+                faceList?.let {
+                    // Make new AugmentedFaceNodes for any new faces.
+                    for (face in faceList) {
+                        if (!faceNodeMap.containsKey(face)) {
+                            val faceNode = AugmentedFaceNode(face)
+                            faceNode.setParent(arSceneView?.scene)
+                            faceNode.faceRegionsRenderable = faceRegionsRenderable
+                            faceNode.faceMeshTexture = faceMeshTexture
+                            faceNodeMap[face] = faceNode
+                        }
+                    }
+
+                    // Remove any AugmentedFaceNodes associated with an AugmentedFace that stopped tracking.
+                    val iter = faceNodeMap.iterator()
+                    while (iter.hasNext()) {
+                        val entry = iter.next()
+                        val face = entry.key
+                        if (face.trackingState == TrackingState.STOPPED) {
+                            val faceNode = entry.value
+                            faceNode.setParent(null)
+                            iter.remove()
+                        }
+                    }
                 }
             }
         }
@@ -87,47 +129,30 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         setupLifeCycle(context)
     }
 
-    private fun setupLifeCycle(context: Context) {
-        activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
-                Log.i(TAG, "onActivityCreated")
-            }
+    fun loadMesh(textureBytes: ByteArray?) {
+        // Load the face regions renderable.
+        // This is a skinned model that renders 3D objects mapped to the regions of the augmented face.
+        /*ModelRenderable.builder()
+                .setSource(activity, Uri.parse("fox_face.sfb"))
+                .build()
+                .thenAccept { modelRenderable ->
+                    faceRegionsRenderable = modelRenderable;
+                    modelRenderable.isShadowCaster = false;
+                    modelRenderable.isShadowReceiver = false;
+                }*/
 
-            override fun onActivityStarted(activity: Activity) {
-                Log.i(TAG, "onActivityStarted")
-            }
-
-            override fun onActivityResumed(activity: Activity) {
-                Log.i(TAG, "onActivityResumed")
-                onResume()
-            }
-
-            override fun onActivityPaused(activity: Activity) {
-                Log.i(TAG, "onActivityPaused")
-                onPause()
-            }
-
-            override fun onActivityStopped(activity: Activity) {
-                Log.i(TAG, "onActivityStopped")
-                onPause()
-            }
-
-            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-
-            override fun onActivityDestroyed(activity: Activity) {
-                Log.i(TAG, "onActivityDestroyed")
-                onDestroy()
-            }
-        }
-
-        (context.getApplicationContext() as FlutterApplication).currentActivity.application
-                .registerActivityLifecycleCallbacks(this.activityLifecycleCallbacks)
+        // Load the face mesh texture.
+        //                .setSource(activity, Uri.parse("fox_face_mesh_texture.png"))
+        Texture.builder()
+                .setSource(BitmapFactory.decodeByteArray(textureBytes, 0, textureBytes!!.size))
+                .build()
+                .thenAccept { texture -> faceMeshTexture = texture }
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "init" -> {
-                arScenViewInit(call, result);
+                arScenViewInit(call, result, activity)
             }
             "addArCoreNode" -> {
                 Log.i(TAG, " addArCoreNode")
@@ -160,6 +185,11 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
                 updateMaterials(call, result)
 
             }
+            "loadMesh" -> {
+                val map = call.arguments as HashMap<String, Any>
+                val textureBytes = map["textureBytes"] as ByteArray
+                loadMesh(textureBytes)
+            }
             "dispose" -> {
                 Log.i(TAG, " updateMaterials")
                 dispose()
@@ -169,49 +199,64 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         }
     }
 
-    fun onResume() {
-        if (arSceneView == null) {
-            return
-        }
-        // request camera permission if not already requested
-        if (!ArCoreUtils.hasCameraPermission(activity)) {
-            ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
+/*    fun maybeEnableArButton() {
+        Log.i(TAG,"maybeEnableArButton" )
+        try{
+            val availability = ArCoreApk.getInstance().checkAvailability(activity.applicationContext)
+            if (availability.isTransient) {
+                // Re-query at 5Hz while compatibility is checked in the background.
+                Handler().postDelayed({ maybeEnableArButton() }, 200)
+            }
+            if (availability.isSupported) {
+                Log.i(TAG, "AR SUPPORTED")
+            } else { // Unsupported or unknown.
+                Log.i(TAG, "AR NOT SUPPORTED")
+            }
+        }catch (ex:Exception){
+            Log.i(TAG,"maybeEnableArButton ${ex.localizedMessage}" )
         }
 
+    }*/
 
-        if (arSceneView?.session == null) {
-            // If the session wasn't created yet, don't resume rendering.
-            // This can happen if ARCore needs to be updated or permissions are not granted yet.
-            try {
-                val session = ArCoreUtils.createArSession(activity, installRequested)
-                if (session == null) {
-                    installRequested = ArCoreUtils.hasCameraPermission(activity)
-                    return
-                } else {
-                    arSceneView?.setupSession(session)
-                }
-            } catch (e: UnavailableException) {
-                ArCoreUtils.handleSessionException(activity, e)
+    private fun setupLifeCycle(context: Context) {
+        activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
+                Log.i(TAG, "onActivityCreated")
+//                maybeEnableArButton()
             }
 
+            override fun onActivityStarted(activity: Activity) {
+                Log.i(TAG, "onActivityStarted")
+            }
+
+            override fun onActivityResumed(activity: Activity) {
+                Log.i(TAG, "onActivityResumed")
+                onResume()
+            }
+
+            override fun onActivityPaused(activity: Activity) {
+                Log.i(TAG, "onActivityPaused")
+                onPause()
+            }
+
+            override fun onActivityStopped(activity: Activity) {
+                Log.i(TAG, "onActivityStopped")
+                onPause()
+            }
+
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+
+            override fun onActivityDestroyed(activity: Activity) {
+                Log.i(TAG, "onActivityDestroyed")
+                onDestroy()
+            }
         }
 
-        try {
-            arSceneView?.resume()
-        } catch (ex: CameraNotAvailableException) {
-            ArCoreUtils.displayError(activity, "Unable to get camera", ex)
-            activity.finish()
-            return
-        }
-
-        if (arSceneView?.getSession() != null) {
-            Log.i(TAG, "Searching for surfaces")
-        }
+        (context.applicationContext as FlutterApplication).currentActivity.application
+                .registerActivityLifecycleCallbacks(this.activityLifecycleCallbacks)
     }
 
     private fun onSingleTap(tap: MotionEvent?) {
-
-
         Log.i(TAG, " onSingleTap")
         val frame = arSceneView?.arFrame
         if (frame != null) {
@@ -235,9 +280,8 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         }
     }
 
-    private fun arScenViewInit(call: MethodCall, result: MethodChannel.Result) {
+    private fun arScenViewInit(call: MethodCall, result: MethodChannel.Result, context: Context) {
         Log.i(TAG, "arScenViewInit")
-        onResume() //TODO delete?
         val enableTapRecognizer: Boolean? = call.argument("enableTapRecognizer")
         if (enableTapRecognizer != null && enableTapRecognizer) {
             arSceneView
@@ -260,35 +304,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
             // detected.
             arSceneView?.scene?.addOnUpdateListener(sceneUpdateListener)
         }
-
         result.success(null)
-    }
-
-    private fun tryPlaceNode(tap: MotionEvent?, frame: Frame) {
-        if (tap != null && frame.camera.trackingState == TrackingState.TRACKING) {
-            for (hit in frame.hitTest(tap)) {
-                val trackable = hit.trackable
-                if (trackable is Plane && trackable.isPoseInPolygon(hit.hitPose)) {
-                    // Create the Anchor.
-                    val anchor = hit.createAnchor()
-                    val anchorNode = AnchorNode(anchor)
-                    anchorNode.setParent(arSceneView?.scene)
-
-                    ModelRenderable.builder()
-                            .setSource(activity.applicationContext, Uri.parse("TocoToucan.sfb"))
-                            .build()
-                            .thenAccept { renderable ->
-                                val node = Node()
-                                node.renderable = renderable
-                                anchorNode.addChild(node)
-                            }.exceptionally { throwable ->
-                                Log.e(TAG, "Unable to load Renderable.", throwable);
-                                return@exceptionally null
-                            }
-                }
-            }
-        }
-
     }
 
     fun addNodeWithAnchor(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result) {
@@ -366,13 +382,6 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         result.success(null)
     }
 
-    fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
-        val name = call.argument<String>("name")
-        val node = arSceneView?.scene?.findByName(name)
-        node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
-        result.success(null)
-    }
-
     fun updateRotation(call: MethodCall, result: MethodChannel.Result) {
         val name = call.argument<String>("name")
         val node = arSceneView?.scene?.findByName(name) as RotatingNode
@@ -409,6 +418,62 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
         }
     }
 
+    fun onResume() {
+
+        Log.i(TAG, "onResume()")
+
+        if (arSceneView == null) {
+            return
+        }
+
+        // request camera permission if not already requested
+        if (!ArCoreUtils.hasCameraPermission(activity)) {
+            ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
+        }
+
+        if (arSceneView?.session == null) {
+            Log.i(TAG, "session is null")
+            try {
+                val session = ArCoreUtils.createArSession(activity, mUserRequestedInstall, isAugmentedFaces)
+                if (session == null) {
+                    // Ensures next invocation of requestInstall() will either return
+                    // INSTALLED or throw an exception.
+                    mUserRequestedInstall = false
+                    return
+                } else {
+                    val config = Config(session)
+                    if (isAugmentedFaces) {
+                        config.augmentedFaceMode = Config.AugmentedFaceMode.MESH3D
+                    }
+                    config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+                    config.focusMode = Config.FocusMode.AUTO;
+                    session.configure(config)
+                    arSceneView?.setupSession(session)
+                }
+            } catch (ex: UnavailableUserDeclinedInstallationException) {
+                // Display an appropriate message to the user zand return gracefully.
+                Toast.makeText(activity, "TODO: handle exception " + ex.localizedMessage, Toast.LENGTH_LONG)
+                        .show();
+                return
+            } catch (e: UnavailableException) {
+                ArCoreUtils.handleSessionException(activity, e)
+                return
+            }
+        }
+
+        try {
+            arSceneView?.resume()
+        } catch (ex: CameraNotAvailableException) {
+            ArCoreUtils.displayError(activity, "Unable to get camera", ex)
+            activity.finish()
+            return
+        }
+
+        if (arSceneView?.session != null) {
+            Log.i(TAG, "Searching for surfaces")
+        }
+    }
+
     fun onPause() {
         if (arSceneView != null) {
             arSceneView?.pause()
@@ -418,13 +483,43 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : Platfo
     fun onDestroy() {
         if (arSceneView != null) {
             arSceneView?.scene?.removeOnUpdateListener(sceneUpdateListener)
+            arSceneView?.scene?.removeOnUpdateListener(faceSceneUpdateListener)
             arSceneView?.destroy()
             arSceneView = null
         }
     }
+
+    /* private fun tryPlaceNode(tap: MotionEvent?, frame: Frame) {
+        if (tap != null && frame.camera.trackingState == TrackingState.TRACKING) {
+            for (hit in frame.hitTest(tap)) {
+                val trackable = hit.trackable
+                if (trackable is Plane && trackable.isPoseInPolygon(hit.hitPose)) {
+                    // Create the Anchor.
+                    val anchor = hit.createAnchor()
+                    val anchorNode = AnchorNode(anchor)
+                    anchorNode.setParent(arSceneView?.scene)
+
+                    ModelRenderable.builder()
+                            .setSource(activity.applicationContext, Uri.parse("TocoToucan.sfb"))
+                            .build()
+                            .thenAccept { renderable ->
+                                val node = Node()
+                                node.renderable = renderable
+                                anchorNode.addChild(node)
+                            }.exceptionally { throwable ->
+                                Log.e(TAG, "Unable to load Renderable.", throwable);
+                                return@exceptionally null
+                            }
+                }
+            }
+        }
+
+    }*/
+
+    /*    fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
+        val name = call.argument<String>("name")
+        val node = arSceneView?.scene?.findByName(name)
+        node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
+        result.success(null)
+    }*/
 }
-
-
-
-
-

@@ -4,9 +4,10 @@ import android.graphics.Color
 
 class FlutterArCoreMaterial(map: HashMap<String, *>) {
 
-    val argb : ArrayList<Int>? = map["color"] as? ArrayList<Int>
+    val argb: ArrayList<Int>? = map["color"] as? ArrayList<Int>
     val color: Int? = getIntColor(argb)
-    val texture: String? = map["texture"] as? String
+    //    val texture: String? = map["texture"] as? String
+    val textureBytes: ByteArray? = map["textureBytes"] as? ByteArray
     val metallic: Float? = (map["metallic"] as? Double)?.toFloat()
     val roughness: Float? = (map["roughness"] as? Double)?.toFloat()
     val reflectance: Float? = (map["reflectance"] as? Double)?.toFloat()
@@ -19,6 +20,10 @@ class FlutterArCoreMaterial(map: HashMap<String, *>) {
     }
 
     override fun toString(): String {
-        return "color: $color\nargb: $argb\ntexture: $texture\nmetallic: $metallic\nroughness: $roughness\nreflectance: $reflectance"
+        return "color: $color\nargb: $argb\n" +
+                "textureBytesLength: ${textureBytes?.size}\n" +
+                "metallic: $metallic\n" +
+                "roughness: $roughness\n" +
+                "reflectance: $reflectance"
     }
 }

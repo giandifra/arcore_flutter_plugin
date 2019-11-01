@@ -73,20 +73,20 @@ class _AssetsObjectState extends State<AssetsObject> {
     showDialog<void>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-            content: Row(
-              children: <Widget>[
-                Text('Remove $name?'),
-                IconButton(
-                    icon: Icon(
-                      Icons.delete,
-                    ),
-                    onPressed: () {
-                      arCoreController.removeNode(nodeName: name);
-                      Navigator.pop(context);
-                    })
-              ],
-            ),
-          ),
+        content: Row(
+          children: <Widget>[
+            Text('Remove $name?'),
+            IconButton(
+                icon: Icon(
+                  Icons.delete,
+                ),
+                onPressed: () {
+                  arCoreController.removeNode(nodeName: name);
+                  Navigator.pop(context);
+                })
+          ],
+        ),
+      ),
     );
   }
 
@@ -108,15 +108,17 @@ class ListObjectSelection extends StatefulWidget {
 
 class _ListObjectSelectionState extends State<ListObjectSelection> {
   List<String> gifs = [
+    "assets/halloween.gif",
     "assets/TocoToucan.gif",
     "assets/AndroidRobot.gif",
-    "assets/ArcticFox.gif"
+    "assets/ArcticFox.gif",
   ];
 
   List<String> objectsFileName = [
-    "TocoToucan.sfb",
-    "Andy.sfb",
-    "ArcticFox_Posed.sfb"
+    "halloween.sfb",
+    "toucan.sfb",
+    "andy.sfb",
+    "artic_fox.sfb"
   ];
 
   String selected;

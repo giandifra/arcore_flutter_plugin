@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.google.ar.sceneform.Node
-import java.lang.Exception
 
 typealias NodeHandler = (Node?, Throwable?) -> Unit
 

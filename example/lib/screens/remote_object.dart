@@ -53,20 +53,20 @@ class _RemoteObjectState extends State<RemoteObject> {
     showDialog<void>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-            content: Row(
-              children: <Widget>[
-                Text('Remove $name?'),
-                IconButton(
-                    icon: Icon(
-                      Icons.delete,
-                    ),
-                    onPressed: () {
-                      arCoreController.removeNode(nodeName: name);
-                      Navigator.pop(context);
-                    })
-              ],
-            ),
-          ),
+        content: Row(
+          children: <Widget>[
+            Text('Remove $name?'),
+            IconButton(
+                icon: Icon(
+                  Icons.delete,
+                ),
+                onPressed: () {
+                  arCoreController.removeNode(nodeName: name);
+                  Navigator.pop(context);
+                })
+          ],
+        ),
+      ),
     );
   }
 

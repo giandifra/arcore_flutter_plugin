@@ -8,6 +8,7 @@ import 'arcore_node.dart';
 import 'arcore_plane.dart';
 
 typedef StringResultHandler = void Function(String text);
+typedef UnsupportedHandler = void Function(String text);
 typedef ArCoreHitResultHandler = void Function(List<ArCoreHitTestResult> hits);
 typedef ArCorePlaneHandler = void Function(ArCorePlane plane);
 
@@ -16,13 +17,11 @@ class ArCoreController {
     int id,
     this.enableTapRecognizer,
     this.enableUpdateListener,
+//    @required this.onUnsupported,
   }) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
     _channel.setMethodCallHandler(_handleMethodCalls);
-    _channel.invokeMethod<void>('init', {
-      'enableTapRecognizer': enableTapRecognizer,
-      'enableUpdateListener': enableUpdateListener,
-    });
+    init();
   }
 
   final bool enableUpdateListener;
@@ -30,8 +29,21 @@ class ArCoreController {
   MethodChannel _channel;
   StringResultHandler onError;
   StringResultHandler onNodeTap;
+
+//  UnsupportedHandler onUnsupported;
   ArCoreHitResultHandler onPlaneTap;
   ArCorePlaneHandler onPlaneDetected;
+
+  init() async {
+    try {
+      await _channel.invokeMethod<void>('init', {
+        'enableTapRecognizer': enableTapRecognizer,
+        'enableUpdateListener': enableUpdateListener,
+      });
+    } on PlatformException catch (ex) {
+      print(ex.message);
+    }
+  }
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
     print('_platformCallHandler call ${call.method} ${call.arguments}');

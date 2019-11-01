@@ -2,19 +2,14 @@ package com.difrancescogianmarco.arcore_flutter_plugin
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
+import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.Material
 import com.google.ar.sceneform.rendering.ModelRenderable
-import com.google.ar.sceneform.assets.RenderableSource
-import androidx.core.view.accessibility.AccessibilityRecordCompat.setSource
-import com.google.ar.sceneform.Node
-import android.view.Gravity
-import androidx.core.view.accessibility.AccessibilityRecordCompat.setSource
-import com.google.ar.sceneform.rendering.Renderable
-
 
 typealias MaterialHandler = (Material?, Throwable?) -> Unit
 typealias RenderableHandler = (ModelRenderable?, Throwable?) -> Unit
@@ -82,17 +77,19 @@ class RenderableCustomFactory {
                     }
                 }
             }
-
-
         }
 
         private fun makeMaterial(context: Context, flutterArCoreNode: FlutterArCoreNode, handler: MaterialHandler) {
-            val texture = flutterArCoreNode.shape?.materials?.first()?.texture
+//            val texture = flutterArCoreNode.shape?.materials?.first()?.texture
+            val textureBytes = flutterArCoreNode.shape?.materials?.first()?.textureBytes
             val color = flutterArCoreNode.shape?.materials?.first()?.color
-            if (texture != null) {
-                val isPng = texture.endsWith("png")
+            if (textureBytes != null) {
+//                val isPng = texture.endsWith("png")
+                val isPng = true
+
                 val builder = com.google.ar.sceneform.rendering.Texture.builder();
-                builder.setSource(context, Uri.parse(texture))
+//                builder.setSource(context, Uri.parse(texture))
+                builder.setSource(BitmapFactory.decodeByteArray(textureBytes, 0, textureBytes.size))
                 builder.build().thenAccept { texture ->
                     MaterialCustomFactory.makeWithTexture(context, texture, isPng, flutterArCoreNode.shape.materials[0])?.thenAccept { material ->
                         handler(material, null)

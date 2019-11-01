@@ -1,5 +1,6 @@
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 class ObjectWithTextureAndRotation extends StatefulWidget {
@@ -43,10 +44,12 @@ class _ObjectWithTextureAndRotationState
     _addSphere(arCoreController);
   }
 
-  void _addSphere(ArCoreController controller) {
+  Future _addSphere(ArCoreController controller) async {
+    final ByteData textureBytes = await rootBundle.load('assets/italia.png');
+
     final material = ArCoreMaterial(
       color: Color.fromARGB(120, 66, 134, 244),
-      texture: "italia.png",
+      textureBytes: textureBytes.buffer.asUint8List(),
     );
     final sphere = ArCoreSphere(
       materials: [material],

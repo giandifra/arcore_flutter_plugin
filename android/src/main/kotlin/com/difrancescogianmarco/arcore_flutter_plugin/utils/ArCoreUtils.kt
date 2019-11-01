@@ -21,6 +21,7 @@ import com.google.ar.core.ArCoreApk
 import com.google.ar.core.Config
 import com.google.ar.core.Session
 import com.google.ar.core.exceptions.*
+import java.util.*
 
 class ArCoreUtils {
 
@@ -45,22 +46,25 @@ class ArCoreUtils {
          * null. and the camera permission has been granted.
          */
         @Throws(UnavailableException::class)
-        fun createArSession(activity: Activity, installRequested: Boolean): Session? {
+        fun createArSession(activity: Activity, userRequestedInstall: Boolean, isAugmentedFaces: Boolean): Session? {
             var session: Session? = null
             // if we have the camera permission, create the session
             if (hasCameraPermission(activity)) {
-                when (ArCoreApk.getInstance().requestInstall(activity, !installRequested)) {
-                    ArCoreApk.InstallStatus.INSTALL_REQUESTED -> return null
-                    ArCoreApk.InstallStatus.INSTALLED -> {
+                session = when (ArCoreApk.getInstance().requestInstall(activity, userRequestedInstall)) {
+                    ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
+                        Log.i(TAG,"INSTALL REQUESTED")
+                        null
                     }
+        //                    ArCoreApk.InstallStatus.INSTALLED -> {}
                     else -> {
+                        if(isAugmentedFaces){
+                            Session(activity, EnumSet.of(Session.Feature.FRONT_CAMERA))
+                        }else{
+                            Session(activity)
+                        }
                     }
                 }
-                session = Session(activity)
-                // IMPORTANT!!!  ArSceneView requires the `LATEST_CAMERA_IMAGE` non-blocking update mode.
-                val config = Config(session)
-                config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
-                session.configure(config)
+
             }
             return session
         }
@@ -136,37 +140,6 @@ class ArCoreUtils {
             Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
         }
 
-
-        /**
-         * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
-         * on this device.
-         *
-         *
-         * Sceneform requires Android N on the device as well as OpenGL 3.0 capabilities.
-         *
-         *
-         * Finishes the activity if Sceneform can not run
-         */
-        fun checkIsSupportedDeviceOrFinish(activity: Activity): Boolean {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                Log.e(TAG, "Sceneform requires Android N or later")
-                Toast.makeText(activity, "Sceneform requires Android N or later", Toast.LENGTH_LONG).show()
-                activity.finish()
-                return false
-            }
-            val openGlVersionString = (activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
-                    .deviceConfigurationInfo
-                    .glEsVersion
-            if (java.lang.Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
-                Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later")
-                Toast.makeText(activity, "Sceneform requires OpenGL ES 3.0 or later", Toast.LENGTH_LONG)
-                        .show()
-                activity.finish()
-                return false
-            }
-            return true
-        }
-
         fun checkIfArCoreIsInstalled(activity: Activity, installRequested: Boolean): Boolean {
             var isInstalled: Boolean = false
             when (ArCoreApk.getInstance().requestInstall(activity, installRequested)) {
@@ -179,6 +152,29 @@ class ArCoreUtils {
                 }
             }
             return isInstalled
+        }
+
+        /**
+         * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
+         * on this device.
+         *
+         *
+         * Sceneform requires Android N on the device as well as OpenGL 3.0 capabilities.
+         *
+         *
+         * Finishes the activity if Sceneform can not run
+         */
+        fun checkIsSupportedDeviceOrFinish(activity: Activity): String? {
+            val openGlVersionString = (activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+                    .deviceConfigurationInfo
+                    .glEsVersion
+            if (java.lang.Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
+                Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later")
+//                Toast.makeText(activity, "Sceneform requires OpenGL ES 3.0 or later", Toast.LENGTH_LONG)
+//                        .show()
+                return "Sceneform requires OpenGL ES 3.0 later"
+            }
+            return null
         }
     }
 }

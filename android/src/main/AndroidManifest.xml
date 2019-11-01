@@ -6,7 +6,10 @@
     <!-- Indicates that app requires ARCore ("AR Required"). Ensures app is only
          visible in the Google Play Store on devices that support ARCore.
     -->
-    <uses-feature android:name="android.hardware.camera.ar" />
+    <uses-feature android:name="android.hardware.camera.ar"/>
+
+    <!-- Sceneform requires OpenGL ES 3.0 or later. -->
+    <uses-feature android:glEsVersion="0x00030000" android:required="true" />
 
     <application>
         <!-- Indicates that app requires ARCore ("AR Required"). Causes Google

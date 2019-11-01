@@ -5,17 +5,27 @@ import 'package:flutter/material.dart';
 
 typedef void ArCoreViewCreatedCallback(ArCoreController controller);
 
+enum ArCoreViewType {
+  AUGMENTEDFACE,
+  STANDARDVIEW,
+}
+
 class ArCoreView extends StatefulWidget {
   final ArCoreViewCreatedCallback onArCoreViewCreated;
 
+//  final UnsupportedHandler onArCoreUnsupported;
+
   final bool enableTapRecognizer;
   final bool enableUpdateListener;
+  final ArCoreViewType type;
 
   const ArCoreView({
     Key key,
-    this.onArCoreViewCreated,
+    @required this.onArCoreViewCreated,
+//    @required this.onArCoreUnsupported,
     this.enableTapRecognizer = false,
     this.enableUpdateListener = false,
+    this.type = ArCoreViewType.STANDARDVIEW,
   }) : super(key: key);
 
   @override
@@ -36,6 +46,7 @@ class _ArCoreViewState extends State<ArCoreView> with WidgetsBindingObserver {
         child: ArCoreAndroidView(
           viewType: 'arcore_flutter_plugin',
           onPlatformViewCreated: _onPlatformViewCreated,
+          arCoreViewType: widget.type,
         ),
       );
     }
@@ -50,9 +61,11 @@ class _ArCoreViewState extends State<ArCoreView> with WidgetsBindingObserver {
       return;
     }
     widget.onArCoreViewCreated(ArCoreController(
-        id: id,
-        enableTapRecognizer: widget.enableTapRecognizer,
-        enableUpdateListener: widget.enableUpdateListener));
+      id: id,
+      enableTapRecognizer: widget.enableTapRecognizer,
+      enableUpdateListener: widget.enableUpdateListener,
+//      onUnsupported: widget.onArCoreUnsupported,
+    ));
   }
 
   @override
