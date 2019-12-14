@@ -4,7 +4,7 @@ import android.util.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.PluginRegistry
 
-class ArcoreFlutterPlugin{
+class ArcoreFlutterPlugin: FlutterPlugin{
 
     companion object {
 
