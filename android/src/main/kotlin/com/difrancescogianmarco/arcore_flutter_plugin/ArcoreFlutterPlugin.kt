@@ -16,4 +16,7 @@ class ArcoreFlutterPlugin: FlutterPlugin{
                     .registerViewFactory("arcore_flutter_plugin", ArCoreViewFactory(registrar.messenger()))
         }
     }
+
+    override fun onAttachedToEngine (p0: FlutterPlugin.FlutterPluginBinding) {}
+    override fun onDetachedFromEngine (p0: FlutterPlugin.FlutterPluginBinding) {}
 }
