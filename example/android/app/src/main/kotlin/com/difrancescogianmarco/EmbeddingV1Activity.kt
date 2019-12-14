@@ -4,9 +4,9 @@ import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 
-public class EmbeddingV1Activity extends FlutterActivity {
- @Override
- protected void onCreate(Bundle savedInstanceState) {
+class EmbeddingV1Activity : FlutterActivity() {
+
+ override fun onCreate(savedInstanceState: Bundle?) {
    super.onCreate(savedInstanceState);
    GeneratedPluginRegistrant.registerWith(this);
  }

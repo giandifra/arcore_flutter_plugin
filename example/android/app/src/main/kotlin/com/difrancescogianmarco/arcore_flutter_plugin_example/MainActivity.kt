@@ -7,8 +7,8 @@ import io.flutter.embedding.engine.FlutterEngine;
 import com.difrancescogianmarco.arcore_flutter_plugin.ArcoreFlutterPlugin;
 
 class MainActivity: FlutterActivity() {
-  @Override
-  public void configureFlutterEngine(FlutterEngine flutterEngine) {
-    flutterEngine.getPlugins().add(new ArcoreFlutterPlugin());
+  
+  override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+    flutterEngine.getPlugins().add(ArcoreFlutterPlugin());
   }
 }
