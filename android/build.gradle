@@ -49,13 +49,13 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    api 'com.google.ar:core:1.10.0'
+    api 'com.google.ar:core:1.14.0'
     api 'com.android.support:appcompat-v7:28.0.0'
     // Provides ArFragment, and other UX resources.
-    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.10.0'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.14.0'
     // Alternatively, use ArSceneView without the UX dependency.
-    implementation 'com.google.ar.sceneform:core:1.10.0'
-    implementation 'com.google.ar.sceneform:assets:1.10.0'
+    implementation 'com.google.ar.sceneform:core:1.14.0'
+    implementation 'com.google.ar.sceneform:assets:1.14.0'
 }
 
 afterEvaluate {
