@@ -30,9 +30,9 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
-class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int, private val isAugmentedFaces: Boolean) : PlatformView, MethodChannel.MethodCallHandler {
+class ArCoreView(val activity:Activity, context: Context, messenger: BinaryMessenger, id: Int, private val isAugmentedFaces: Boolean) : PlatformView, MethodChannel.MethodCallHandler {
     private val methodChannel: MethodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
-    private val activity: Activity = (context.applicationContext as FlutterApplication).currentActivity
+//       private val activity: Activity = (context.applicationContext as FlutterApplication).currentActivity
     lateinit var activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks
     private var installRequested: Boolean = false
     private var mUserRequestedInstall = true
@@ -42,7 +42,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int, private 
     private val RC_PERMISSIONS = 0x123
     private var sceneUpdateListener: Scene.OnUpdateListener
     private var faceSceneUpdateListener: Scene.OnUpdateListener
-    
+
     //AUGMENTEDFACE
     private var faceRegionsRenderable: ModelRenderable? = null
     private var faceMeshTexture: Texture? = null
@@ -252,8 +252,7 @@ class ArCoreView(context: Context, messenger: BinaryMessenger, id: Int, private 
             }
         }
 
-        (context.applicationContext as FlutterApplication).currentActivity.application
-                .registerActivityLifecycleCallbacks(this.activityLifecycleCallbacks)
+        activity.application.registerActivityLifecycleCallbacks(this.activityLifecycleCallbacks)
     }
 
     private fun onSingleTap(tap: MotionEvent?) {

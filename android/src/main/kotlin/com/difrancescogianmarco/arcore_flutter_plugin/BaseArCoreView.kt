@@ -16,12 +16,12 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
-open class BaseArCoreView(context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
+open class BaseArCoreView(val activity:Activity,context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
 
     lateinit var activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks
     private val methodChannel: MethodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
     protected var arSceneView: ArSceneView? = null
-    protected val activity: Activity = (context.applicationContext as FlutterApplication).currentActivity
+//    protected val activity: Activity = (context.applicationContext as FlutterApplication).currentActivity
     protected val RC_PERMISSIONS = 0x123
     protected var installRequested: Boolean = false
     private val TAG: String = BaseArCoreView::class.java.name
@@ -67,7 +67,7 @@ open class BaseArCoreView(context: Context, messenger: BinaryMessenger, id: Int)
             }
         }
 
-        (context.applicationContext as FlutterApplication).currentActivity.application
+       activity.application
                 .registerActivityLifecycleCallbacks(this.activityLifecycleCallbacks)
     }
 

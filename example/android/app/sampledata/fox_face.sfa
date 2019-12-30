@@ -1,0 +1,117 @@
+{
+  animations: [
+    {
+      clips: [
+        {
+          name: 'Take 001',
+          runtime_name: 'fox_face',
+        },
+      ],
+      path: 'sampledata/fox_face.fbx',
+    },
+  ],
+  materials: [
+    {
+      name: 'nose',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: 'nose_fur',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'earMAT',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: 'ear_fur',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+      'BoneIndices',
+      'BoneWeights',
+    ],
+    collision: {},
+    file: 'sampledata/fox_face.fbx',
+    name: 'fox_face',
+    recenter: 'root',
+  },
+  samplers: [
+    {
+      file: 'sampledata/ear_fur.png',
+      name: 'ear_fur',
+      pipeline_name: '..\\sample assets\\ear_fur.png',
+    },
+    {
+      file: 'sampledata/nose_fur.png',
+      name: 'nose_fur',
+      pipeline_name: '..\\fox\\nose_fur.png',
+    },
+  ],
+  version: '0.54:2',
+}

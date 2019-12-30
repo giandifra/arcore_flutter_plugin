@@ -1,5 +1,6 @@
 package com.difrancescogianmarco.arcore_flutter_plugin
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -19,7 +20,7 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-class ArCoreFaceView(context: Context, messenger: BinaryMessenger, id: Int) : BaseArCoreView(context, messenger, id) {
+class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessenger, id: Int) : BaseArCoreView(activity, context, messenger, id) {
 
     private val TAG: String = ArCoreFaceView::class.java.name
     private var faceRegionsRenderable: ModelRenderable? = null
@@ -112,7 +113,7 @@ class ArCoreFaceView(context: Context, messenger: BinaryMessenger, id: Int) : Ba
         if (enableAugmentedFaces != null && enableAugmentedFaces) {
             // This is important to make sure that the camera stream renders first so that
             // the face mesh occlusion works correctly.
-            arSceneView?.cameraStreamRenderPriority = Renderable.RENDER_PRIORITY_FIRST;
+            arSceneView?.cameraStreamRenderPriority = Renderable.RENDER_PRIORITY_FIRST
             arSceneView?.scene?.addOnUpdateListener(faceSceneUpdateListener)
         }
 

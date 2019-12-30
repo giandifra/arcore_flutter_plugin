@@ -1,0 +1,49 @@
+{
+  materials: [
+    {
+      name: 'initialShadingGroup',
+      parameters: [
+        {
+          baseColor: 'TocoToucan_Albedo',
+        },
+        {
+          baseColorTint: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          metallic: 0,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/TocoToucan.obj',
+    name: 'TocoToucan',
+    recenter: 'root',
+  },
+  samplers: [
+    {
+      file: 'sampledata/TocoToucan_Albedo.png',
+      name: 'TocoToucan_Albedo',
+      pipeline_name: 'TocoToucan_Albedo.png',
+    },
+  ],
+  version: '0.54:2',
+}
