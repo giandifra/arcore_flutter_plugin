@@ -12,14 +12,22 @@ class ArCoreFaceController {
   }) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
     _channel.setMethodCallHandler(_handleMethodCalls);
-    _channel.invokeMethod<void>('init', {
-      'enableAugmentedFaces': enableAugmentedFaces,
-    });
+    init();
   }
 
   final bool enableAugmentedFaces;
   MethodChannel _channel;
   StringResultHandler onError;
+
+  init() async {
+    try {
+      await _channel.invokeMethod<void>('init', {
+        'enableAugmentedFaces': enableAugmentedFaces,
+      });
+    } on PlatformException catch (ex) {
+      print(ex.message);
+    }
+  }
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
     print('_platformCallHandler call ${call.method} ${call.arguments}');
