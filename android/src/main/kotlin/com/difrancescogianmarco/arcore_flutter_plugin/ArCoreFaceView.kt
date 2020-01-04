@@ -11,6 +11,7 @@ import com.google.ar.core.Config
 import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
+import com.google.ar.sceneform.ArSceneView
 import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Renderable
@@ -67,22 +68,29 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        when (call.method) {
-            "init" -> {
-                arScenViewInit(call, result);
+        if(isSupportedDevice){
+            Log.i(TAG,call.method +"called on supported device")
+            when (call.method) {
+                "init" -> {
+                    arScenViewInit(call, result)
+                }
+                "loadMesh" -> {
+                    val map = call.arguments as HashMap<*, *>
+                    val textureBytes = map["textureBytes"] as ByteArray
+                    val skin3DModelFilename = map["skin3DModelFilename"] as? String
+                    loadMesh(textureBytes, skin3DModelFilename)
+                }
+                "dispose" -> {
+                    Log.i(TAG, " updateMaterials")
+                    dispose()
+                }
+                else -> {
+                    result.notImplemented()
+                }
             }
-            "loadMesh" -> {
-                val map = call.arguments as HashMap<*, *>
-                val textureBytes = map["textureBytes"] as ByteArray
-                val skin3DModelFilename = map["skin3DModelFilename"] as? String
-                loadMesh(textureBytes, skin3DModelFilename)
-            }
-            "dispose" -> {
-                Log.i(TAG, " updateMaterials")
-                dispose()
-            }
-            else -> {
-            }
+        }else{
+            Log.i(TAG,"Impossible call " + call.method + " method on unsupported device")
+            result.error("Unsupported Device","",null)
         }
     }
 
@@ -121,7 +129,9 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
     }
 
     override fun onResume() {
-        super.onResume()
+        if (arSceneView == null) {
+            return
+        }
 
         if (arSceneView?.session == null) {
 
@@ -135,7 +145,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
             try {
                 val session = ArCoreUtils.createArSession(activity, installRequested, true)
                 if (session == null) {
-                    installRequested = ArCoreUtils.hasCameraPermission(activity)
+                    installRequested = false
                     return
                 } else {
                     val config = Config(session)

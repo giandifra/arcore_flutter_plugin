@@ -25,19 +25,21 @@ open class BaseArCoreView(val activity:Activity,context: Context, messenger: Bin
     protected val RC_PERMISSIONS = 0x123
     protected var installRequested: Boolean = false
     private val TAG: String = BaseArCoreView::class.java.name
-
+    protected var isSupportedDevice = false
     init {
         methodChannel.setMethodCallHandler(this)
-        arSceneView = ArSceneView(context)
-        ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
-        setupLifeCycle(context)
+        if(ArCoreUtils.checkIsSupportedDeviceOrFinish(activity)){
+            isSupportedDevice = true
+            arSceneView = ArSceneView(context)
+            ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
+            setupLifeCycle(context)
+        }
     }
 
     private fun setupLifeCycle(context: Context) {
         activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
                 Log.i(TAG, "onActivityCreated")
-                maybeEnableArButton()
             }
 
             override fun onActivityStarted(activity: Activity) {
@@ -71,19 +73,6 @@ open class BaseArCoreView(val activity:Activity,context: Context, messenger: Bin
                 .registerActivityLifecycleCallbacks(this.activityLifecycleCallbacks)
     }
 
-    fun maybeEnableArButton() {
-        val availability = ArCoreApk.getInstance().checkAvailability(activity.applicationContext)
-        if (availability.isTransient) {
-            // Re-query at 5Hz while compatibility is checked in the background.
-            Handler().postDelayed({ maybeEnableArButton() }, 200)
-        }
-        if (availability.isSupported) {
-            Log.i(TAG, "AR SUPPORTED")
-        } else { // Unsupported or unknown.
-            Log.i(TAG, "AR NOT SUPPORTED")
-        }
-    }
-
     override fun getView(): View {
         return arSceneView as View
     }
@@ -100,10 +89,6 @@ open class BaseArCoreView(val activity:Activity,context: Context, messenger: Bin
     }
 
     open fun onResume() {
-
-        if (arSceneView == null) {
-            return
-        }
 
 //        if (arSceneView?.session == null) {
 //

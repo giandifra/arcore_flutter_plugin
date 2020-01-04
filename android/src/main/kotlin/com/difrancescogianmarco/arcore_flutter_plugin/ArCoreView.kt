@@ -418,7 +418,6 @@ class ArCoreView(val activity:Activity, context: Context, messenger: BinaryMesse
     }
 
     fun onResume() {
-
         Log.i(TAG, "onResume()")
 
         if (arSceneView == null) {
