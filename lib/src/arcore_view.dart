@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 
 typedef void ArCoreViewCreatedCallback(ArCoreController controller);
 
-enum ArCoreViewType {
-  AUGMENTEDFACE,
-  STANDARDVIEW,
-}
+enum ArCoreViewType { AUGMENTEDFACE, STANDARDVIEW, AUGMENTEDIMAGES }
 
 class ArCoreView extends StatefulWidget {
   final ArCoreViewCreatedCallback onArCoreViewCreated;

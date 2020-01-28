@@ -50,7 +50,7 @@ class ArCoreUtils {
          * null. and the camera permission has been granted.
          */
         @Throws(UnavailableException::class)
-        fun createArSession(activity: Activity, userRequestedInstall: Boolean, isAugmentedFaces: Boolean): Session? {
+        fun createArSession(activity: Activity, userRequestedInstall: Boolean, isFrontCamera: Boolean): Session? {
             var session: Session? = null
             // if we have the camera permission, create the session
             if (hasCameraPermission(activity)) {
@@ -61,7 +61,7 @@ class ArCoreUtils {
                     }
         //                    ArCoreApk.InstallStatus.INSTALLED -> {}
                     else -> {
-                        if(isAugmentedFaces){
+                        if(isFrontCamera){
                             Session(activity, EnumSet.of(Session.Feature.FRONT_CAMERA))
                         }else{
                             Session(activity)

@@ -20,7 +20,9 @@ class ArCoreAndroidView extends AndroidView {
           creationParams: <String, dynamic>{
             "type": arCoreViewType == ArCoreViewType.AUGMENTEDFACE
                 ? "faces"
-                : "standard"
+                : arCoreViewType == ArCoreViewType.AUGMENTEDIMAGES
+                    ? "augmented"
+                    : "standard"
           },
           creationParamsCodec: const StandardMessageCodec(),
         );

@@ -1,5 +1,7 @@
 package com.difrancescogianmarco.arcore_flutter_plugin.flutter_models
 
+import com.google.ar.core.Pose
+
 class FlutterArCorePose(val translation: FloatArray, val rotation: FloatArray) {
 
     fun toHashMap(): HashMap<String, Any> {
@@ -15,6 +17,12 @@ class FlutterArCorePose(val translation: FloatArray, val rotation: FloatArray) {
             doubleArray[i] = a.toDouble()
         }
         return doubleArray
+    }
+    
+    companion object{
+        fun fromPose(pose: Pose): FlutterArCorePose{
+            return FlutterArCorePose(pose.translation, pose.rotationQuaternion)
+        }
     }
 
 }

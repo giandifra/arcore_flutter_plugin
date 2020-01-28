@@ -21,8 +21,7 @@ class RenderableCustomFactory {
         val TAG = RenderableCustomFactory::class.java.name
         @SuppressLint("ShowToast")
         fun makeRenderable(context: Context, flutterArCoreNode: FlutterArCoreNode, handler: RenderableHandler) {
-
-
+            
             if (flutterArCoreNode.dartType == "ArCoreReferenceNode") {
 
                 val url = flutterArCoreNode.objectUrl

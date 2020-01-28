@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:arcore_flutter_plugin/src/arcore_augmented_image.dart';
 import 'package:arcore_flutter_plugin/src/arcore_rotating_node.dart';
 import 'package:arcore_flutter_plugin/src/utils/vector_utils.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +14,8 @@ typedef StringResultHandler = void Function(String text);
 typedef UnsupportedHandler = void Function(String text);
 typedef ArCoreHitResultHandler = void Function(List<ArCoreHitTestResult> hits);
 typedef ArCorePlaneHandler = void Function(ArCorePlane plane);
+typedef ArCoreAugmentedImageTrackingHandler = void Function(
+    ArCoreAugmentedImage);
 
 class ArCoreController {
   ArCoreController({
@@ -33,6 +38,7 @@ class ArCoreController {
 //  UnsupportedHandler onUnsupported;
   ArCoreHitResultHandler onPlaneTap;
   ArCorePlaneHandler onPlaneDetected;
+  ArCoreAugmentedImageTrackingHandler onTrackingImage;
 
   init() async {
     try {
@@ -75,6 +81,12 @@ class ArCoreController {
           onPlaneDetected(plane);
         }
         break;
+      case 'onTrackingImage':
+        print('flutter onTrackingImage');
+        final arCoreAugmentedImage =
+            ArCoreAugmentedImage.fromMap(call.arguments);
+        onTrackingImage(arCoreAugmentedImage);
+        break;
       default:
         print('Unknowm method ${call.method} ');
     }
@@ -87,6 +99,15 @@ class ArCoreController {
     print(params.toString());
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNode', params);
+  }
+
+  addArCoreNodeToAugmentedImage(ArCoreNode node, int index,
+      {String parentNodeName}) {
+    assert(node != null);
+
+    final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
+    return _channel.invokeMethod(
+        'attachObjectToAugmentedImage', {'index': index, 'node': params});
   }
 
   Future<void> addArCoreNodeWithAnchor(ArCoreNode node,
@@ -141,7 +162,24 @@ class ArCoreController {
     return values;
   }
 
+  Future<void> loadAugmentedImage({@required Uint8List bytes}) {
+    assert(bytes != null);
+    return _channel.invokeMethod('load_single_image_on_db', {
+      'bytes': bytes,
+    });
+  }
+
   void dispose() {
     _channel?.invokeMethod<void>('dispose');
+  }
+
+  Future<void> removeNodeWithIndex(int index) {
+    try {
+      return _channel.invokeMethod('removeARCoreNodeWithIndex', {
+        'index': index,
+      });
+    } catch (ex) {
+      print(ex);
+    }
   }
 }

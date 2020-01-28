@@ -41,6 +41,8 @@ flutter:
     - assets/prova_texture.png
     - assets/venom.jpg
     - assets/venom_with_eyes.jpg
+    - assets/earth.jpg
+    - assets/earth_augmented_image.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

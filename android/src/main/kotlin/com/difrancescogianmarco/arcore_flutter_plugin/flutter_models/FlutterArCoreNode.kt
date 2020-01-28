@@ -3,6 +3,7 @@ package com.difrancescogianmarco.arcore_flutter_plugin.flutter_models
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseQuaternion
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
+import com.google.ar.core.Pose
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
@@ -23,12 +24,10 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
     var parentNodeName: String? = map["parentNodeName"] as? String
 
     val children: ArrayList<FlutterArCoreNode> = getChildrenFromMap(map["children"] as ArrayList<HashMap<String, *>>)
-
-
+    
     private fun getChildrenFromMap(list: ArrayList<HashMap<String, *>>): ArrayList<FlutterArCoreNode> {
         return ArrayList(list.map { map -> FlutterArCoreNode(map) })
     }
-
 
     fun buildNode(): Node {
         lateinit var node: Node
@@ -45,8 +44,7 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
 
         return node
     }
-
-
+    
     fun getPosition(): FloatArray {
         return floatArrayOf(position.x, position.y, position.z)
     }
@@ -55,7 +53,10 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         return floatArrayOf(rotation.x, rotation.y, rotation.z, rotation.w)
     }
 
-
+    fun getPose(): Pose{
+        return Pose(getPosition(), getRotation())
+    }
+    
     private fun getDegreesPerSecond(degreesPerSecond: Double?): Float? {
         if (dartType == "ArCoreRotatingNode" && degreesPerSecond != null) {
             return degreesPerSecond.toFloat()

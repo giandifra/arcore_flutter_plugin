@@ -163,7 +163,7 @@ class ArCoreView(val activity:Activity, context: Context, messenger: BinaryMesse
             "addArCoreNodeWithAnchor" -> {
                 Log.i(TAG, " addArCoreNode")
                 val map = call.arguments as HashMap<String, Any>
-                val flutterNode = FlutterArCoreNode(map);
+                val flutterNode = FlutterArCoreNode(map)
                 addNodeWithAnchor(flutterNode, result)
             }
             "removeARCoreNode" -> {

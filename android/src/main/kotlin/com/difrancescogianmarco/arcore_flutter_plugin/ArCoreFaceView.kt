@@ -172,7 +172,6 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
     override fun onDestroy() {
         arSceneView?.scene?.removeOnUpdateListener(faceSceneUpdateListener)
         super.onDestroy()
-
     }
 
 }

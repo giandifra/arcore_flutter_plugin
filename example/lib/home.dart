@@ -1,4 +1,6 @@
 import 'package:arcore_flutter_plugin_example/screens/augmented_faces.dart';
+import 'package:arcore_flutter_plugin_example/screens/augmented_images.dart';
+import 'package:arcore_flutter_plugin_example/screens/matri_3d.dart';
 import 'package:flutter/material.dart';
 import 'screens/hello_world.dart';
 import 'screens/custom_object.dart';
@@ -23,6 +25,20 @@ class HomeScreen extends StatelessWidget {
                   .push(MaterialPageRoute(builder: (context) => HelloWorld()));
             },
             title: Text("Hello World"),
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => Matrix3DRenderingPage()));
+            },
+            title: Text("Matrix3DRenderingPage"),
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => AugmentedPage()));
+            },
+            title: Text("AugmentedPage"),
           ),
           ListTile(
             onTap: () {
