@@ -17,14 +17,12 @@ import androidx.core.app.ActivityCompat
 import android.widget.Toast
 import androidx.annotation.Nullable
 import androidx.core.content.ContextCompat
-import com.google.ar.core.ArCoreApk
-import com.google.ar.core.Config
-import com.google.ar.core.Session
 import com.google.ar.core.exceptions.*
 import java.util.*
 import androidx.core.content.ContextCompat.getSystemService
 import android.os.Build.VERSION_CODES
-
+import com.google.ar.core.*
+import com.google.ar.core.CameraConfig
 
 
 class ArCoreUtils {
@@ -56,17 +54,38 @@ class ArCoreUtils {
             if (hasCameraPermission(activity)) {
                 session = when (ArCoreApk.getInstance().requestInstall(activity, userRequestedInstall)) {
                     ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
-                        Log.i(TAG,"INSTALL REQUESTED")
+                        Log.i(TAG, "INSTALL REQUESTED")
                         null
                     }
-        //                    ArCoreApk.InstallStatus.INSTALLED -> {}
+                    //                    ArCoreApk.InstallStatus.INSTALLED -> {}
                     else -> {
-                        if(isFrontCamera){
+                        if (isFrontCamera) {
                             Session(activity, EnumSet.of(Session.Feature.FRONT_CAMERA))
-                        }else{
+                        } else {
                             Session(activity)
                         }
                     }
+                }
+                session?.let {
+                    // Create a camera config filter for the session.
+                    val filter = CameraConfigFilter(it)
+
+                    // Return only camera configs that target 30 fps camera capture frame rate.
+                    filter.setTargetFps(EnumSet.of(CameraConfig.TargetFps.TARGET_FPS_30))
+
+                    // Return only camera configs that will not use the depth sensor.
+                    filter.setDepthSensorUsage(EnumSet.of(CameraConfig.DepthSensorUsage.DO_NOT_USE))
+
+                    // Get list of configs that match filter settings.
+                    // In this case, this list is guaranteed to contain at least one element,
+                    // because both TargetFps.TARGET_FPS_30 and DepthSensorUsage.DO_NOT_USE
+                    // are supported on all ARCore supported devices.
+                    val cameraConfigList = it.getSupportedCameraConfigs(filter)
+
+                    // Use element 0 from the list of returned camera configs. This is because
+                    // it contains the camera config that best matches the specified filter
+                    // settings.
+                    it.cameraConfig = cameraConfigList[0]
                 }
 
             }

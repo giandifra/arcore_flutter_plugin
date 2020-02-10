@@ -323,7 +323,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 anchorNode.name = flutterArCoreNode.name
                 anchorNode.renderable = renderable
 
-                Log.i(TAG, "inserted ${anchorNode.name}")
+                Log.i(TAG, "addNodeWithAnchor inserted ${anchorNode.name}")
                 attachNodeToParent(anchorNode, flutterArCoreNode.parentNodeName)
 
                 for (node in flutterArCoreNode.children) {
@@ -340,7 +340,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         Log.i(TAG, flutterArCoreNode.toString())
         NodeFactory.makeNode(activity.applicationContext, flutterArCoreNode) { node, throwable ->
 
-            Log.i(TAG, "inserted ${node?.name}")
+            Log.i(TAG, "onAddNode inserted ${node?.name}")
 
 /*            if (flutterArCoreNode.parentNodeName != null) {
                 Log.i(TAG, flutterArCoreNode.parentNodeName);
