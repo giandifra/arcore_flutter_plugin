@@ -131,34 +131,8 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
 //            return
 //        }
     }
-
-    fun addNodeWithAnchor(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result) {
-
-        if (arSceneView == null) {
-            return
-        }
-
-        RenderableCustomFactory.makeRenderable(activity.applicationContext, flutterArCoreNode) { renderable, t ->
-            if (renderable != null) {
-                val myAnchor = arSceneView?.session?.createAnchor(Pose(flutterArCoreNode.getPosition(), flutterArCoreNode.getRotation()))
-                if (myAnchor != null) {
-                    val anchorNode = AnchorNode(myAnchor)
-                    anchorNode.name = flutterArCoreNode.name
-                    anchorNode.renderable = renderable
-
-                    Log.i(TAG, "inserted ${anchorNode.name}")
-                    attachNodeToParent(anchorNode, flutterArCoreNode.parentNodeName)
-
-                    for (node in flutterArCoreNode.children) {
-                        node.parentNodeName = flutterArCoreNode.name
-                        onAddNode(node, null)
-                    }
-                }
-            }
-        }
-        result.success(null)
-    }
-
+    
+    
     fun attachNodeToParent(node: Node?, parentNodeName: String?) {
         if (parentNodeName != null) {
             Log.i(TAG, parentNodeName)

@@ -5,14 +5,14 @@ import 'arcore_node.dart';
 class ArCoreReferenceNode extends ArCoreNode {
   /// Filenaeme of sfb object in assets folder (generated with Import Sceneform Asset)
   /// https://developers.google.com/ar/develop/java/sceneform/import-assets
-  final String obcject3DFileName;
+  final String object3DFileName;
 
   /// Url of gltf object for remote rendering
   final String objectUrl;
 
   ArCoreReferenceNode({
     String name,
-    this.obcject3DFileName,
+    this.object3DFileName,
     this.objectUrl,
     List<ArCoreNode> children = const [],
     Vector3 position,
@@ -27,7 +27,7 @@ class ArCoreReferenceNode extends ArCoreNode {
 
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'obcject3DFileName': this.obcject3DFileName,
+        'object3DFileName': this.object3DFileName,
         'objectUrl': this.objectUrl,
       }..addAll(super.toMap());
 }

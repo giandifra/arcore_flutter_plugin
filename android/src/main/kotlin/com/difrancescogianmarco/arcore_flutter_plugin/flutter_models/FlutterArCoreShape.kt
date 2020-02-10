@@ -15,15 +15,12 @@ class FlutterArCoreShape(map: HashMap<String, *>) {
     val height: Float? = (map["height"] as? Double)?.toFloat()
 
     fun buildShape(material: Material): ModelRenderable? {
-        if (dartType == "ArCoreSphere") {
-            return ShapeFactory.makeSphere(radius!!, Vector3(0.0f, 0.15f, 0.0f), material)
-        } else if (dartType == "ArCoreCube") {
-            return ShapeFactory.makeCube(size, Vector3(0.0f, 0.15f, 0.0f), material);
-        } else if (dartType == "ArCoreCylinder") {
-            return ShapeFactory.makeCylinder(radius!!, height!!, Vector3(0.0f, 0.15f, 0.0f), material);
-        } else {
-            //TODO return exception
-            return null
+        return when (dartType) {
+            "ArCoreSphere" -> ShapeFactory.makeSphere(radius!!, Vector3(0.0f, 0.15f, 0.0f), material)
+            "ArCoreCube" -> ShapeFactory.makeCube(size, Vector3(0.0f, 0.15f, 0.0f), material)
+            "ArCoreCylinder" -> ShapeFactory.makeCylinder(radius!!, height!!, Vector3(0.0f, 0.15f, 0.0f), material)
+            else -> //TODO return exception
+                null
         }
     }
 

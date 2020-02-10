@@ -30,9 +30,9 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
-class ArCoreView(val activity:Activity, context: Context, messenger: BinaryMessenger, id: Int, private val isAugmentedFaces: Boolean) : PlatformView, MethodChannel.MethodCallHandler {
+class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMessenger, id: Int, private val isAugmentedFaces: Boolean) : PlatformView, MethodChannel.MethodCallHandler {
     private val methodChannel: MethodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
-//       private val activity: Activity = (context.applicationContext as FlutterApplication).currentActivity
+    //       private val activity: Activity = (context.applicationContext as FlutterApplication).currentActivity
     lateinit var activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks
     private var installRequested: Boolean = false
     private var mUserRequestedInstall = true
@@ -313,24 +313,26 @@ class ArCoreView(val activity:Activity, context: Context, messenger: BinaryMesse
         }
 
         RenderableCustomFactory.makeRenderable(activity.applicationContext, flutterArCoreNode) { renderable, t ->
-            if (renderable != null) {
-                val myAnchor = arSceneView?.session?.createAnchor(Pose(flutterArCoreNode.getPosition(), flutterArCoreNode.getRotation()))
-                if (myAnchor != null) {
-                    val anchorNode = AnchorNode(myAnchor)
-                    anchorNode.name = flutterArCoreNode.name
-                    anchorNode.renderable = renderable
+            if (t != null) {
+                result.error("Make Renderable Error", t.localizedMessage, null)
+                return@makeRenderable
+            }
+            val myAnchor = arSceneView?.session?.createAnchor(Pose(flutterArCoreNode.getPosition(), flutterArCoreNode.getRotation()))
+            if (myAnchor != null) {
+                val anchorNode = AnchorNode(myAnchor)
+                anchorNode.name = flutterArCoreNode.name
+                anchorNode.renderable = renderable
 
-                    Log.i(TAG, "inserted ${anchorNode.name}")
-                    attachNodeToParent(anchorNode, flutterArCoreNode.parentNodeName)
+                Log.i(TAG, "inserted ${anchorNode.name}")
+                attachNodeToParent(anchorNode, flutterArCoreNode.parentNodeName)
 
-                    for (node in flutterArCoreNode.children) {
-                        node.parentNodeName = flutterArCoreNode.name
-                        onAddNode(node, null)
-                    }
+                for (node in flutterArCoreNode.children) {
+                    node.parentNodeName = flutterArCoreNode.name
+                    onAddNode(node, null)
                 }
             }
+            result.success(null)
         }
-        result.success(null)
     }
 
     fun onAddNode(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result?) {

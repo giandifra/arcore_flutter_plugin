@@ -63,13 +63,13 @@ class _Matrix3DRenderingPageState extends State<Matrix3DRenderingPage> {
     }
 
     final node = ArCoreNode(
-      shape: createCube(),
+      shape: null,
       position: hit.pose.translation + vector.Vector3(0.0, 0.5, 0.0),
       rotation: hit.pose.rotation,
       children: list,
     );
 
-    arCoreController.addArCoreNode(node);
+    arCoreController.addArCoreNodeWithAnchor(node);
   }
 
   createNode(ArCoreCube shape, int i, int z) {

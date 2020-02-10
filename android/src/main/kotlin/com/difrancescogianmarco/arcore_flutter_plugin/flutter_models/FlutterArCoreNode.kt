@@ -13,7 +13,7 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
     val dartType: String = map["dartType"] as String
     val name: String = map["name"] as String
     val objectUrl: String? = map["objectUrl"] as? String
-    val obcject3DFileName: String? = map["obcject3DFileName"] as? String
+    val object3DFileName: String? = map["object3DFileName"] as? String
     val shape: FlutterArCoreShape? = getShape(map["shape"] as? HashMap<String, *>)
     val position: Vector3 = parseVector3(map["position"] as? HashMap<String, *>) ?: Vector3()
     val scale: Vector3 = parseVector3(map["scale"] as? HashMap<String, *>)
@@ -75,7 +75,7 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         return "dartType: $dartType\n" +
                 "name: $name\n" +
                 "shape: ${shape.toString()}\n" +
-                "obcject3DFileName: $obcject3DFileName \n" +
+                "object3DFileName: $object3DFileName \n" +
                 "objectUrl: $objectUrl \n" +
                 "position: $position\n" +
                 "scale: $scale\n" +

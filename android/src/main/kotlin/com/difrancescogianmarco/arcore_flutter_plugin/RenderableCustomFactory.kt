@@ -18,15 +18,14 @@ class RenderableCustomFactory {
 
     companion object {
 
-        val TAG = RenderableCustomFactory::class.java.name
+        val TAG = "RenderableCustomFactory"
         @SuppressLint("ShowToast")
         fun makeRenderable(context: Context, flutterArCoreNode: FlutterArCoreNode, handler: RenderableHandler) {
-            
             if (flutterArCoreNode.dartType == "ArCoreReferenceNode") {
 
                 val url = flutterArCoreNode.objectUrl
 
-                val localObject = flutterArCoreNode.obcject3DFileName
+                val localObject = flutterArCoreNode.object3DFileName
 
                 if (localObject != null) {
                     val builder = ModelRenderable.builder()
@@ -63,16 +62,21 @@ class RenderableCustomFactory {
 
             } else {
                 makeMaterial(context, flutterArCoreNode) { material, throwable ->
-                    if (material != null) {
-                        Log.i(TAG, "material not null")
-                        try {
-                            val renderable = flutterArCoreNode.shape?.buildShape(material)
-                            handler(renderable, null)
-                        } catch (ex: Exception) {
-                            Log.i(TAG, "renderable error ${ex}")
-                            handler(null, ex)
-                            Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG)
-                        }
+                    if (throwable != null) {
+                        handler(null, throwable)
+                        return@makeMaterial
+                    }
+                    if(material == null){
+                        handler(null, null)
+                        return@makeMaterial
+                    }
+                    try {
+                        val renderable = flutterArCoreNode.shape?.buildShape(material)
+                        handler(renderable, null)
+                    } catch (ex: Exception) {
+                        Log.i(TAG, "renderable error ${ex}")
+                        handler(null, ex)
+                        Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG)
                     }
                 }
             }
@@ -107,6 +111,8 @@ class RenderableCustomFactory {
                             handler(null, throwable)
                             return@exceptionally null
                         }
+            } else {
+                handler(null, null)
             }
         }
     }

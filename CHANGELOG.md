@@ -1,7 +1,9 @@
 ## 0.0.5+1
 
 * Migrate to new Android Plugin Api
-* Update AR Core and Sceneform dependencies to 1.14
+* Update AR Core and Sceneform dependencies to 1.14+
+* Add method to check AR Core compatibility
+* Add Augmented Images feature (from single image or from imgdb file)
 
 ## 0.0.4
 

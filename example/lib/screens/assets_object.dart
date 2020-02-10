@@ -49,7 +49,7 @@ class _AssetsObjectState extends State<AssetsObject> {
       //"https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF/Duck.gltf"
       final toucanoNode = ArCoreReferenceNode(
           name: objectSelected,
-          obcject3DFileName: objectSelected,
+          object3DFileName: objectSelected,
           position: plane.pose.translation,
           rotation: plane.pose.rotation);
 
