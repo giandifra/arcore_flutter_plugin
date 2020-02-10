@@ -34,7 +34,7 @@ class _CustomObjectState extends State<CustomObject> {
     arCoreController.onPlaneTap = _handleOnPlaneTap;
   }
 
-  Future _addSphere(ArCoreHitTestResult plane) async {
+  Future _addSphere(ArCoreHitTestResult hit) async {
     final moonMaterial = ArCoreMaterial(color: Colors.grey);
 
     final moonShape = ArCoreSphere(
@@ -62,8 +62,8 @@ class _CustomObjectState extends State<CustomObject> {
     final earth = ArCoreNode(
         shape: earthShape,
         children: [moon],
-        position: plane.pose.translation + vector.Vector3(0.0, 1.0, 0.0),
-        rotation: plane.pose.rotation);
+        position: hit.pose.translation + vector.Vector3(0.0, 1.0, 0.0),
+        rotation: hit.pose.rotation);
 
     arCoreController.addArCoreNodeWithAnchor(earth);
   }

@@ -1,10 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
-import 'package:vector_math/vector_math_64.dart' as vector;
-import 'dart:math' as Math;
 
 class AugmentedPage extends StatefulWidget {
   @override
@@ -33,9 +29,22 @@ class _AugmentedPageState extends State<AugmentedPage> {
   void _onArCoreViewCreated(ArCoreController controller) async {
     arCoreController = controller;
     arCoreController.onTrackingImage = _handleOnTrackingImage;
+    //loadSingleImage();
+    //OR
+    loadImagesDatabase();
+  }
+
+  loadSingleImage() async {
     final ByteData bytes =
         await rootBundle.load('assets/earth_augmented_image.jpg');
-    arCoreController.loadAugmentedImage(bytes: bytes.buffer.asUint8List());
+    arCoreController.loadSingleAugmentedImage(
+        bytes: bytes.buffer.asUint8List());
+  }
+
+  loadImagesDatabase() async {
+    final ByteData bytes = await rootBundle.load('assets/myimages.imgdb');
+    arCoreController.loadAugmentedImagesDatabase(
+        bytes: bytes.buffer.asUint8List());
   }
 
   _handleOnTrackingImage(ArCoreAugmentedImage augmentedImage) {

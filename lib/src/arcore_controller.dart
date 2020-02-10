@@ -17,7 +17,15 @@ typedef ArCorePlaneHandler = void Function(ArCorePlane plane);
 typedef ArCoreAugmentedImageTrackingHandler = void Function(
     ArCoreAugmentedImage);
 
+const UTILS_CHANNEL_NAME = 'arcore_flutter_plugin/utils';
+
 class ArCoreController {
+  static checkArCoreAvailability() async {
+    final bool arcoreAvailable = await MethodChannel(UTILS_CHANNEL_NAME)
+        .invokeMethod('checkArCoreApkAvailability');
+    return arcoreAvailable;
+  }
+
   ArCoreController({
     int id,
     this.enableTapRecognizer,
@@ -162,9 +170,16 @@ class ArCoreController {
     return values;
   }
 
-  Future<void> loadAugmentedImage({@required Uint8List bytes}) {
+  Future<void> loadSingleAugmentedImage({@required Uint8List bytes}) {
     assert(bytes != null);
     return _channel.invokeMethod('load_single_image_on_db', {
+      'bytes': bytes,
+    });
+  }
+
+  Future<void> loadAugmentedImagesDatabase({@required Uint8List bytes}) {
+    assert(bytes != null);
+    return _channel.invokeMethod('load_augmented_images_database', {
       'bytes': bytes,
     });
   }

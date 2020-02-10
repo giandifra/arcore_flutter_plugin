@@ -28,13 +28,6 @@ class HomeScreen extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Matrix3DRenderingPage()));
-            },
-            title: Text("Matrix3DRenderingPage"),
-          ),
-          ListTile(
-            onTap: () {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => AugmentedPage()));
             },

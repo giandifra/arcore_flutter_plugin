@@ -43,6 +43,9 @@ flutter:
     - assets/venom_with_eyes.jpg
     - assets/earth.jpg
     - assets/earth_augmented_image.jpg
+    - assets/copertina.jpg
+    - assets/umano_digitale.png
+    - assets/myimages.imgdb
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

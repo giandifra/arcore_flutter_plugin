@@ -1,8 +1,10 @@
 package com.difrancescogianmarco.arcore_flutter_plugin
 
+import android.os.Handler
 import android.util.Log
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable
+import com.google.ar.core.ArCoreApk
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -16,16 +18,19 @@ class ArcoreFlutterPlugin : FlutterPlugin, ActivityAware {
 
     @Nullable
     private var flutterPluginBinding: FlutterPlugin.FlutterPluginBinding? = null
+    
+    private var methodCallHandler: MethodCallHandlerImpl? = null
 
     companion object {
         const val TAG = "ArCoreFlutterPlugin"
-
+        
+        private const val CHANNEL_NAME = "arcore_flutter_plugin"
         @JvmStatic
         fun registerWith(registrar: Registrar) {
             Log.i(TAG, "registerWith")
             registrar
                     .platformViewRegistry()
-                    .registerViewFactory("arcore_flutter_plugin", ArCoreViewFactory(registrar.activity(), registrar.messenger()))
+                    .registerViewFactory(CHANNEL_NAME, ArCoreViewFactory(registrar.activity(), registrar.messenger()))
         }
     }
 
@@ -41,7 +46,11 @@ class ArcoreFlutterPlugin : FlutterPlugin, ActivityAware {
 
 
     override fun onDetachedFromActivity() {
-        Log.i(TAG,"onDetachedFromActivity")
+        Log.i(TAG, "onDetachedFromActivity")
+
+        //TODO remove othen channel
+        methodCallHandler?.stopListening()
+        methodCallHandler = null
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
@@ -51,9 +60,9 @@ class ArcoreFlutterPlugin : FlutterPlugin, ActivityAware {
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         Log.i(TAG, "onAttachedToActivity")
-        flutterPluginBinding?.let {
-            it.platformViewRegistry.registerViewFactory("arcore_flutter_plugin", ArCoreViewFactory(binding.activity,it.binaryMessenger))
-        }
+        flutterPluginBinding?.platformViewRegistry?.registerViewFactory(CHANNEL_NAME, ArCoreViewFactory(binding.activity, flutterPluginBinding?.binaryMessenger!!))
+        methodCallHandler = MethodCallHandlerImpl(
+                binding.activity, flutterPluginBinding?.binaryMessenger!!)
 
     }
 
@@ -61,5 +70,6 @@ class ArcoreFlutterPlugin : FlutterPlugin, ActivityAware {
         Log.i(TAG, "onDetachedFromActivityForConfigChanges")
         onDetachedFromActivity()
     }
+
 
 }

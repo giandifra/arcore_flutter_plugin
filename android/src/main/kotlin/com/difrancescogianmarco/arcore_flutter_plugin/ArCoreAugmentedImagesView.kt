@@ -137,7 +137,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     val singleImageBytes = map["bytes"] as? ByteArray
                     setupSession(singleImageBytes, true)
                 }
-                "load_db" -> {
+                "load_augmented_images_database" -> {
                     Log.i(TAG, "LOAD DB")
                     val map = call.arguments as HashMap<String, Any>
                     val dbByteArray = map["bytes"] as? ByteArray
