@@ -14,15 +14,13 @@ class _Matrix3DRenderingPageState extends State<Matrix3DRenderingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Hello World'),
-        ),
-        body: ArCoreView(
-          onArCoreViewCreated: _onArCoreViewCreated,
-          enableTapRecognizer: true,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Hello World'),
+      ),
+      body: ArCoreView(
+        onArCoreViewCreated: _onArCoreViewCreated,
+        enableTapRecognizer: true,
       ),
     );
   }

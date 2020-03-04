@@ -13,27 +13,25 @@ class _AssetsObjectState extends State<AssetsObject> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Custom Object on plane detected'),
-        ),
-        body: Stack(
-          children: <Widget>[
-            ArCoreView(
-              onArCoreViewCreated: _onArCoreViewCreated,
-              enableTapRecognizer: true,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Custom Object on plane detected'),
+      ),
+      body: Stack(
+        children: <Widget>[
+          ArCoreView(
+            onArCoreViewCreated: _onArCoreViewCreated,
+            enableTapRecognizer: true,
+          ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: ListObjectSelection(
+              onTap: (value) {
+                objectSelected = value;
+              },
             ),
-            Align(
-              alignment: Alignment.topLeft,
-              child: ListObjectSelection(
-                onTap: (value) {
-                  objectSelected = value;
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

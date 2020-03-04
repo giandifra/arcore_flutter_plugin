@@ -16,15 +16,13 @@ class _AugmentedFacesScreenState extends State<AugmentedFacesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Augmented Faces'),
-        ),
-        body: ArCoreFaceView(
-          onArCoreViewCreated: _onArCoreViewCreated,
-          enableAugmentedFaces: true,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Augmented Faces'),
+      ),
+      body: ArCoreFaceView(
+        onArCoreViewCreated: _onArCoreViewCreated,
+        enableAugmentedFaces: true,
       ),
     );
   }

@@ -13,14 +13,12 @@ class _HelloWorldState extends State<HelloWorld> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Hello World'),
-        ),
-        body: ArCoreView(
-          onArCoreViewCreated: _onArCoreViewCreated,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Hello World'),
+      ),
+      body: ArCoreView(
+        onArCoreViewCreated: _onArCoreViewCreated,
       ),
     );
   }
@@ -29,7 +27,7 @@ class _HelloWorldState extends State<HelloWorld> {
     arCoreController = controller;
 
     _addSphere(arCoreController);
-    _addCylindre(arCoreController);
+    _addCylinder(arCoreController);
     _addCube(arCoreController);
   }
 
@@ -50,18 +48,18 @@ class _HelloWorldState extends State<HelloWorld> {
     controller.addArCoreNode(node);
   }
 
-  void _addCylindre(ArCoreController controller) {
+  void _addCylinder(ArCoreController controller) {
     final material = ArCoreMaterial(
       color: Colors.red,
       reflectance: 1.0,
     );
-    final cylindre = ArCoreCylinder(
+    final cylinder = ArCoreCylinder(
       materials: [material],
       radius: 0.5,
       height: 0.3,
     );
     final node = ArCoreNode(
-      shape: cylindre,
+      shape: cylinder,
       position: vector.Vector3(0.0, -0.5, -2.0),
     );
     controller.addArCoreNode(node);

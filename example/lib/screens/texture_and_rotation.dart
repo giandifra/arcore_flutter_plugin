@@ -17,24 +17,22 @@ class _ObjectWithTextureAndRotationState
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Object with rotation'),
-        ),
-        body: Column(
-          children: <Widget>[
-            RotationSlider(
-              degreesPerSecondInitialValue: 90.0,
-              onDegreesPerSecondChange: onDegreesPerSecondChange,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Object with rotation'),
+      ),
+      body: Column(
+        children: <Widget>[
+          RotationSlider(
+            degreesPerSecondInitialValue: 90.0,
+            onDegreesPerSecondChange: onDegreesPerSecondChange,
+          ),
+          Expanded(
+            child: ArCoreView(
+              onArCoreViewCreated: _onArCoreViewCreated,
             ),
-            Expanded(
-              child: ArCoreView(
-                onArCoreViewCreated: _onArCoreViewCreated,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

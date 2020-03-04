@@ -15,15 +15,13 @@ class _CustomObjectState extends State<CustomObject> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Custom Object on plane detected'),
-        ),
-        body: ArCoreView(
-          onArCoreViewCreated: _onArCoreViewCreated,
-          enableTapRecognizer: true,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Custom Object on plane detected'),
+      ),
+      body: ArCoreView(
+        onArCoreViewCreated: _onArCoreViewCreated,
+        enableTapRecognizer: true,
       ),
     );
   }
