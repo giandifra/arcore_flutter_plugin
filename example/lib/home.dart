@@ -9,6 +9,7 @@ import 'screens/texture_and_rotation.dart';
 import 'screens/assets_object.dart';
 import 'screens/auto_detect_plane.dart';
 import 'screens/remote_object.dart';
+import 'screens/measurement_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -88,6 +89,13 @@ class HomeScreen extends StatelessWidget {
                   builder: (context) => AugmentedFacesScreen()));
             },
             title: Text("Augmented Faces"),
+          ),
+          ListTile(
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => MeasurementScreen()));
+            },
+            title: Text("Measurements"),
           ),
         ],
       ),
