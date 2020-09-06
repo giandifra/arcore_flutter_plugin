@@ -43,7 +43,7 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
 
     private fun setupLifeCycle(context: Context) {
         activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                 Log.i(TAG, "onActivityCreated")
             }
 
