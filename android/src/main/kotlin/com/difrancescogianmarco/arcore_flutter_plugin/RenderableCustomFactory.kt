@@ -72,6 +72,8 @@ class RenderableCustomFactory {
                     }
                     try {
                         val renderable = flutterArCoreNode.shape?.buildShape(material)
+//                            renderable?.isShadowCaster = false
+//                            renderable?.isShadowReceiver = false
                         handler(renderable, null)
                     } catch (ex: Exception) {
                         Log.i(TAG, "renderable error ${ex}")

@@ -15,7 +15,7 @@ class ArCoreCylinder extends ArCoreShape {
 
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'height': this.radius,
-        'radius': this.height,
+        'height': this.height,
+        'radius': this.radius,
       }..addAll(super.toMap());
 }

@@ -14,6 +14,7 @@ class ArCoreView extends StatefulWidget {
 
   final bool enableTapRecognizer;
   final bool enableUpdateListener;
+  final bool forceTapOnScreenCenter;
   final ArCoreViewType type;
 
   const ArCoreView({
@@ -22,6 +23,7 @@ class ArCoreView extends StatefulWidget {
 //    @required this.onArCoreUnsupported,
     this.enableTapRecognizer = false,
     this.enableUpdateListener = false,
+    this.forceTapOnScreenCenter = false,
     this.type = ArCoreViewType.STANDARDVIEW,
   }) : super(key: key);
 
@@ -61,6 +63,7 @@ class _ArCoreViewState extends State<ArCoreView> with WidgetsBindingObserver {
       id: id,
       enableTapRecognizer: widget.enableTapRecognizer,
       enableUpdateListener: widget.enableUpdateListener,
+      forceTapOnScreenCenter: widget.forceTapOnScreenCenter,
 //      onUnsupported: widget.onArCoreUnsupported,
     ));
   }

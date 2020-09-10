@@ -20,36 +20,34 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Materials Runtime Change'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.update),
-              onPressed: () {},
-            )
-          ],
-        ),
-        body: Column(
-          children: <Widget>[
-            SphereControl(
-              initialColor: color,
-              initialMetallicValue: metallic,
-              initialRoughnessValue: roughness,
-              initialReflectanceValue: reflectance,
-              onColorChange: onColorChange,
-              onMetallicChange: onMetallicChange,
-              onRoughnessChange: onRoughnessChange,
-              onReflectanceChange: onReflectanceChange,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Materials Runtime Change'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.update),
+            onPressed: () {},
+          )
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          SphereControl(
+            initialColor: color,
+            initialMetallicValue: metallic,
+            initialRoughnessValue: roughness,
+            initialReflectanceValue: reflectance,
+            onColorChange: onColorChange,
+            onMetallicChange: onMetallicChange,
+            onRoughnessChange: onRoughnessChange,
+            onReflectanceChange: onReflectanceChange,
+          ),
+          Expanded(
+            child: ArCoreView(
+              onArCoreViewCreated: _onArCoreViewCreated,
             ),
-            Expanded(
-              child: ArCoreView(
-                onArCoreViewCreated: _onArCoreViewCreated,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
