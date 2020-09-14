@@ -177,6 +177,13 @@ class ArCoreController {
     });
   }
 
+  Future<void> loadMultipleAugmentedImage({@required List<Uint8List> bytes}) {
+    assert(bytes != null);
+    return _channel.invokeMethod('load_multiple_images_on_db', {
+      'bytes': bytes,
+    });
+  }
+
   Future<void> loadAugmentedImagesDatabase({@required Uint8List bytes}) {
     assert(bytes != null);
     return _channel.invokeMethod('load_augmented_images_database', {
