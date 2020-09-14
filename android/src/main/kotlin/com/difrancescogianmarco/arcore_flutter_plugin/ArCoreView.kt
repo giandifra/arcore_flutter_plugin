@@ -470,6 +470,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         }
 
         if (arSceneView?.session != null) {
+            arSceneView?.getPlaneRenderer().setVisible(false)
             Log.i(TAG, "Searching for surfaces")
         }
     }
