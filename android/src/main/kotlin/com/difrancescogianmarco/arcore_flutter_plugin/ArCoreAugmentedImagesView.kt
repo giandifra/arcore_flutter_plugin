@@ -140,8 +140,8 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 "load_multiple_images_on_db" -> {
                     Log.i(TAG, "load_multiple_image_on_db")
                     val map = call.arguments as HashMap<String, Any>
-                    val dbByteArray = map["bytes"] as? List<ByteArray>
-                    setupSession(dbByteArray)
+                    val dbByteMap = map["bytesMap"] as? Map<String, ByteArray>
+                    setupSession(dbByteMap)
                 }
                 "load_augmented_images_database" -> {
                     Log.i(TAG, "LOAD DB")
@@ -278,15 +278,15 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
         }
     }
 
-    fun setupSession(bytes: List<ByteArray>?) {
+    fun setupSession(bytesMap: Map<String, ByteArray>?) {
         Log.i(TAG, "setupSession()")
         try {
             val session = arSceneView?.session ?: return
             val config = Config(session)
             config.focusMode = Config.FocusMode.AUTO
             config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
-            bytes?.let {
-                if (!addImagesToAugmentedImageDatabase(config, bytes)) {
+            bytesMap?.let {
+                if (!addMultipleImagesToAugmentedImageDatabase(config, bytesMap)) {
                     throw Exception("Could not setup augmented image database")
                 }
             }
@@ -297,23 +297,13 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
         }
     }
 
-    private fun addImagesToAugmentedImageDatabase(config: Config, bytes: List<ByteArray>): Boolean {
-
-        // There are two ways to configure an AugmentedImageDatabase:
-        // 1. Add Bitmap to DB directly
-        // 2. Load a pre-built AugmentedImageDatabase
-        // Option 2) has
-        // * shorter setup time
-        // * doesn't require images to be packaged in apk.
-//        if (useSingleImage && singleImageBytes != null) {
+    private fun addMultipleImagesToAugmentedImageDatabase(config: Config, bytesMap: Map<String, ByteArray>): Boolean {
         Log.i(TAG, "addImageToAugmentedImageDatabase")
         try{
             val augmentedImageDatabase = AugmentedImageDatabase(arSceneView?.session)
-            var counter = 1;
-            for (byteArray in bytes) {
-                val augmentedImageBitmap = loadAugmentedImageBitmap(byteArray) ?: return false
-                augmentedImageDatabase.addImage("image_name" + counter, augmentedImageBitmap)
-                counter++
+            for ((key, value) in bytesMap) {
+                 val augmentedImageBitmap = loadAugmentedImageBitmap(value) ?: return false
+                augmentedImageDatabase.addImage(key, augmentedImageBitmap)
             }
             config.augmentedImageDatabase = augmentedImageDatabase
             return true
@@ -321,28 +311,6 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
             Log.i(TAG,ex.localizedMessage)
             return false
         }
-
-        // If the physical size of the image is known, you can instead use:
-        //     augmentedImageDatabase.addImage("image_name", augmentedImageBitmap, widthInMeters);
-        // This will improve the initial detection speed. ARCore will still actively estimate the
-        // physical size of the image as it is viewed from multiple viewpoints.
-        /* } else {
-             // This is an alternative way to initialize an AugmentedImageDatabase instance,
-             // load a pre-existing augmented image database.
-             try {
- //                getAssets().open("sample_database.imgdb").use({ `is` -> augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, `is`) })
- //                val inputStream = ByteArrayInputStream(bytes)
- //                augmentedImageDatabase = AugmentedImageDatabase.deserialize(arSceneView?.session, inputStream)
-                 augmentedImageDatabase = null
-                 return false
-             } catch (e: IOException) {
-                 Log.e(TAG, "IO exception loading augmented image database.", e)
-                 return false
-             }*/
-
-//        }
-
-
     }
 
     private fun addImageToAugmentedImageDatabase(config: Config, bytes: ByteArray): Boolean {
