@@ -198,6 +198,13 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 Log.i(TAG, "Resuming ARCore now")
                 onResume()
             }
+            "getTrackingState" -> {
+                Log.i(TAG, "1/3: Requested tracking state, returning that back to Flutter now")
+
+                val trState = arSceneView?.arFrame?.camera?.trackingState
+                Log.i(TAG, "2/3: Tracking state is " + trState.toString())
+                methodChannel.invokeMethod("getTrackingState", trState.toString())
+            }
             else -> {
             }
         }

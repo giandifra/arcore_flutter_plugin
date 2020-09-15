@@ -44,6 +44,7 @@ class ArCoreController {
 //  UnsupportedHandler onUnsupported;
   ArCoreHitResultHandler onPlaneTap;
   ArCorePlaneHandler onPlaneDetected;
+  String trackingState = '';
   ArCoreAugmentedImageTrackingHandler onTrackingImage;
 
   init() async {
@@ -83,6 +84,11 @@ class ArCoreController {
           onPlaneDetected(plane);
         }
         break;
+      case 'getTrackingState':
+        // TRACKING, PAUSED or STOPPED
+        trackingState = call.arguments;
+        print('Latest tracking state received is: $trackingState');
+        break;
       case 'onTrackingImage':
         print('flutter onTrackingImage');
         final arCoreAugmentedImage = ArCoreAugmentedImage.fromMap(call.arguments);
@@ -102,6 +108,10 @@ class ArCoreController {
     return _channel.invokeMethod('addArCoreNode', params);
   }
 
+  Future<String> getTrackingState() async {
+    return _channel.invokeMethod('getTrackingState');
+  }
+
   addArCoreNodeToAugmentedImage(ArCoreNode node, int index, {String parentNodeName}) {
     assert(node != null);
 
@@ -114,6 +124,7 @@ class ArCoreController {
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
     print(params.toString());
     _addListeners(node);
+    print('---------_CALLING addArCoreNodeWithAnchor : $params');
     return _channel.invokeMethod('addArCoreNodeWithAnchor', params);
   }
 
