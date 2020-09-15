@@ -70,7 +70,7 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
 
             override fun onActivityDestroyed(activity: Activity) {
                 Log.i(TAG, "onActivityDestroyed")
-                onDestroy()
+//                onDestroy()
             }
         }
 

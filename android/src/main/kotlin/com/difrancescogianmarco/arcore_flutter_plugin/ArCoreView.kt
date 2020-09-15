@@ -191,8 +191,12 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 loadMesh(textureBytes)
             }
             "dispose" -> {
-                Log.i(TAG, " updateMaterials")
+                Log.i(TAG, "Disposing ARCore now")
                 dispose()
+            }
+            "resume" -> {
+                Log.i(TAG, "Resuming ARCore now")
+                onResume()
             }
             else -> {
             }
@@ -240,15 +244,16 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
 
             override fun onActivityStopped(activity: Activity) {
-                Log.i(TAG, "onActivityStopped")
-                onPause()
+                Log.i(TAG, "onActivityStopped (Just so you know)")
+//                onPause()
             }
 
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
             override fun onActivityDestroyed(activity: Activity) {
-                Log.i(TAG, "onActivityDestroyed")
-                onDestroy()
+                Log.i(TAG, "onActivityDestroyed (Just so you know)")
+//                onDestroy()
+//                dispose()
             }
         }
 
@@ -470,7 +475,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         }
 
         if (arSceneView?.session != null) {
-            arSceneView?.getPlaneRenderer().setVisible(false)
+            arSceneView!!.getPlaneRenderer().setVisible(false)
             Log.i(TAG, "Searching for surfaces")
         }
     }
@@ -482,11 +487,20 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     }
 
     fun onDestroy() {
-        if (arSceneView != null) {
-            arSceneView?.scene?.removeOnUpdateListener(sceneUpdateListener)
-            arSceneView?.scene?.removeOnUpdateListener(faceSceneUpdateListener)
-            arSceneView?.destroy()
-            arSceneView = null
+      if (arSceneView != null) {
+            Log.i(TAG, "Goodbye ARCore! Destroying the Activity now 7.")
+
+            try {
+                arSceneView?.scene?.removeOnUpdateListener(sceneUpdateListener)
+                arSceneView?.scene?.removeOnUpdateListener(faceSceneUpdateListener)
+                Log.i(TAG, "Goodbye arSceneView.")
+
+                arSceneView?.destroy()
+                arSceneView = null
+
+            }catch (e : Exception){
+                e.printStackTrace();
+           }
         }
     }
 
