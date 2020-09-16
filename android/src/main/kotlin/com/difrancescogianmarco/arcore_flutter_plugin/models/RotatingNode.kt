@@ -126,7 +126,7 @@ class RotatingNode(var degreesPerSecond: Float = 90.0f, private val clockwise: B
         orbitAnimation.setObjectValues(*orientations as Array<Any>)
 
         // Next, give it the localRotation property.
-        orbitAnimation.propertyName = "localRotation"
+        orbitAnimation.setPropertyName("localRotation")
 
         // Use Sceneform's QuaternionEvaluator.
         orbitAnimation.setEvaluator(QuaternionEvaluator())
