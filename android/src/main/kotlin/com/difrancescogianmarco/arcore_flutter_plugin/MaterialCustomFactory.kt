@@ -42,7 +42,7 @@ class MaterialCustomFactory {
         fun makeOpaqueWithColor(context: Context, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material> {
             val materialFuture = Material.builder().setSource(context, R.raw.sceneform_opaque_colored_material).build()
             return materialFuture.thenApply { material ->
-                material.setFloat3(MATERIAL_COLOR, Color(flutterArCoreMaterial.color!!))
+                material.setFloat3(MATERIAL_COLOR, flutterArCoreMaterial.color.toArColor())
                 applyCustomPbrParams2(material, flutterArCoreMaterial)
                 material
             }
@@ -51,7 +51,7 @@ class MaterialCustomFactory {
         fun makeTransparentWithColor(context: Context, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material> {
             val materialFuture = Material.builder().setSource(context, R.raw.sceneform_transparent_colored_material).build()
             return materialFuture.thenApply { material ->
-                material.setFloat4(MATERIAL_COLOR, Color(flutterArCoreMaterial.color!!))
+                material.setFloat4(MATERIAL_COLOR, flutterArCoreMaterial.color.toArColor())
                 applyCustomPbrParams2(material, flutterArCoreMaterial)
                 material
             }
