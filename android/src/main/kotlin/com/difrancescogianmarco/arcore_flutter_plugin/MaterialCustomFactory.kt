@@ -20,9 +20,6 @@ class MaterialCustomFactory {
         val MATERIAL_METALLIC = "metallic"
         val MATERIAL_ROUGHNESS = "roughness"
         val MATERIAL_REFLECTANCE = "reflectance"
-        private val DEFAULT_METALLIC_PROPERTY = 0.0f
-        private val DEFAULT_ROUGHNESS_PROPERTY = 0.4f
-        private val DEFAULT_REFLECTANCE_PROPERTY = 0.5f
         val TAG: String = MaterialCustomFactory::class.java.name
 
         fun makeWithColor(context: Context, flutterArCoreMaterial: FlutterArCoreMaterial): CompletableFuture<Material>? {
@@ -106,12 +103,9 @@ class MaterialCustomFactory {
 
         private fun applyCustomPbrParams2(material: Material, flutterArCoreMaterial: FlutterArCoreMaterial) {
 
-            material.setFloat(MATERIAL_METALLIC, flutterArCoreMaterial.metallic
-                    ?: DEFAULT_METALLIC_PROPERTY)
-            material.setFloat(MATERIAL_ROUGHNESS, flutterArCoreMaterial.roughness
-                    ?: DEFAULT_ROUGHNESS_PROPERTY)
-            material.setFloat(MATERIAL_REFLECTANCE, flutterArCoreMaterial.reflectance
-                    ?: DEFAULT_REFLECTANCE_PROPERTY)
+            material.setFloat(MATERIAL_METALLIC, flutterArCoreMaterial.metallic / 100F)
+            material.setFloat(MATERIAL_ROUGHNESS, flutterArCoreMaterial.roughness / 100F)
+            material.setFloat(MATERIAL_REFLECTANCE, flutterArCoreMaterial.reflectance / 100F)
         }
     }
 }
