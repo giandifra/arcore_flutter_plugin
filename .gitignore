@@ -7,3 +7,5 @@
 build/
 
 *.sfb
+
+pubspec.lock
