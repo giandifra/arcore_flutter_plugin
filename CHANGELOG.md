@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Added Augmented Image feature
+
 ## 0.0.5+1
 
 * Migrate to new Android Plugin Api
