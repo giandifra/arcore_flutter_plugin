@@ -54,6 +54,11 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 flutter {
@@ -63,24 +68,24 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
 sceneform.asset('sampledata/Andy.obj',
         'default',
         'sampledata/Andy.sfa',
-        'src/main/assets/Andy')
+        'src/main/assets/andy')
 
 sceneform.asset('sampledata/TocoToucan.obj',
         'default',
         'sampledata/TocoToucan.sfa',
-        'src/main/assets/TocoToucan')
+        'src/main/assets/toucan')
 
 sceneform.asset('sampledata/ArcticFox_Posed.obj',
         'default',
         'sampledata/ArcticFox_Posed.sfa',
-        'src/main/assets/ArcticFox_Posed')
+        'src/main/assets/artic_fox')
 
 sceneform.asset('sampledata/fox_face.fbx',
         'sampledata/fox_face_material.mat',

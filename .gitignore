@@ -1,9 +1,11 @@
 .DS_Store
 .dart_tool/
-.idea/*
+.idea/
 .packages
 .pub/
 
 build/
 
 *.sfb
+
+pubspec.lock

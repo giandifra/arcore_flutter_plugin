@@ -1,6 +1,6 @@
 name: arcore_flutter_plugin
 description: Flutter plugin for ARCore SDK, Android platform to build new augmented reality experiences
-version: 0.0.5+1
+version: 0.0.6
 homepage: https://github.com/giandifra/arcore_flutter_plugin
 
 environment:
@@ -11,7 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   vector_math: ^2.0.8
-  meta: ^1.1.6
+  meta: ^1.1.8
+  equatable: ^1.1.0
 
 dev_dependencies:
   flutter_test:
