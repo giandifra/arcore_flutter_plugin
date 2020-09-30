@@ -226,7 +226,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
             // If the session wasn't created yet, don't resume rendering.
             // This can happen if ARCore needs to be updated or permissions are not granted yet.
             try {
-                val session = ArCoreUtils.createArSession(activity, installRequested, false)
+                val session = ArCoreUtils.createArSession(activity, true, false)
                 if (session == null) {
                     installRequested = false
                     return
