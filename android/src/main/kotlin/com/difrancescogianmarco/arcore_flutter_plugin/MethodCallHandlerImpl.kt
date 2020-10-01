@@ -27,6 +27,12 @@ class MethodCallHandlerImpl(private val activity: Activity, private val messenge
                     result.success(available)
                 }
             }
+            "checkIfARCoreServicesInstalled" -> {
+                isARServicesInstalled { isInstalled ->
+                    Log.i(ArcoreFlutterPlugin.TAG, "handler")
+                    result.success(isInstalled)
+                }
+            }
             else -> {
                 result.notImplemented()
             }
@@ -45,6 +51,20 @@ class MethodCallHandlerImpl(private val activity: Activity, private val messenge
                 }
             }, 200)
         } else handler(availability.isSupported)
+    }
+
+    private fun isARServicesInstalled(handler: (Boolean) -> Unit) {
+        Log.i(ArcoreFlutterPlugin.TAG, "isARServicesInstalled")
+        var isInstalled = false;
+        try {
+            val status = ArCoreApk.getInstance().requestInstall(activity, false)
+            if (status == ArCoreApk.InstallStatus.INSTALLED) {
+                isInstalled = true;
+                handler(isInstalled)
+            }
+        } catch (e: Exception) {
+        }
+        handler(isInstalled)
     }
 
     fun stopListening() {
