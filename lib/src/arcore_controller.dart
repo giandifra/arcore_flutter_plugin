@@ -26,6 +26,12 @@ class ArCoreController {
     return arcoreAvailable;
   }
 
+  static checkIsArCoreInstalled() async {
+    final bool arcoreInstalled = await MethodChannel(UTILS_CHANNEL_NAME)
+        .invokeMethod('checkIfARCoreServicesInstalled');
+    return arcoreInstalled;
+  }
+
   ArCoreController({
     int id,
     this.enableTapRecognizer,
