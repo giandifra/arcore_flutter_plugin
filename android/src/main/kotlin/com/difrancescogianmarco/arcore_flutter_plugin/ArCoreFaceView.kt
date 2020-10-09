@@ -20,6 +20,7 @@ import com.google.ar.sceneform.ux.AugmentedFaceNode
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import kotlin.collections.HashMap
 
 class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessenger, id: Int, debug: Boolean) : BaseArCoreView(activity, context, messenger, id, debug) {
 
@@ -36,8 +37,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                 if (faceMeshTexture == null) {
                     return@OnUpdateListener
                 }
-
-                val faceList = arSceneView?.session?.getAllTrackables(AugmentedFace::class.java)
+                var faceList = arSceneView?.session?.getAllTrackables(AugmentedFace::class.java)
 
                 faceList?.let {
                     // Make new AugmentedFaceNodes for any new faces.
@@ -79,6 +79,18 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                     val textureBytes = map["textureBytes"] as ByteArray
                     val skin3DModelFilename = map["skin3DModelFilename"] as? String
                     loadMesh(textureBytes, skin3DModelFilename)
+
+                    // for change assets on runtime
+                    var faceList = arSceneView?.session?.getAllTrackables(AugmentedFace::class.java)
+                    faceList?.let {
+                        // Make new AugmentedFaceNodes for any new faces.
+                        for (face in faceList) {
+                            println(face.centerPose)
+                            if (faceNodeMap.containsKey(face)) {
+                                faceNodeMap[face]?.faceRegionsRenderable = faceRegionsRenderable
+                            }
+                        }
+                    }
                 }
                 "dispose" -> {
                     debugLog( " updateMaterials")
