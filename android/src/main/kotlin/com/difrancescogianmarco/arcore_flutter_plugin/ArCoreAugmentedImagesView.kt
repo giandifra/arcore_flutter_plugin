@@ -299,18 +299,18 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
 
     private fun addMultipleImagesToAugmentedImageDatabase(config: Config, bytesMap: Map<String, ByteArray>): Boolean {
         Log.i(TAG, "addImageToAugmentedImageDatabase")
-        try{
-            val augmentedImageDatabase = AugmentedImageDatabase(arSceneView?.session)
-            for ((key, value) in bytesMap) {
-                 val augmentedImageBitmap = loadAugmentedImageBitmap(value) ?: return false
+        val augmentedImageDatabase = AugmentedImageDatabase(arSceneView?.session)
+        for ((key, value) in bytesMap) {
+            val augmentedImageBitmap = loadAugmentedImageBitmap(value)
+            try {
                 augmentedImageDatabase.addImage(key, augmentedImageBitmap)
+            } catch (ex: Exception) {
+                Log.i(TAG, "Image with the title $key cannot be added to the database. " +
+                        "The exeption was thrown: " + ex?.toString())
             }
-            config.augmentedImageDatabase = augmentedImageDatabase
-            return true
-        }catch (ex:Exception){
-            Log.i(TAG,ex.localizedMessage)
-            return false
         }
+        config.augmentedImageDatabase = augmentedImageDatabase
+        return augmentedImageDatabase?.getNumImages() != 0 ?: return false
     }
 
     private fun addImageToAugmentedImageDatabase(config: Config, bytes: ByteArray): Boolean {
