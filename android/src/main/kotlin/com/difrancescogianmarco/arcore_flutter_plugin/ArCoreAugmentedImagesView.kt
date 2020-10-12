@@ -306,7 +306,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 augmentedImageDatabase.addImage(key, augmentedImageBitmap)
             } catch (ex: Exception) {
                 Log.i(TAG, "Image with the title $key cannot be added to the database. " +
-                        "The exeption was thrown: " + ex?.toString())
+                        "The exception was thrown: " + ex?.toString())
             }
         }
         config.augmentedImageDatabase = augmentedImageDatabase
