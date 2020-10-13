@@ -24,6 +24,12 @@ class ArCoreController {
     return arcoreAvailable;
   }
 
+  static checkIsArCoreInstalled() async {
+    final bool arcoreInstalled = await MethodChannel(UTILS_CHANNEL_NAME)
+        .invokeMethod('checkIfARCoreServicesInstalled');
+    return arcoreInstalled;
+  }
+
   ArCoreController({
     int id,
     this.enableTapRecognizer,
@@ -168,6 +174,14 @@ class ArCoreController {
     assert(bytes != null);
     return _channel.invokeMethod('load_single_image_on_db', {
       'bytes': bytes,
+    });
+  }
+
+  Future<void> loadMultipleAugmentedImage(
+      {@required Map<String, Uint8List> bytesMap}) {
+    assert(bytesMap != null);
+    return _channel.invokeMethod('load_multiple_images_on_db', {
+      'bytesMap': bytesMap,
     });
   }
 

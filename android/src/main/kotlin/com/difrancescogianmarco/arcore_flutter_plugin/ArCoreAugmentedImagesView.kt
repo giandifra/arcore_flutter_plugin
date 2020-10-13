@@ -137,6 +137,12 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     val singleImageBytes = map["bytes"] as? ByteArray
                     setupSession(singleImageBytes, true)
                 }
+                "load_multiple_images_on_db" -> {
+                    Log.i(TAG, "load_multiple_image_on_db")
+                    val map = call.arguments as HashMap<String, Any>
+                    val dbByteMap = map["bytesMap"] as? Map<String, ByteArray>
+                    setupSession(dbByteMap)
+                }
                 "load_augmented_images_database" -> {
                     Log.i(TAG, "LOAD DB")
                     val map = call.arguments as HashMap<String, Any>
@@ -269,6 +275,41 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
             arSceneView?.setupSession(session)
         } catch (ex: Exception) {
             Log.i(TAG, ex.localizedMessage)
+        }
+    }
+
+    fun setupSession(bytesMap: Map<String, ByteArray>?) {
+        Log.i(TAG, "setupSession()")
+        try {
+            val session = arSceneView?.session ?: return
+            val config = Config(session)
+            config.focusMode = Config.FocusMode.AUTO
+            config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+            bytesMap?.let {
+                if (!addMultipleImagesToAugmentedImageDatabase(config, bytesMap)) {
+                    throw Exception("Could not setup augmented image database")
+                }
+            }
+            session.configure(config)
+            arSceneView?.setupSession(session)
+        } catch (ex: Exception) {
+            Log.i(TAG, ex.localizedMessage)
+        }
+    }
+
+    private fun addMultipleImagesToAugmentedImageDatabase(config: Config, bytesMap: Map<String, ByteArray>): Boolean {
+        Log.i(TAG, "addImageToAugmentedImageDatabase")
+        try{
+            val augmentedImageDatabase = AugmentedImageDatabase(arSceneView?.session)
+            for ((key, value) in bytesMap) {
+                 val augmentedImageBitmap = loadAugmentedImageBitmap(value) ?: return false
+                augmentedImageDatabase.addImage(key, augmentedImageBitmap)
+            }
+            config.augmentedImageDatabase = augmentedImageDatabase
+            return true
+        }catch (ex:Exception){
+            Log.i(TAG,ex.localizedMessage)
+            return false
         }
     }
 

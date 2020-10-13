@@ -87,7 +87,7 @@ class _HelloWorldState extends State<HelloWorld> {
 
   void _addSphere(ArCoreController controller) {
     final material = ArCoreMaterial(
-        color: Color.fromARGB(120, 66, 134, 244), texture: "earth.jpg");
+        color: Color.fromARGB(120, 66, 134, 244));
     final sphere = ArCoreSphere(
       materials: [material],
       radius: 0.1,
@@ -96,7 +96,7 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
-    controller.add(node);
+    controller.addArCoreNode(node);
   }
 
   void _addCylindre(ArCoreController controller) {
@@ -113,7 +113,7 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: cylindre,
       position: vector.Vector3(0.0, -0.5, -2.0),
     );
-    controller.add(node);
+    controller.addArCoreNode(node);
   }
 
   void _addCube(ArCoreController controller) {
@@ -129,7 +129,7 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: cube,
       position: vector.Vector3(-0.5, 0.5, -3.5),
     );
-    controller.add(node);
+    controller.addArCoreNode(node);
   }
 
   @override
