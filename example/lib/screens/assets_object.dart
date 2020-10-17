@@ -108,17 +108,15 @@ class ListObjectSelection extends StatefulWidget {
 
 class _ListObjectSelectionState extends State<ListObjectSelection> {
   List<String> gifs = [
-    "assets/halloween.gif",
-    "assets/TocoToucan.gif",
-    "assets/AndroidRobot.gif",
-    "assets/ArcticFox.gif",
+    'assets/TocoToucan.gif',
+    'assets/AndroidRobot.gif',
+    'assets/ArcticFox.gif',
   ];
 
   List<String> objectsFileName = [
-    "halloween.sfb",
-    "toucan.sfb",
-    "andy.sfb",
-    "artic_fox.sfb"
+    'toucan.sfb',
+    'andy.sfb',
+    'artic_fox.sfb',
   ];
 
   String selected;
