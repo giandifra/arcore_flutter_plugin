@@ -1,3 +1,9 @@
+## 0.0.7
+
+* You can load multiple image into augmented images database (Alina Stepanova)
+* Add check to see if AR are installed (Alina Stepanova)
+* Fix Exception when use with another plugin (BrutalCoding)
+
 ## 0.0.6
 
 * Added Augmented Image feature
