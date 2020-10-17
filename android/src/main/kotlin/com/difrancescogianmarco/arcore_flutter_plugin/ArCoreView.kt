@@ -191,8 +191,19 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 loadMesh(textureBytes)
             }
             "dispose" -> {
-                Log.i(TAG, " updateMaterials")
+                Log.i(TAG, "Disposing ARCore now")
                 dispose()
+            }
+            "resume" -> {
+                Log.i(TAG, "Resuming ARCore now")
+                onResume()
+            }
+            "getTrackingState" -> {
+                Log.i(TAG, "1/3: Requested tracking state, returning that back to Flutter now")
+
+                val trState = arSceneView?.arFrame?.camera?.trackingState
+                Log.i(TAG, "2/3: Tracking state is " + trState.toString())
+                methodChannel.invokeMethod("getTrackingState", trState.toString())
             }
             else -> {
             }
@@ -220,7 +231,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
 
     private fun setupLifeCycle(context: Context) {
         activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
+            override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
                 Log.i(TAG, "onActivityCreated")
 //                maybeEnableArButton()
             }
@@ -240,15 +251,16 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
 
             override fun onActivityStopped(activity: Activity) {
-                Log.i(TAG, "onActivityStopped")
-                onPause()
+                Log.i(TAG, "onActivityStopped (Just so you know)")
+//                onPause()
             }
 
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
             override fun onActivityDestroyed(activity: Activity) {
-                Log.i(TAG, "onActivityDestroyed")
-                onDestroy()
+                Log.i(TAG, "onActivityDestroyed (Just so you know)")
+//                onDestroy()
+//                dispose()
             }
         }
 
@@ -470,6 +482,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         }
 
         if (arSceneView?.session != null) {
+            arSceneView!!.getPlaneRenderer().setVisible(false)
             Log.i(TAG, "Searching for surfaces")
         }
     }
@@ -481,11 +494,20 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     }
 
     fun onDestroy() {
-        if (arSceneView != null) {
-            arSceneView?.scene?.removeOnUpdateListener(sceneUpdateListener)
-            arSceneView?.scene?.removeOnUpdateListener(faceSceneUpdateListener)
-            arSceneView?.destroy()
-            arSceneView = null
+      if (arSceneView != null) {
+            Log.i(TAG, "Goodbye ARCore! Destroying the Activity now 7.")
+
+            try {
+                arSceneView?.scene?.removeOnUpdateListener(sceneUpdateListener)
+                arSceneView?.scene?.removeOnUpdateListener(faceSceneUpdateListener)
+                Log.i(TAG, "Goodbye arSceneView.")
+
+                arSceneView?.destroy()
+                arSceneView = null
+
+            }catch (e : Exception){
+                e.printStackTrace();
+           }
         }
     }
 

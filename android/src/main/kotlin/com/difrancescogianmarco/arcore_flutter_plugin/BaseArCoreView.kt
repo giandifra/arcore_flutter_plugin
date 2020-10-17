@@ -43,7 +43,7 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
 
     private fun setupLifeCycle(context: Context) {
         activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                 Log.i(TAG, "onActivityCreated")
             }
 
@@ -70,7 +70,7 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
 
             override fun onActivityDestroyed(activity: Activity) {
                 Log.i(TAG, "onActivityDestroyed")
-                onDestroy()
+//                onDestroy()
             }
         }
 
