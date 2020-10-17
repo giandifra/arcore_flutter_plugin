@@ -1,3 +1,7 @@
+## 0.0.8
+
+* Show 2D image with ArCoreImage
+
 ## 0.0.7
 
 * You can load multiple image into augmented images database (Alina Stepanova)
