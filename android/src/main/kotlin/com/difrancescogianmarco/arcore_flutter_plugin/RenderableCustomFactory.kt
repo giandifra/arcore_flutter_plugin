@@ -26,8 +26,7 @@ class RenderableCustomFactory {
                 val url = flutterArCoreNode.objectUrl
 
                 val localObject = flutterArCoreNode.object3DFileName
-                Log.e(TAG, "Modified by BrutalCoding - 1");
-                if (false) {
+                if (localObject != null) {
                     val builder = ModelRenderable.builder()
                     builder.setSource(context, Uri.parse(localObject))
                     builder.build().thenAccept { renderable ->
@@ -42,7 +41,7 @@ class RenderableCustomFactory {
                     val renderableSourceBuilder = RenderableSource.builder()
 
                     renderableSourceBuilder
-                            .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLB)
+                            .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLTF2)
                             .setScale(0.5f)
                             .setRecenterMode(RenderableSource.RecenterMode.ROOT)
 
