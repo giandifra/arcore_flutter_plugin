@@ -19,17 +19,17 @@ class MethodCallHandlerImpl(private val activity: Activity, private val messenge
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        Log.i(ArcoreFlutterPlugin.TAG, "Method called: " + call.method)
         when (call.method) {
             "checkArCoreApkAvailability" -> {
-                Log.i(ArcoreFlutterPlugin.TAG, "checkArCoreApkAvailability")
                 maybeEnableAr { available ->
-                    Log.i(ArcoreFlutterPlugin.TAG, "handler")
+                    Log.i(ArcoreFlutterPlugin.TAG, "checkArCoreApkAvailability handler")
                     result.success(available)
                 }
             }
             "checkIfARCoreServicesInstalled" -> {
                 isARServicesInstalled { isInstalled ->
-                    Log.i(ArcoreFlutterPlugin.TAG, "handler")
+                    Log.i(ArcoreFlutterPlugin.TAG, "checkIfARCoreServicesInstalled handler")
                     result.success(isInstalled)
                 }
             }
@@ -60,11 +60,13 @@ class MethodCallHandlerImpl(private val activity: Activity, private val messenge
             val status = ArCoreApk.getInstance().requestInstall(activity, false)
             if (status == ArCoreApk.InstallStatus.INSTALLED) {
                 isInstalled = true;
-                handler(isInstalled)
             }
         } catch (e: Exception) {
+            Log.e(ArcoreFlutterPlugin.TAG, e.toString());
+        } finally {
+            handler(isInstalled)
         }
-        handler(isInstalled)
+        
     }
 
     fun stopListening() {
