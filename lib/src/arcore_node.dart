@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:arcore_flutter_plugin/src/arcore_image.dart';
 import 'package:arcore_flutter_plugin/src/utils/vector_utils.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -8,6 +11,7 @@ import 'package:arcore_flutter_plugin/src/shape/arcore_shape.dart';
 class ArCoreNode {
   ArCoreNode({
     this.shape,
+    this.image,
     String name,
     Vector3 position,
     Vector3 scale,
@@ -16,7 +20,8 @@ class ArCoreNode {
   })  : name = name ?? random_string.randomString(),
         position = ValueNotifier(position),
         scale = ValueNotifier(scale),
-        rotation = ValueNotifier(rotation);
+        rotation = ValueNotifier(rotation),
+        assert(!(shape != null && image != null));
 
   final List<ArCoreNode> children;
 
@@ -30,6 +35,8 @@ class ArCoreNode {
 
   final String name;
 
+  final ArCoreImage image;
+
   Map<String, dynamic> toMap() => <String, dynamic>{
         'dartType': runtimeType.toString(),
         'shape': shape?.toMap(),
@@ -37,6 +44,7 @@ class ArCoreNode {
         'scale': convertVector3ToMap(scale.value),
         'rotation': convertVector4ToMap(rotation.value),
         'name': name,
+        'image': image?.toMap(),
         'children':
             this.children.map((arCoreNode) => arCoreNode.toMap()).toList(),
       }..removeWhere((String k, dynamic v) => v == null);

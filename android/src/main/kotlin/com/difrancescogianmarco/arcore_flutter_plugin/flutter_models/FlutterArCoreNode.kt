@@ -12,6 +12,7 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
 
     val dartType: String = map["dartType"] as String
     val name: String = map["name"] as String
+    val image: FlutterArCoreImage? = createArCoreImage(map["image"] as? HashMap<String, *>)
     val objectUrl: String? = map["objectUrl"] as? String
     val object3DFileName: String? = map["object3DFileName"] as? String
     val shape: FlutterArCoreShape? = getShape(map["shape"] as? HashMap<String, *>)
@@ -24,7 +25,7 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
     var parentNodeName: String? = map["parentNodeName"] as? String
 
     val children: ArrayList<FlutterArCoreNode> = getChildrenFromMap(map["children"] as ArrayList<HashMap<String, *>>)
-    
+
     private fun getChildrenFromMap(list: ArrayList<HashMap<String, *>>): ArrayList<FlutterArCoreNode> {
         return ArrayList(list.map { map -> FlutterArCoreNode(map) })
     }
@@ -44,7 +45,7 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
 
         return node
     }
-    
+
     fun getPosition(): FloatArray {
         return floatArrayOf(position.x, position.y, position.z)
     }
@@ -53,15 +54,22 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         return floatArrayOf(rotation.x, rotation.y, rotation.z, rotation.w)
     }
 
-    fun getPose(): Pose{
+    fun getPose(): Pose {
         return Pose(getPosition(), getRotation())
     }
-    
+
     private fun getDegreesPerSecond(degreesPerSecond: Double?): Float? {
         if (dartType == "ArCoreRotatingNode" && degreesPerSecond != null) {
             return degreesPerSecond.toFloat()
         }
         return null
+    }
+
+    private fun createArCoreImage(map: HashMap<String, *>?): FlutterArCoreImage? {
+        if (map != null)
+            return FlutterArCoreImage(map);
+
+        return null;
     }
 
     private fun getShape(map: HashMap<String, *>?): FlutterArCoreShape? {
