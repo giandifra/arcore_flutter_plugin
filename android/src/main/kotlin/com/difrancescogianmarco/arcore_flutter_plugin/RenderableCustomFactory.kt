@@ -48,11 +48,17 @@ class RenderableCustomFactory {
                 } else if (url != null) {
                     val modelRenderableBuilder = ModelRenderable.builder()
                     val renderableSourceBuilder = RenderableSource.builder()
-
-                    renderableSourceBuilder
+                    if(url.endsWith(".glb")){
+                        renderableSourceBuilder
+                            .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLB)
+                            .setScale(0.5f)
+                            .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                    } else {
+                        renderableSourceBuilder
                             .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLTF2)
                             .setScale(0.5f)
                             .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                    }
 
                     modelRenderableBuilder
                             .setSource(context, renderableSourceBuilder.build())
