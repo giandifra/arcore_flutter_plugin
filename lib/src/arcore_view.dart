@@ -13,6 +13,7 @@ class ArCoreView extends StatefulWidget {
 //  final UnsupportedHandler onArCoreUnsupported;
 
   final bool enableTapRecognizer;
+  final bool enablePlaneRenderer;
   final bool enableUpdateListener;
   final ArCoreViewType type;
 
@@ -21,6 +22,7 @@ class ArCoreView extends StatefulWidget {
     @required this.onArCoreViewCreated,
 //    @required this.onArCoreUnsupported,
     this.enableTapRecognizer = false,
+    this.enablePlaneRenderer = true,
     this.enableUpdateListener = false,
     this.type = ArCoreViewType.STANDARDVIEW,
   }) : super(key: key);
@@ -58,11 +60,12 @@ class _ArCoreViewState extends State<ArCoreView> with WidgetsBindingObserver {
       return;
     }
     widget.onArCoreViewCreated(ArCoreController(
-      id: id,
-      enableTapRecognizer: widget.enableTapRecognizer,
-      enableUpdateListener: widget.enableUpdateListener,
+        id: id,
+        enableTapRecognizer: widget.enableTapRecognizer,
+        enableUpdateListener: widget.enableUpdateListener,
+        enablePlaneRenderer: widget.enablePlaneRenderer
 //      onUnsupported: widget.onArCoreUnsupported,
-    ));
+        ));
   }
 
   @override

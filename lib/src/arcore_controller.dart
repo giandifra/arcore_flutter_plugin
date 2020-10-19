@@ -35,6 +35,7 @@ class ArCoreController {
   ArCoreController({
     int id,
     this.enableTapRecognizer,
+    this.enablePlaneRenderer,
     this.enableUpdateListener,
 //    @required this.onUnsupported,
   }) {
@@ -45,6 +46,7 @@ class ArCoreController {
 
   final bool enableUpdateListener;
   final bool enableTapRecognizer;
+  final bool enablePlaneRenderer;
   MethodChannel _channel;
   StringResultHandler onError;
   StringResultHandler onNodeTap;
@@ -59,6 +61,7 @@ class ArCoreController {
     try {
       await _channel.invokeMethod<void>('init', {
         'enableTapRecognizer': enableTapRecognizer,
+        'enablePlaneRenderer': enablePlaneRenderer,
         'enableUpdateListener': enableUpdateListener,
       });
     } on PlatformException catch (ex) {
