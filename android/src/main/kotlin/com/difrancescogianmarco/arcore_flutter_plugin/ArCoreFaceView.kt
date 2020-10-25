@@ -37,7 +37,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                 if (faceMeshTexture == null) {
                     return@OnUpdateListener
                 }
-                var faceList = arSceneView?.session?.getAllTrackables(AugmentedFace::class.java)
+                val faceList = arSceneView?.session?.getAllTrackables(AugmentedFace::class.java)
 
                 faceList?.let {
                     // Make new AugmentedFaceNodes for any new faces.
@@ -48,6 +48,11 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                             faceNode.faceRegionsRenderable = faceRegionsRenderable
                             faceNode.faceMeshTexture = faceMeshTexture
                             faceNodeMap[face] = faceNode
+
+                            // change assets on runtime
+                        } else if(faceNodeMap[face]?.faceRegionsRenderable != faceRegionsRenderable  ||  faceNodeMap[face]?.faceMeshTexture != faceMeshTexture ){
+                            faceNodeMap[face]?.faceRegionsRenderable = faceRegionsRenderable
+                            faceNodeMap[face]?.faceMeshTexture = faceMeshTexture
                         }
                     }
 
@@ -79,18 +84,6 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                     val textureBytes = map["textureBytes"] as ByteArray
                     val skin3DModelFilename = map["skin3DModelFilename"] as? String
                     loadMesh(textureBytes, skin3DModelFilename)
-
-                    // for change assets on runtime
-                    var faceList = arSceneView?.session?.getAllTrackables(AugmentedFace::class.java)
-                    faceList?.let {
-                        // Make new AugmentedFaceNodes for any new faces.
-                        for (face in faceList) {
-                            println(face.centerPose)
-                            if (faceNodeMap.containsKey(face)) {
-                                faceNodeMap[face]?.faceRegionsRenderable = faceRegionsRenderable
-                            }
-                        }
-                    }
                 }
                 "dispose" -> {
                     debugLog( " updateMaterials")
