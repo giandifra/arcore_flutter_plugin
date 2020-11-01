@@ -17,6 +17,7 @@ class ArCoreController {
     int id,
     this.enableTapRecognizer,
     this.enableUpdateListener,
+    this.debug = false
 //    @required this.onUnsupported,
   }) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
@@ -26,6 +27,7 @@ class ArCoreController {
 
   final bool enableUpdateListener;
   final bool enableTapRecognizer;
+  final bool debug;
   MethodChannel _channel;
   StringResultHandler onError;
   StringResultHandler onNodeTap;
@@ -35,18 +37,16 @@ class ArCoreController {
   ArCorePlaneHandler onPlaneDetected;
 
   init() async {
-    try {
-      await _channel.invokeMethod<void>('init', {
-        'enableTapRecognizer': enableTapRecognizer,
-        'enableUpdateListener': enableUpdateListener,
-      });
-    } on PlatformException catch (ex) {
-      print(ex.message);
-    }
+    await _channel.invokeMethod<void>('init', {
+      'enableTapRecognizer': enableTapRecognizer,
+      'enableUpdateListener': enableUpdateListener,
+    });
   }
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
-    print('_platformCallHandler call ${call.method} ${call.arguments}');
+    if (debug) {
+      print('_platformCallHandler call ${call.method} ${call.arguments}');
+    }
     switch (call.method) {
       case 'onError':
         if (onError != null) {
@@ -76,15 +76,19 @@ class ArCoreController {
         }
         break;
       default:
-        print('Unknowm method ${call.method} ');
+        if (debug) {
+          print('Unknown method ${call.method}');
+        }
     }
-    return Future.value();
+    return;
   }
 
   Future<void> addArCoreNode(ArCoreNode node, {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
-    print(params.toString());
+    if (debug) {
+      print("addArCoreNode ${params.toString()}");
+    }
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNode', params);
   }
@@ -93,7 +97,9 @@ class ArCoreController {
       {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
-    print(params.toString());
+    if (debug) {
+      print("addArCoreNodeWithAnchor ${params.toString()}");
+    }
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNodeWithAnchor', params);
   }

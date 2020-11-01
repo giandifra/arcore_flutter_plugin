@@ -9,6 +9,7 @@ class ArCoreFaceController {
   ArCoreFaceController({
     int id,
     this.enableAugmentedFaces,
+    this.debug = false
   }) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
     _channel.setMethodCallHandler(_handleMethodCalls);
@@ -18,11 +19,14 @@ class ArCoreFaceController {
   }
 
   final bool enableAugmentedFaces;
+  final bool debug;
   MethodChannel _channel;
   StringResultHandler onError;
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
-    print('_platformCallHandler call ${call.method} ${call.arguments}');
+    if (debug) {
+      print('_platformCallHandler call ${call.method} ${call.arguments}');
+    }
     switch (call.method) {
       case 'onError':
         if (onError != null) {
@@ -30,7 +34,9 @@ class ArCoreFaceController {
         }
         break;
       default:
-        print('Unknowm method ${call.method} ');
+        if (debug) {
+          print('Unknown method ${call.method}');
+        }
     }
     return Future.value();
   }
