@@ -57,7 +57,7 @@ class RenderableCustomFactory {
                             }
                             .exceptionally { throwable ->
                                 handler(null, throwable)
-                                Log.i(TAG, "renderable error ${throwable.localizedMessage}")
+                                Log.e(TAG, "renderable error ${throwable.localizedMessage}")
                                 null
                             }
                 }
@@ -65,12 +65,11 @@ class RenderableCustomFactory {
             } else {
                 makeMaterial(context, flutterArCoreNode) { material, throwable ->
                     if (material != null) {
-                        Log.i(TAG, "material not null")
                         try {
                             val renderable = flutterArCoreNode.shape?.buildShape(material)
                             handler(renderable, null)
                         } catch (ex: Exception) {
-                            Log.i(TAG, "renderable error ${ex}")
+                            Log.e(TAG, "renderable error ${ex}")
                             handler(null, ex)
                             Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG)
                         }
@@ -94,7 +93,7 @@ class RenderableCustomFactory {
                     MaterialCustomFactory.makeWithTexture(context, texture, isPng, flutterArCoreNode.shape.materials[0])?.thenAccept { material ->
                         handler(material, null)
                     }?.exceptionally { throwable ->
-                        Log.i(TAG, "texture error ${throwable}")
+                        Log.e(TAG, "texture error ${throwable}")
                         handler(null, throwable)
                         return@exceptionally null
                     }
@@ -104,7 +103,7 @@ class RenderableCustomFactory {
                         ?.thenAccept { material: Material ->
                             handler(material, null)
                         }?.exceptionally { throwable ->
-                            Log.i(TAG, "material error ${throwable}")
+                            Log.e(TAG, "material error ${throwable}")
                             handler(null, throwable)
                             return@exceptionally null
                         }

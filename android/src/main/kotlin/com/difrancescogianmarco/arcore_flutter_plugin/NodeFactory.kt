@@ -13,7 +13,6 @@ class NodeFactory {
         val TAG: String = NodeFactory::class.java.name
 
         fun makeNode(context: Context, flutterNode: FlutterArCoreNode, handler: NodeHandler) {
-            Log.i(TAG, flutterNode.toString())
             val node = flutterNode.buildNode()
             RenderableCustomFactory.makeRenderable(context, flutterNode) { renderable, t ->
                 if (renderable != null) {

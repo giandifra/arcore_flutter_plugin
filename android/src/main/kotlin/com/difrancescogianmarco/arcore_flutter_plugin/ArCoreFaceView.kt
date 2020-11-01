@@ -77,7 +77,6 @@ class ArCoreFaceView(context: Context, messenger: BinaryMessenger, id: Int) : Ba
                 loadMesh(textureBytes, skin3DModelFilename)
             }
             "dispose" -> {
-                Log.i(TAG, " updateMaterials")
                 dispose()
             }
             else -> {

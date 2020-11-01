@@ -13,8 +13,6 @@ class ArCoreViewFactory(val messenger: BinaryMessenger) : PlatformViewFactory(St
 
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
         val params = args as HashMap<*, *>
-        Log.i("ArCoreViewFactory", id.toString())
-        Log.i("ArCoreViewFactory", args.toString())
         val type = params["type"] as String
         if(type == "faces"){
             return ArCoreFaceView(context, messenger, id)

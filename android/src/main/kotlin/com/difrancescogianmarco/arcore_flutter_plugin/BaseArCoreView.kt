@@ -36,33 +36,27 @@ open class BaseArCoreView(context: Context, messenger: BinaryMessenger, id: Int)
     private fun setupLifeCycle(context: Context) {
         activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
-                Log.i(TAG, "onActivityCreated")
                 maybeEnableArButton()
             }
 
             override fun onActivityStarted(activity: Activity) {
-                Log.i(TAG, "onActivityStarted")
             }
 
             override fun onActivityResumed(activity: Activity) {
-                Log.i(TAG, "onActivityResumed")
                 onResume()
             }
 
             override fun onActivityPaused(activity: Activity) {
-                Log.i(TAG, "onActivityPaused")
                 onPause()
             }
 
             override fun onActivityStopped(activity: Activity) {
-                Log.i(TAG, "onActivityStopped")
                 onPause()
             }
 
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
             override fun onActivityDestroyed(activity: Activity) {
-                Log.i(TAG, "onActivityDestroyed")
                 onDestroy()
             }
         }
