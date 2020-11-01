@@ -54,7 +54,7 @@ class ArCoreUtils {
             if (hasCameraPermission(activity)) {
                 session = when (ArCoreApk.getInstance().requestInstall(activity, userRequestedInstall)) {
                     ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
-                        Log.i(TAG, "INSTALL REQUESTED")
+                        Log.i(TAG, "ArCore INSTALL REQUESTED")
                         null
                     }
                     //                    ArCoreApk.InstallStatus.INSTALLED -> {}

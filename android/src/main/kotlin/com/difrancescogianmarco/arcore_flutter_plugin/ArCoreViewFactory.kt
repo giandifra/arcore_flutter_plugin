@@ -13,15 +13,20 @@ class ArCoreViewFactory(val activity: Activity, val messenger: BinaryMessenger) 
 
     override fun create(context: Context, id: Int, args: Any?): PlatformView {
         val params = args as HashMap<*, *>
-        Log.i("ArCoreViewFactory", id.toString())
-        Log.i("ArCoreViewFactory", args.toString())
+        val debug = params["debug"] as Boolean
         val type = params["type"] as String
+
+        if (debug) {
+            Log.i("ArCoreViewFactory", id.toString())
+            Log.i("ArCoreViewFactory", args.toString())
+        }
+
         if (type == "faces") {
-            return ArCoreFaceView(activity, context, messenger, id)
+            return ArCoreFaceView(activity, context, messenger, id, debug)
         } else if (type == "augmented") {
             val useSingleImage = params["useSingleImage"] as? Boolean ?: true
-            return ArCoreAugmentedImagesView(activity, context, messenger, id, useSingleImage)
+            return ArCoreAugmentedImagesView(activity, context, messenger, id, useSingleImage, debug)
         }
-        return ArCoreView(activity, context, messenger, id, type == "faces")
+        return ArCoreView(activity, context, messenger, id, type == "faces", debug)
     }
 }
