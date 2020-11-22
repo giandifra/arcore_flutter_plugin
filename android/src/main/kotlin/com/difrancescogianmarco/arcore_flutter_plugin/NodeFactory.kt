@@ -12,8 +12,10 @@ class NodeFactory {
     companion object {
         val TAG: String = NodeFactory::class.java.name
 
-        fun makeNode(context: Context, flutterNode: FlutterArCoreNode, handler: NodeHandler) {
-            Log.i(TAG, flutterNode.toString())
+        fun makeNode(context: Context, flutterNode: FlutterArCoreNode, debug: Boolean, handler: NodeHandler) {
+            if (debug) {
+                Log.i(TAG, flutterNode.toString())
+            }
             val node = flutterNode.buildNode()
             RenderableCustomFactory.makeRenderable(context, flutterNode) { renderable, t ->
                 if (renderable != null) {

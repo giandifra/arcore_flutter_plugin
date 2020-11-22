@@ -24,7 +24,7 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.util.*
 
-class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger: BinaryMessenger, id: Int, val useSingleImage: Boolean) : BaseArCoreView(activity, context, messenger, id) {
+class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger: BinaryMessenger, id: Int, val useSingleImage: Boolean, debug: Boolean) : BaseArCoreView(activity, context, messenger, id, debug) {
 
     private val TAG: String = ArCoreAugmentedImagesView::class.java.name
     private var sceneUpdateListener: Scene.OnUpdateListener
@@ -50,13 +50,13 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 when (augmentedImage.trackingState) {
                     TrackingState.PAUSED -> {
                         val text = String.format("Detected Image %d", augmentedImage.index)
-                        Log.i(TAG, text)
+                        debugLog( text)
                     }
 
                     TrackingState.TRACKING -> {
-                        Log.i(TAG, "${augmentedImage.name} ${augmentedImage.trackingMethod}")
+                        debugLog( "${augmentedImage.name} ${augmentedImage.trackingMethod}")
                         if (!augmentedImageMap.containsKey(augmentedImage.index)) {
-                            Log.i(TAG, "${augmentedImage.name} ASSENTE")
+                            debugLog( "${augmentedImage.name} ASSENTE")
                             val centerPoseAnchor = augmentedImage.createAnchor(augmentedImage.centerPose)
                             val anchorNode = AnchorNode()
                             anchorNode.anchor = centerPoseAnchor
@@ -67,12 +67,12 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     }
 
                     TrackingState.STOPPED -> {
-                        Log.i(TAG, "STOPPED: ${augmentedImage.name}")
+                        debugLog( "STOPPED: ${augmentedImage.name}")
                         val anchorNode = augmentedImageMap[augmentedImage.index]!!.second
                         augmentedImageMap.remove(augmentedImage.index)
                         arSceneView?.scene?.removeChild(anchorNode)
                         val text = String.format("Removed Image %d", augmentedImage.index)
-                        Log.i(TAG, text)
+                        debugLog( text)
                     }
 
                     else -> {
@@ -125,32 +125,32 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (isSupportedDevice) {
-            Log.i(TAG, call.method + "called on supported device")
+            debugLog( call.method + "called on supported device")
             when (call.method) {
                 "init" -> {
-                    Log.i(TAG, "INIT AUGMENTED IMAGES")
+                    debugLog( "INIT AUGMENTED IMAGES")
                     arScenViewInit(call, result)
                 }
                 "load_single_image_on_db" -> {
-                    Log.i(TAG, "load_single_image_on_db")
+                    debugLog( "load_single_image_on_db")
                     val map = call.arguments as HashMap<String, Any>
                     val singleImageBytes = map["bytes"] as? ByteArray
                     setupSession(singleImageBytes, true)
                 }
                 "load_multiple_images_on_db" -> {
-                    Log.i(TAG, "load_multiple_image_on_db")
+                    debugLog( "load_multiple_image_on_db")
                     val map = call.arguments as HashMap<String, Any>
                     val dbByteMap = map["bytesMap"] as? Map<String, ByteArray>
                     setupSession(dbByteMap)
                 }
                 "load_augmented_images_database" -> {
-                    Log.i(TAG, "LOAD DB")
+                    debugLog( "LOAD DB")
                     val map = call.arguments as HashMap<String, Any>
                     val dbByteArray = map["bytes"] as? ByteArray
                     setupSession(dbByteArray, false)
                 }
                 "attachObjectToAugmentedImage" -> {
-                    Log.i(TAG, "attachObjectToAugmentedImage")
+                    debugLog( "attachObjectToAugmentedImage")
                     val map = call.arguments as HashMap<String, Any>
                     val flutterArCoreNode = FlutterArCoreNode(map["node"] as HashMap<String, Any>)
                     val index = map["index"] as Int
@@ -159,8 +159,8 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                         val anchorNode = augmentedImageMap[index]!!.second
 //                        setImage(augmentedImage, anchorNode)
 //                        onAddNode(flutterArCoreNode, result)
-                        NodeFactory.makeNode(activity.applicationContext, flutterArCoreNode) { node, throwable ->
-                            Log.i(TAG, "inserted ${node?.name}")
+                        NodeFactory.makeNode(activity.applicationContext, flutterArCoreNode, debug) { node, throwable ->
+                            debugLog( "inserted ${node?.name}")
                             if (node != null) {
                                 node.setParent(anchorNode)
                                 arSceneView?.scene?.addChild(anchorNode)
@@ -175,7 +175,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     }
                 }
                 "removeARCoreNodeWithIndex" -> {
-                    Log.i(TAG, "removeObject")
+                    debugLog( "removeObject")
                     try {
                         val map = call.arguments as HashMap<String, Any>
                         val index = map["index"] as Int
@@ -188,7 +188,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
 
                 }
                 "dispose" -> {
-                    Log.i(TAG, " updateMaterials")
+                    debugLog( " updateMaterials")
                     dispose()
                 }
                 else -> {
@@ -196,7 +196,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 }
             }
         } else {
-            Log.i(TAG, "Impossible call " + call.method + " method on unsupported device")
+            debugLog( "Impossible call " + call.method + " method on unsupported device")
             result.error("Unsupported Device", "", null)
         }
     }
@@ -208,21 +208,21 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
     }
 
     override fun onResume() {
-        Log.i(TAG, "onResume")
+        debugLog( "onResume")
         if (arSceneView == null) {
-            Log.i(TAG, "arSceneView NULL")
+            debugLog( "arSceneView NULL")
             return
         }
-        Log.i(TAG, "arSceneView NOT null")
+        debugLog( "arSceneView NOT null")
 
         if (arSceneView?.session == null) {
-            Log.i(TAG, "session NULL")
+            debugLog( "session NULL")
             if (!ArCoreUtils.hasCameraPermission(activity)) {
                 ArCoreUtils.requestCameraPermission(activity, RC_PERMISSIONS)
                 return
             }
 
-            Log.i(TAG, "Camera has permission")
+            debugLog( "Camera has permission")
             // If the session wasn't created yet, don't resume rendering.
             // This can happen if ARCore needs to be updated or permissions are not granted yet.
             try {
@@ -244,17 +244,17 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
 
         try {
             arSceneView?.resume()
-            Log.i(TAG, "arSceneView.resume()")
+            debugLog( "arSceneView.resume()")
         } catch (ex: CameraNotAvailableException) {
             ArCoreUtils.displayError(activity, "Unable to get camera", ex)
-            Log.i(TAG, "CameraNotAvailableException")
+            debugLog( "CameraNotAvailableException")
             activity.finish()
             return
         }
     }
 
     fun setupSession(bytes: ByteArray?, useSingleImage: Boolean) {
-        Log.i(TAG, "setupSession()")
+        debugLog( "setupSession()")
         try {
             val session = arSceneView?.session ?: return
             val config = Config(session)
@@ -274,12 +274,12 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
             session.configure(config)
             arSceneView?.setupSession(session)
         } catch (ex: Exception) {
-            Log.i(TAG, ex.localizedMessage)
+            debugLog( ex.localizedMessage)
         }
     }
 
     fun setupSession(bytesMap: Map<String, ByteArray>?) {
-        Log.i(TAG, "setupSession()")
+        debugLog( "setupSession()")
         try {
             val session = arSceneView?.session ?: return
             val config = Config(session)
@@ -293,19 +293,19 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
             session.configure(config)
             arSceneView?.setupSession(session)
         } catch (ex: Exception) {
-            Log.i(TAG, ex.localizedMessage)
+            debugLog( ex.localizedMessage)
         }
     }
 
     private fun addMultipleImagesToAugmentedImageDatabase(config: Config, bytesMap: Map<String, ByteArray>): Boolean {
-        Log.i(TAG, "addImageToAugmentedImageDatabase")
+        debugLog( "addImageToAugmentedImageDatabase")
         val augmentedImageDatabase = AugmentedImageDatabase(arSceneView?.session)
         for ((key, value) in bytesMap) {
             val augmentedImageBitmap = loadAugmentedImageBitmap(value)
             try {
                 augmentedImageDatabase.addImage(key, augmentedImageBitmap)
             } catch (ex: Exception) {
-                Log.i(TAG, "Image with the title $key cannot be added to the database. " +
+                debugLog("Image with the title $key cannot be added to the database. " +
                         "The exception was thrown: " + ex?.toString())
             }
         }
@@ -322,7 +322,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
         // * shorter setup time
         // * doesn't require images to be packaged in apk.
 //        if (useSingleImage && singleImageBytes != null) {
-        Log.i(TAG, "addImageToAugmentedImageDatabase")
+        debugLog( "addImageToAugmentedImageDatabase")
         try{
             val augmentedImageBitmap = loadAugmentedImageBitmap(bytes) ?: return false
             val augmentedImageDatabase = AugmentedImageDatabase(arSceneView?.session)
@@ -330,7 +330,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
             config.augmentedImageDatabase = augmentedImageDatabase
             return true
         }catch (ex:Exception){
-            Log.i(TAG,ex.localizedMessage)
+            debugLog(ex.localizedMessage)
             return false
         }
 
@@ -358,7 +358,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
     }
 
     private fun useExistingAugmentedImageDatabase(config: Config, bytes: ByteArray): Boolean {
-        Log.i(TAG, "useExistingAugmentedImageDatabase")
+        debugLog( "useExistingAugmentedImageDatabase")
         return try {
             val inputStream = ByteArrayInputStream(bytes)
             val augmentedImageDatabase = AugmentedImageDatabase.deserialize(arSceneView?.session, inputStream)
@@ -371,7 +371,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
     }
 
     private fun loadAugmentedImageBitmap(bitmapdata: ByteArray): Bitmap? {
-        Log.i(TAG, "loadAugmentedImageBitmap")
+        debugLog( "loadAugmentedImageBitmap")
        try {
            return  BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.size)
         } catch (e: Exception) {

@@ -8,13 +8,15 @@ class ArCoreAndroidView extends AndroidView {
   final String viewType;
   final PlatformViewCreatedCallback onPlatformViewCreated;
   final ArCoreViewType arCoreViewType;
+  final bool debug;
 
-  ArCoreAndroidView({
-    Key key,
-    @required this.viewType,
-    this.onPlatformViewCreated,
-    this.arCoreViewType = ArCoreViewType.STANDARDVIEW,
-  }) : super(
+  ArCoreAndroidView(
+      {Key key,
+      @required this.viewType,
+      this.onPlatformViewCreated,
+      this.arCoreViewType = ArCoreViewType.STANDARDVIEW,
+      this.debug = false})
+      : super(
           viewType: viewType,
           onPlatformViewCreated: onPlatformViewCreated,
           creationParams: <String, dynamic>{
@@ -22,7 +24,8 @@ class ArCoreAndroidView extends AndroidView {
                 ? "faces"
                 : arCoreViewType == ArCoreViewType.AUGMENTEDIMAGES
                     ? "augmented"
-                    : "standard"
+                    : "standard",
+            "debug": debug
           },
           creationParamsCodec: const StandardMessageCodec(),
         );

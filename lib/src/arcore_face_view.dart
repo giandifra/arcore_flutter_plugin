@@ -10,12 +10,14 @@ typedef void ArCoreFaceViewCreatedCallback(ArCoreFaceController controller);
 class ArCoreFaceView extends StatefulWidget {
   final ArCoreFaceViewCreatedCallback onArCoreViewCreated;
   final bool enableAugmentedFaces;
+  final bool debug;
 
-  const ArCoreFaceView({
-    Key key,
-    this.onArCoreViewCreated,
-    this.enableAugmentedFaces = false,
-  }) : super(key: key);
+  const ArCoreFaceView(
+      {Key key,
+      this.onArCoreViewCreated,
+      this.enableAugmentedFaces = false,
+      this.debug = false})
+      : super(key: key);
 
   @override
   _ArCoreFaceViewState createState() => _ArCoreFaceViewState();
@@ -37,12 +39,13 @@ class _ArCoreFaceViewState extends State<ArCoreFaceView>
           viewType: 'arcore_flutter_plugin',
           onPlatformViewCreated: _onPlatformViewCreated,
           arCoreViewType: ArCoreViewType.AUGMENTEDFACE,
+          debug: widget.debug,
         ),
       );
     }
     return Center(
-      child: Text(
-          '$defaultTargetPlatform is not  supported by the ar_view plugin'),
+      child:
+          Text('$defaultTargetPlatform is not supported by the ar_view plugin'),
     );
   }
 

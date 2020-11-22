@@ -15,17 +15,19 @@ class ArCoreView extends StatefulWidget {
   final bool enableTapRecognizer;
   final bool enablePlaneRenderer;
   final bool enableUpdateListener;
+  final bool debug;
   final ArCoreViewType type;
 
-  const ArCoreView({
-    Key key,
-    @required this.onArCoreViewCreated,
+  const ArCoreView(
+      {Key key,
+      @required this.onArCoreViewCreated,
 //    @required this.onArCoreUnsupported,
-    this.enableTapRecognizer = false,
-    this.enablePlaneRenderer = true,
-    this.enableUpdateListener = false,
-    this.type = ArCoreViewType.STANDARDVIEW,
-  }) : super(key: key);
+      this.enableTapRecognizer = false,
+      this.enablePlaneRenderer = true,
+      this.enableUpdateListener = false,
+      this.type = ArCoreViewType.STANDARDVIEW,
+      this.debug = false})
+      : super(key: key);
 
   @override
   _ArCoreViewState createState() => _ArCoreViewState();
@@ -46,12 +48,13 @@ class _ArCoreViewState extends State<ArCoreView> with WidgetsBindingObserver {
           viewType: 'arcore_flutter_plugin',
           onPlatformViewCreated: _onPlatformViewCreated,
           arCoreViewType: widget.type,
+          debug: widget.debug,
         ),
       );
     }
     return Center(
-      child: Text(
-          '$defaultTargetPlatform is not  supported by the ar_view plugin'),
+      child:
+          Text('$defaultTargetPlatform is not supported by the ar_view plugin'),
     );
   }
 
