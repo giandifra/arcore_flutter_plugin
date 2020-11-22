@@ -1,3 +1,7 @@
+## 0.0.10
+
+* Fix debugLog error
+
 ## 0.0.9
 
 * Initialize an AugmentedImageDatabase only with valid images (@AlinaStepanova)
