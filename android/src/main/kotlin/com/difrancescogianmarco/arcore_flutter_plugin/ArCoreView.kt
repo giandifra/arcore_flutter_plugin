@@ -42,6 +42,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     private val RC_PERMISSIONS = 0x123
     private var sceneUpdateListener: Scene.OnUpdateListener
     private var faceSceneUpdateListener: Scene.OnUpdateListener
+    private var sceneOnPeekTouchListener: Scene.OnPeekTouchListener
 
     //AUGMENTEDFACE
     private var faceRegionsRenderable: ModelRenderable? = null
@@ -86,6 +87,10 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                     methodChannel.invokeMethod("onPlaneDetected", map)
                 }
             }
+        }
+
+        sceneOnPeekTouchListener = Scene.OnPeekTouchListener {hitTestResult, motionEvent ->
+            coordinator.onTouch(hitTestResult, motionEvent)
         }
 
         faceSceneUpdateListener = Scene.OnUpdateListener { frameTime ->
@@ -160,7 +165,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "init" -> {
-                arScenViewInit(FlutterArCoreSceneSetup(call.arguments as Map<String,*>), result)
+                arScenViewInit(FlutterArCoreSceneSetup(call.arguments as Map<String, *>), result)
             }
             "addArCoreNode" -> {
                 debugLog(" addArCoreNode")
@@ -299,24 +304,23 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         }
     }
 
-    private fun arScenViewInit(flutterArCoreSceneSetup:FlutterArCoreSceneSetup, result: MethodChannel.Result) {
+    private fun arScenViewInit(flutterArCoreSceneSetup: FlutterArCoreSceneSetup, result: MethodChannel.Result) {
         debugLog("arScenViewInit")
 
-       if(flutterArCoreSceneSetup.enableTapRecognizer == true){
-            arSceneView?.scene?.addOnPeekTouchListener { hitTestResult, motionEvent ->
-                coordinator.onTouch(hitTestResult, motionEvent)
-            }
-
+        if (flutterArCoreSceneSetup.enableTapRecognizer == true) {
+            arSceneView?.scene?.addOnPeekTouchListener(sceneOnPeekTouchListener)
         }
 
-        if(flutterArCoreSceneSetup.enableUpdateListener == true){
+        if (flutterArCoreSceneSetup.enableUpdateListener == true) {
             // Set an update listener on the Scene that will hide the loading message once a Plane is
             // detected.
             arSceneView?.scene?.addOnUpdateListener(sceneUpdateListener)
         }
 
-        if(flutterArCoreSceneSetup.enablePlaneRenderer == true){  debugLog(" The plane renderer (enablePlaneRenderer) is set to " + enablePlaneRenderer.toString())
-            arSceneView!!.planeRenderer.isVisible = false}
+        if (flutterArCoreSceneSetup.enablePlaneRenderer == false) {
+            debugLog(" The plane renderer (enablePlaneRenderer) is set to false")
+            arSceneView!!.planeRenderer.isVisible = false
+        }
 
         result.success(null)
     }
@@ -334,10 +338,10 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
 
             val myAnchor = arSceneView?.session?.createAnchor(Pose(flutterArCoreNode.getPosition(), flutterArCoreNode.getRotation()))
-            myAnchor?.let{anchor->
+            myAnchor?.let { anchor ->
                 NodeFactory.makeTransformableNode(activity.applicationContext, flutterArCoreNode, debug, coordinator) { node, throwable ->
-                    node?.let{baseNode->
-                        baseNode.attach(anchor,arSceneView!!.scene,true)
+                    node?.let { baseNode ->
+                        baseNode.attach(anchor, arSceneView!!.scene, true)
                         for (n in flutterArCoreNode.children) {
                             n.parentNodeName = flutterArCoreNode.name
                             onAddNode(n, null)
@@ -493,6 +497,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             try {
                 arSceneView?.scene?.removeOnUpdateListener(sceneUpdateListener)
                 arSceneView?.scene?.removeOnUpdateListener(faceSceneUpdateListener)
+                arSceneView?.scene?.removeOnPeekTouchListener(sceneOnPeekTouchListener)
                 debugLog("Goodbye arSceneView.")
 
                 arSceneView?.destroy()
@@ -544,7 +549,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         debugLog("onNodeFocused: " + node?.name)
     }
 
-    private fun onNodeTapped(node: Node?){
+    private fun onNodeTapped(node: Node?) {
         debugLog("onNodeTapped: " + node?.name)
         methodChannel.invokeMethod("onNodeTap", node?.name)
     }
