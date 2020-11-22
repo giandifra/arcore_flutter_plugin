@@ -1,12 +1,19 @@
+## 0.0.9
+
+* Initialize an AugmentedImageDatabase only with valid images (@AlinaStepanova)
+* ArCoreReferenceNode objectUrl now using .glb or .gltf2 depending on file extension of URL (@BrutalCoding)
+* Added new parameter to enable/disable the white dots on surface (@BrutalCoding)
+* Added debug parameter to control logging for dart and kotlin (@xvld)
+
 ## 0.0.8
 
 * Show 2D image with ArCoreImage
 
 ## 0.0.7
 
-* You can load multiple image into augmented images database (Alina Stepanova)
-* Add check to see if AR are installed (Alina Stepanova)
-* Fix Exception when use with another plugin (BrutalCoding)
+* You can load multiple image into augmented images database (@AlinaStepanova)
+* Add check to see if AR are installed (@AlinaStepanova)
+* Fix Exception when use with another plugin (@BrutalCoding)
 
 ## 0.0.6
 
