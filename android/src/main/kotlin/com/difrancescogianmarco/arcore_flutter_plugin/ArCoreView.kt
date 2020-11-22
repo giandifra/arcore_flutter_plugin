@@ -131,7 +131,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
 
     fun debugLog(message: String) {
         if (debug) {
-            debugLog(message)
+            Log.i(TAG, message)
         }
     }
 
