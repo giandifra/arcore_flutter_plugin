@@ -1,5 +1,7 @@
 package com.difrancescogianmarco.arcore_flutter_plugin.flutter_models
 
+import com.difrancescogianmarco.arcore_flutter_plugin.BaseNode
+import com.difrancescogianmarco.arcore_flutter_plugin.Coordinator
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseQuaternion
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
@@ -7,6 +9,7 @@ import com.google.ar.core.Pose
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.ux.TransformableNode
 
 class FlutterArCoreNode(map: HashMap<String, *>) {
 
@@ -46,6 +49,16 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         return node
     }
 
+    fun buildTransformableNode(transformationSystem: Coordinator): BaseNode {
+        val node = BaseNode(transformationSystem)
+        node.name = name
+        node.localPosition = position
+        node.localScale = scale
+        node.localRotation = rotation
+
+        return node
+    }
+    
     fun getPosition(): FloatArray {
         return floatArrayOf(position.x, position.y, position.z)
     }
