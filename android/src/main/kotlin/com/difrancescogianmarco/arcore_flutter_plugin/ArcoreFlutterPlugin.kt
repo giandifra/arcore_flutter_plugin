@@ -27,7 +27,6 @@ class ArcoreFlutterPlugin : FlutterPlugin, ActivityAware {
         private const val CHANNEL_NAME = "arcore_flutter_plugin"
         @JvmStatic
         fun registerWith(registrar: Registrar) {
-            Log.i(TAG, "registerWith")
             registrar
                     .platformViewRegistry()
                     .registerViewFactory(CHANNEL_NAME, ArCoreViewFactory(registrar.activity(), registrar.messenger()))
@@ -35,31 +34,25 @@ class ArcoreFlutterPlugin : FlutterPlugin, ActivityAware {
     }
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        Log.i(TAG, "onAttachedToEngine")
         this.flutterPluginBinding = flutterPluginBinding
     }
 
     override fun onDetachedFromEngine(p0: FlutterPlugin.FlutterPluginBinding) {
-        Log.i(TAG, "onDetachedFromEngine")
         this.flutterPluginBinding = null
     }
 
 
     override fun onDetachedFromActivity() {
-        Log.i(TAG, "onDetachedFromActivity")
-
         //TODO remove othen channel
         methodCallHandler?.stopListening()
         methodCallHandler = null
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        Log.i(TAG, "onReattachedToActivityForConfigChanges")
         onAttachedToActivity(binding)
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        Log.i(TAG, "onAttachedToActivity")
         flutterPluginBinding?.platformViewRegistry?.registerViewFactory(CHANNEL_NAME, ArCoreViewFactory(binding.activity, flutterPluginBinding?.binaryMessenger!!))
         methodCallHandler = MethodCallHandlerImpl(
                 binding.activity, flutterPluginBinding?.binaryMessenger!!)
@@ -67,7 +60,6 @@ class ArcoreFlutterPlugin : FlutterPlugin, ActivityAware {
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-        Log.i(TAG, "onDetachedFromActivityForConfigChanges")
         onDetachedFromActivity()
     }
 

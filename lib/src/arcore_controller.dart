@@ -32,12 +32,14 @@ class ArCoreController {
     return arcoreInstalled;
   }
 
-  ArCoreController({
-    int id,
-    this.enableTapRecognizer,
-    this.enableUpdateListener,
+  ArCoreController(
+      {int id,
+      this.enableTapRecognizer,
+      this.enablePlaneRenderer,
+      this.enableUpdateListener,
+      this.debug = false
 //    @required this.onUnsupported,
-  }) {
+      }) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
     _channel.setMethodCallHandler(_handleMethodCalls);
     init();
@@ -45,6 +47,8 @@ class ArCoreController {
 
   final bool enableUpdateListener;
   final bool enableTapRecognizer;
+  final bool enablePlaneRenderer;
+  final bool debug;
   MethodChannel _channel;
   StringResultHandler onError;
   StringResultHandler onNodeTap;
@@ -59,6 +63,7 @@ class ArCoreController {
     try {
       await _channel.invokeMethod<void>('init', {
         'enableTapRecognizer': enableTapRecognizer,
+        'enablePlaneRenderer': enablePlaneRenderer,
         'enableUpdateListener': enableUpdateListener,
       });
     } on PlatformException catch (ex) {
@@ -67,7 +72,10 @@ class ArCoreController {
   }
 
   Future<dynamic> _handleMethodCalls(MethodCall call) async {
-    print('_platformCallHandler call ${call.method} ${call.arguments}');
+    if (debug) {
+      print('_platformCallHandler call ${call.method} ${call.arguments}');
+    }
+
     switch (call.method) {
       case 'onError':
         if (onError != null) {
@@ -99,16 +107,22 @@ class ArCoreController {
       case 'getTrackingState':
         // TRACKING, PAUSED or STOPPED
         trackingState = call.arguments;
-        print('Latest tracking state received is: $trackingState');
+        if (debug) {
+          print('Latest tracking state received is: $trackingState');
+        }
         break;
       case 'onTrackingImage':
-        print('flutter onTrackingImage');
+        if (debug) {
+          print('flutter onTrackingImage');
+        }
         final arCoreAugmentedImage =
             ArCoreAugmentedImage.fromMap(call.arguments);
         onTrackingImage(arCoreAugmentedImage);
         break;
       default:
-        print('Unknowm method ${call.method} ');
+        if (debug) {
+          print('Unknown method ${call.method}');
+        }
     }
     return Future.value();
   }
@@ -116,7 +130,9 @@ class ArCoreController {
   Future<void> addArCoreNode(ArCoreNode node, {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
-    print(params.toString());
+    if (debug) {
+      print(params.toString());
+    }
     _addListeners(node);
     return _channel.invokeMethod('addArCoreNode', params);
   }
@@ -138,9 +154,13 @@ class ArCoreController {
       {String parentNodeName}) {
     assert(node != null);
     final params = _addParentNodeNameToParams(node.toMap(), parentNodeName);
-    print(params.toString());
+    if (debug) {
+      print(params.toString());
+    }
     _addListeners(node);
-    print('---------_CALLING addArCoreNodeWithAnchor : $params');
+    if (debug) {
+      print('---------_CALLING addArCoreNodeWithAnchor : $params');
+    }
     return _channel.invokeMethod('addArCoreNodeWithAnchor', params);
   }
 

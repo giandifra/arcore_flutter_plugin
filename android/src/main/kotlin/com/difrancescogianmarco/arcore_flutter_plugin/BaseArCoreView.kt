@@ -20,7 +20,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
-open class BaseArCoreView(val activity: Activity, context: Context, messenger: BinaryMessenger, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
+open class BaseArCoreView(val activity: Activity, context: Context, messenger: BinaryMessenger, id: Int, protected val debug: Boolean) : PlatformView, MethodChannel.MethodCallHandler {
 
     lateinit var activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks
     protected val methodChannel: MethodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
@@ -41,35 +41,41 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
         }
     }
 
+    protected fun debugLog(message: String) {
+        if (debug) {
+            debugLog(message)
+        }
+    }
+
     private fun setupLifeCycle(context: Context) {
         activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                Log.i(TAG, "onActivityCreated")
+                debugLog("onActivityCreated")
             }
 
             override fun onActivityStarted(activity: Activity) {
-                Log.i(TAG, "onActivityStarted")
+                debugLog("onActivityStarted")
             }
 
             override fun onActivityResumed(activity: Activity) {
-                Log.i(TAG, "onActivityResumed")
+                debugLog("onActivityResumed")
                 onResume()
             }
 
             override fun onActivityPaused(activity: Activity) {
-                Log.i(TAG, "onActivityPaused")
+                debugLog("onActivityPaused")
                 onPause()
             }
 
             override fun onActivityStopped(activity: Activity) {
-                Log.i(TAG, "onActivityStopped")
+                debugLog("onActivityStopped")
                 onPause()
             }
 
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
             override fun onActivityDestroyed(activity: Activity) {
-                Log.i(TAG, "onActivityDestroyed")
+                debugLog("onActivityDestroyed")
 //                onDestroy()
             }
         }
@@ -135,26 +141,26 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
     
     fun attachNodeToParent(node: Node?, parentNodeName: String?) {
         if (parentNodeName != null) {
-            Log.i(TAG, parentNodeName)
+            debugLog(parentNodeName)
             val parentNode: Node? = arSceneView?.scene?.findByName(parentNodeName)
             parentNode?.addChild(node)
         } else {
-            Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
+            debugLog("addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
             arSceneView?.scene?.addChild(node)
         }
     }
 
     fun onAddNode(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result?) {
-        Log.i(TAG, flutterArCoreNode.toString())
-        NodeFactory.makeNode(activity.applicationContext, flutterArCoreNode) { node, throwable ->
-            Log.i(TAG, "inserted ${node?.name}")
+        debugLog(flutterArCoreNode.toString())
+        NodeFactory.makeNode(activity.applicationContext, flutterArCoreNode, debug) { node, throwable ->
+            debugLog("inserted ${node?.name}")
 
 /*            if (flutterArCoreNode.parentNodeName != null) {
-                Log.i(TAG, flutterArCoreNode.parentNodeName);
+                debugLog(flutterArCoreNode.parentNodeName);
                 val parentNode: Node? = arSceneView?.scene?.findByName(flutterArCoreNode.parentNodeName)
                 parentNode?.addChild(node)
             } else {
-                Log.i(TAG, "addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
+                debugLog("addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
                 arSceneView?.scene?.addChild(node)
             }*/
             if (node != null) {
@@ -174,18 +180,18 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
         val node = arSceneView?.scene?.findByName(name)
         if (node != null) {
             arSceneView?.scene?.removeChild(node)
-            Log.i(TAG, "removed ${node.name}")
+            debugLog("removed ${node.name}")
         }
         result?.success(null)
     }
 
     fun removeNode(node: Node) {
             arSceneView?.scene?.removeChild(node)
-            Log.i(TAG, "removed ${node.name}")
+            debugLog("removed ${node.name}")
     }
 
     fun onPause() {
-        Log.i(TAG, "onPause()")
+        debugLog("onPause()")
         if (arSceneView != null) {
             arSceneView?.pause()
         }

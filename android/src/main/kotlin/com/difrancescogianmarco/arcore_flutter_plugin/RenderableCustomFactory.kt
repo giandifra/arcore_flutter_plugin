@@ -48,11 +48,17 @@ class RenderableCustomFactory {
                 } else if (url != null) {
                     val modelRenderableBuilder = ModelRenderable.builder()
                     val renderableSourceBuilder = RenderableSource.builder()
-
-                    renderableSourceBuilder
+                    if(url.endsWith(".glb")){
+                        renderableSourceBuilder
+                            .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLB)
+                            .setScale(0.5f)
+                            .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                    } else {
+                        renderableSourceBuilder
                             .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLTF2)
                             .setScale(0.5f)
                             .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                    }
 
                     modelRenderableBuilder
                             .setSource(context, renderableSourceBuilder.build())
@@ -63,7 +69,7 @@ class RenderableCustomFactory {
                             }
                             .exceptionally { throwable ->
                                 handler(null, throwable)
-                                Log.i(TAG, "renderable error ${throwable.localizedMessage}")
+                                Log.e(TAG, "renderable error ${throwable.localizedMessage}")
                                 null
                             }
                 }
@@ -100,7 +106,7 @@ class RenderableCustomFactory {
                             val renderable = flutterArCoreNode.shape?.buildShape(material)
                             handler(renderable, null)
                         } catch (ex: Exception) {
-                            Log.i(TAG, "renderable error ${ex}")
+                            Log.e(TAG, "renderable error ${ex}")
                             handler(null, ex)
                             Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG)
                         }
@@ -127,7 +133,7 @@ class RenderableCustomFactory {
                     MaterialCustomFactory.makeWithTexture(context, texture, isPng, flutterArCoreNode.shape.materials[0])?.thenAccept { material ->
                         handler(material, null)
                     }?.exceptionally { throwable ->
-                        Log.i(TAG, "texture error ${throwable}")
+                        Log.e(TAG, "texture error ${throwable}")
                         handler(null, throwable)
                         return@exceptionally null
                     }
@@ -137,7 +143,7 @@ class RenderableCustomFactory {
                         ?.thenAccept { material: Material ->
                             handler(material, null)
                         }?.exceptionally { throwable ->
-                            Log.i(TAG, "material error ${throwable}")
+                            Log.e(TAG, "material error ${throwable}")
                             handler(null, throwable)
                             return@exceptionally null
                         }
