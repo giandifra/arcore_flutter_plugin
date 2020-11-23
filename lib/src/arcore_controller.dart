@@ -178,24 +178,48 @@ class ArCoreController {
 
   void _addListeners(ArCoreNode node) {
     node.position.addListener(() => _handlePositionChanged(node));
+    node.scale.addListener(() => _handleScaleChanged(node));
+    node.rotation.addListener(() => _handleRotationChanged(node));
     node?.shape?.materials?.addListener(() => _updateMaterials(node));
 
-    if (node is ArCoreRotatingNode) {
-      node.degreesPerSecond.addListener(() => _handleRotationChanged(node));
-    }
+    // if (node is ArCoreRotatingNode) {
+    //   node.degreesPerSecond.addListener(() => _handleRotationChanged(node));
+    // }
+  }
+
+  void _handleScaleChanged(ArCoreNode node) {
+    print('_handleScaleChanged: ${node.name}');
+    _channel.invokeMethod<void>(
+        'scaleChanged',
+        _getHandlerParams(
+            node,
+            _getHandlerParams(node, <String, dynamic>{
+              'scale': convertVector3ToMap(node.scale.value)
+            })));
   }
 
   void _handlePositionChanged(ArCoreNode node) {
-    _channel.invokeMethod<void>('positionChanged',
-        _getHandlerParams(node, convertVector3ToMap(node.position.value)));
+    print('_handlePositionChanged: ${node.name}');
+    _channel.invokeMethod<void>(
+        'positionChanged',
+        _getHandlerParams(
+            node,
+            _getHandlerParams(node, <String, dynamic>{
+              'position': convertVector3ToMap(node.position.value)
+            })));
   }
 
-  void _handleRotationChanged(ArCoreRotatingNode node) {
-    _channel.invokeMethod<void>('rotationChanged',
-        {'name': node.name, 'degreesPerSecond': node.degreesPerSecond.value});
+  void _handleRotationChanged(ArCoreNode node) {
+    print('_handleRotationChanged: ${node.name}');
+    _channel.invokeMethod<void>(
+        'rotationChanged',
+        _getHandlerParams(node, <String, dynamic>{
+          'rotation': convertVector4ToMap(node.rotation.value)
+        }));
   }
 
   void _updateMaterials(ArCoreNode node) {
+    print('_updateMaterials: ${node.name}');
     _channel.invokeMethod<void>(
         'updateMaterials', _getHandlerParams(node, node.shape.toMap()));
   }

@@ -17,11 +17,13 @@ import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCo
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreSceneSetup
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
+import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils
 import com.google.ar.core.*
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 import com.google.ar.sceneform.*
+import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Texture
 import com.google.ar.sceneform.ux.AugmentedFaceNode
@@ -89,7 +91,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
         }
 
-        sceneOnPeekTouchListener = Scene.OnPeekTouchListener {hitTestResult, motionEvent ->
+        sceneOnPeekTouchListener = Scene.OnPeekTouchListener { hitTestResult, motionEvent ->
             coordinator.onTouch(hitTestResult, motionEvent)
         }
 
@@ -134,11 +136,18 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         setupLifeCycle(context)
     }
 
-    fun debugLog(message: String) {
+    fun debugLog(message: String?) {
         if (debug) {
-            Log.i(TAG, message)
+            Log.i(TAG, message ?: "null message")
         }
     }
+
+/*    private fun onArUpdate() {
+        val frame = arSceneView?.arFrame
+        val camera = frame?.camera
+        val state = camera?.trackingState
+        val reason = camera?.trackingFailureReason
+    }*/
 
 
     fun loadMesh(textureBytes: ByteArray?) {
@@ -186,12 +195,26 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
             "positionChanged" -> {
                 debugLog(" positionChanged")
+                coordinator.selectedNode?.apply {
+                    localPosition = DecodableUtils.parseVector3(call.argument("position") as? HashMap<String, Double>)
+                }
+                result.success(null)
+            }
+            "scaleChanged" -> {
+                debugLog(" scaleChanged")
 
+                coordinator.selectedNode?.parent?.apply {
+                    localScale = DecodableUtils.parseVector3(call.argument("scale") as? HashMap<String, *>)
+                }
+
+                result.success(null)
             }
             "rotationChanged" -> {
                 debugLog(" rotationChanged")
-                updateRotation(call, result)
-
+                coordinator.selectedNode?.apply {
+                    localRotation = DecodableUtils.parseQuaternion(call.argument("rotation") as? HashMap<String, Double>)
+                }
+                result.success(null)
             }
             "updateMaterials" -> {
                 debugLog(" updateMaterials")
@@ -326,7 +349,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     }
 
     fun addNodeWithAnchor(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result) {
-        debugLog("addNodeWithAnchor " + flutterArCoreNode.name)
+        debugLog("addNodeWithAnchor " + flutterArCoreNode.configuration.name)
         if (arSceneView == null) {
             return
         }
@@ -343,7 +366,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                     node?.let { baseNode ->
                         baseNode.attach(anchor, arSceneView!!.scene, true)
                         for (n in flutterArCoreNode.children) {
-                            n.parentNodeName = flutterArCoreNode.name
+                            n.parentNodeName = flutterArCoreNode.configuration.name
                             onAddNode(n, null)
                         }
                     }
@@ -362,7 +385,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             node?.let {
                 attachNodeToParent(node, flutterArCoreNode.parentNodeName)
                 for (n in flutterArCoreNode.children) {
-                    n.parentNodeName = flutterArCoreNode.name
+                    n.parentNodeName = flutterArCoreNode.configuration.name
                     onAddNode(n, null)
                 }
             }
@@ -536,13 +559,17 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         } ?: coordinator.selectNode(null)
     }
 
+    //Called every frame
     private fun onNodeUpdate(node: BaseNode?) {
-        debugLog("onNodeUpdate: " + node?.name)
+        //debugLog("onNodeUpdate: " + node?.name)
+
     }
 
     private fun onNodeSelected(old: BaseNode? = coordinator.selectedNode, new: BaseNode?) {
         debugLog("onNodeSelected old: " + old?.name)
         debugLog("onNodeSelected new: " + new?.name)
+        old?.onNodeUpdate = null
+        new?.onNodeUpdate = ::onNodeUpdate
     }
 
     private fun onNodeFocused(node: BaseNode?) {

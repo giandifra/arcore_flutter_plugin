@@ -12,7 +12,8 @@ class TransformableNodeScreen extends StatefulWidget {
 
 class _TransformableNodeState extends State<TransformableNodeScreen> {
   ArCoreController arCoreController;
-
+  String selectedNode;
+  final nodesMap = <String, ArCoreNode>{};
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,11 +21,115 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
         appBar: AppBar(
           title: const Text('Custom Object on plane detected'),
         ),
-        body: ArCoreView(
-          onArCoreViewCreated: _onArCoreViewCreated,
-          enableTapRecognizer: true,
-          enableUpdateListener: true,
-          debug: true,
+        body: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            ArCoreView(
+              onArCoreViewCreated: _onArCoreViewCreated,
+              enableTapRecognizer: true,
+              enableUpdateListener: true,
+              debug: true,
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(selectedNode ?? 'Unselected node'),
+                    Row(
+                      children: <Widget>[
+                        Text('Scale'),
+                        IconButton(
+                            icon: Icon(Icons.remove),
+                            onPressed: selectedNode != null
+                                ? () {
+                                    if (nodesMap.containsKey(selectedNode)) {
+                                      nodesMap[selectedNode].scale.value -=
+                                          vector.Vector3(1.0, 1.0, 1.0);
+                                      setState(() {});
+                                    }
+                                  }
+                                : null),
+                        IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: selectedNode != null
+                                ? () {
+                                    if (nodesMap.containsKey(selectedNode)) {
+                                      nodesMap[selectedNode].scale.value +=
+                                          vector.Vector3(1.0, 1.0, 1.0);
+                                      setState(() {});
+                                    }
+                                  }
+                                : null),
+                        if (selectedNode != null &&
+                            nodesMap.containsKey(selectedNode))
+                          Text(nodesMap[selectedNode].scale.value.text),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text('Position'),
+                        IconButton(
+                            icon: Icon(Icons.remove),
+                            onPressed: selectedNode != null
+                                ? () {
+                                    if (nodesMap.containsKey(selectedNode)) {
+                                      nodesMap[selectedNode].position.value -=
+                                          vector.Vector3(0.3, 0.0, 0.0);
+                                      setState(() {});
+                                    }
+                                  }
+                                : null),
+                        IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: selectedNode != null
+                                ? () {
+                                    if (nodesMap.containsKey(selectedNode)) {
+                                      nodesMap[selectedNode].position.value +=
+                                          vector.Vector3(0.3, 0.0, 0.0);
+                                    }
+                                  }
+                                : null),
+                        if (selectedNode != null &&
+                            nodesMap.containsKey(selectedNode))
+                          Text(nodesMap[selectedNode].position.value.text),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text('Rotation'),
+                        IconButton(
+                            icon: Icon(Icons.remove),
+                            onPressed: selectedNode != null
+                                ? () {
+                                    if (nodesMap.containsKey(selectedNode)) {
+                                      nodesMap[selectedNode].rotation.value -=
+                                          vector.Vector4(0.1, 0.1, 0.1, 0.1);
+                                    }
+                                  }
+                                : null),
+                        IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: selectedNode != null
+                                ? () {
+                                    if (nodesMap.containsKey(selectedNode)) {
+                                      nodesMap[selectedNode].rotation.value +=
+                                          vector.Vector4(0.1, 0.1, 0.1, 0.1);
+                                    }
+                                  }
+                                : null),
+                        if (selectedNode != null &&
+                            nodesMap.containsKey(selectedNode))
+                          Text(nodesMap[selectedNode].rotation.value.text),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -35,6 +140,9 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
     arCoreController.onPlaneTap = _handleOnPlaneTap;
     arCoreController.onNodeTap = (node) {
       print('TransformableNodeScreen: onNodeTap $node');
+      setState(() {
+        selectedNode = node;
+      });
     };
   }
 
@@ -52,9 +160,12 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
 
     final earth = ArCoreNode(
       shape: earthShape,
+      scale: vector.Vector3(1.0, 1.0, 1.0),
       position: hit.pose.translation + vector.Vector3(0.0, 1.0, 0.0),
       rotation: hit.pose.rotation,
     );
+
+    nodesMap[earth.name] = earth;
 
     arCoreController.addArCoreNodeWithAnchor(earth);
   }

@@ -15,7 +15,7 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
     val shape: FlutterArCoreShape? = getShape(map["shape"] as? HashMap<String, *>)
     private val degreesPerSecond: Float? = getDegreesPerSecond((map["degreesPerSecond"] as? Double))
     var parentNodeName: String? = map["parentNodeName"] as? String
-    private val configuration: FlutterArCoreNodeConfiguration = FlutterArCoreNodeConfiguration(map)
+    val configuration: FlutterArCoreNodeConfiguration = FlutterArCoreNodeConfiguration(map)
     val children: ArrayList<FlutterArCoreNode> = getChildrenFromMap(map["children"] as ArrayList<HashMap<String, *>>)
 
     private fun getChildrenFromMap(list: ArrayList<HashMap<String, *>>): ArrayList<FlutterArCoreNode> {

@@ -15,13 +15,17 @@ class ArCoreNode {
     Vector3 scale,
     Vector4 rotation,
     this.children = const [],
-  })  : name = name ?? random_string.randomString(),
+  })  : name = name ?? 'node_${random_string.randomString(length: 6)}',
         position = ValueNotifier(position),
         scale = ValueNotifier(scale),
         rotation = ValueNotifier(rotation),
         assert(!(shape != null && image != null));
 
   final List<ArCoreNode> children;
+
+  // final double minScale;
+  //
+  // final double maxScale;
 
   final ArCoreShape shape;
 
