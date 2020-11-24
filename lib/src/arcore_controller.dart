@@ -177,9 +177,11 @@ class ArCoreController {
   }
 
   void _addListeners(ArCoreNode node) {
-    node.position.addListener(() => _handlePositionChanged(node));
-    node.scale.addListener(() => _handleScaleChanged(node));
-    node.rotation.addListener(() => _handleRotationChanged(node));
+    node.translationControllerNode
+        .addListener(() => _handlePositionConfigChanged(node));
+    node.scaleControllerNode.addListener(() => _handleScaleConfigChanged(node));
+    node.rotationControllerNode
+        .addListener(() => _handleRotationConfigChanged(node));
     node?.shape?.materials?.addListener(() => _updateMaterials(node));
 
     // if (node is ArCoreRotatingNode) {
@@ -187,7 +189,7 @@ class ArCoreController {
     // }
   }
 
-  void _handleScaleChanged(ArCoreNode node) {
+/*  void _handleScaleChanged(ArCoreNode node) {
     print('_handleScaleChanged: ${node.name}');
     _channel.invokeMethod<void>(
         'scaleChanged',
@@ -216,6 +218,26 @@ class ArCoreController {
         _getHandlerParams(node, <String, dynamic>{
           'rotation': convertVector4ToMap(node.rotation.value)
         }));
+  }*/
+
+  void _handleRotationConfigChanged(ArCoreNode node) {
+    print('_handleRotationGestureChanged: ${node.name}');
+    _channel.invokeMethod<void>('rotationConfigChanged',
+        _getHandlerParams(node, node.rotationControllerNode?.value?.toMap()));
+  }
+
+  void _handleScaleConfigChanged(ArCoreNode node) {
+    print('_handleScaleConfigChanged: ${node.name}');
+    _channel.invokeMethod<void>('scaleConfigChanged',
+        _getHandlerParams(node, node.scaleControllerNode?.value?.toMap()));
+  }
+
+  void _handlePositionConfigChanged(ArCoreNode node) {
+    print('_handlePositionConfigChanged: ${node.name}');
+    _channel.invokeMethod<void>(
+        'positionConfigChanged',
+        _getHandlerParams(
+            node, node.translationControllerNode?.value?.toMap()));
   }
 
   void _updateMaterials(ArCoreNode node) {
@@ -228,6 +250,7 @@ class ArCoreController {
       ArCoreNode node, Map<String, dynamic> params) {
     final Map<String, dynamic> values = <String, dynamic>{'name': node.name}
       ..addAll(params);
+    values.removeWhere((k, v) => v == null);
     return values;
   }
 

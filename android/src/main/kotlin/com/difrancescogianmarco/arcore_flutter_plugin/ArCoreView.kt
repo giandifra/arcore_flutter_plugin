@@ -193,33 +193,38 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 val map = call.arguments as HashMap<String, Any>
                 removeNode(map["nodeName"] as String, result)
             }
-            "positionChanged" -> {
-                debugLog(" positionChanged")
+            "positionConfigChanged" -> {
+                debugLog("positionConfigChanged")
+                val position =DecodableUtils.parseVector3(call.argument("position") as? HashMap<String, Double>)
                 coordinator.selectedNode?.apply {
-                    localPosition = DecodableUtils.parseVector3(call.argument("position") as? HashMap<String, Double>)
+                    localPosition = position
+                    translationController.isEnabled = call.argument("enabled") as? Boolean ?: translationController.isEnabled
                 }
                 result.success(null)
             }
-            "scaleChanged" -> {
-                debugLog(" scaleChanged")
-
-                coordinator.selectedNode?.parent?.apply {
-                    localScale = DecodableUtils.parseVector3(call.argument("scale") as? HashMap<String, *>)
+            "scaleConfigChanged" -> {
+                debugLog(" scaleConfigChanged")
+                val scale = DecodableUtils.parseVector3(call.argument("scale") as? HashMap<String, *>)
+                coordinator.focusedNode?.apply{
+                    scaleController.isEnabled = call.argument("enabled") as? Boolean ?: coordinator.focusedNode?.scaleController!!.isEnabled
+                    parent?.apply {
+                        localScale = scale
+                    }
                 }
-
                 result.success(null)
             }
-            "rotationChanged" -> {
-                debugLog(" rotationChanged")
+            "rotationConfigChanged" -> {
+                debugLog("rotationConfigChanged")
+                val rotation = DecodableUtils.parseQuaternion(call.argument("rotation") as? HashMap<String, Double>)
                 coordinator.selectedNode?.apply {
-                    localRotation = DecodableUtils.parseQuaternion(call.argument("rotation") as? HashMap<String, Double>)
+                    localRotation = rotation
+                    rotationController.isEnabled = call.argument("enabled") as? Boolean ?: rotationController.isEnabled
                 }
                 result.success(null)
             }
             "updateMaterials" -> {
                 debugLog(" updateMaterials")
                 updateMaterials(call, result)
-
             }
             "loadMesh" -> {
                 val map = call.arguments as HashMap<String, Any>
