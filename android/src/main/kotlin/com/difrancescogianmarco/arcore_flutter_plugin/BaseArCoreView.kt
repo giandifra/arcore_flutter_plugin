@@ -166,7 +166,7 @@ open class BaseArCoreView(val activity: Activity, context: Context, messenger: B
             if (node != null) {
                 attachNodeToParent(node, flutterArCoreNode.parentNodeName)
                 for (n in flutterArCoreNode.children) {
-                    n.parentNodeName = flutterArCoreNode.name
+                    n.parentNodeName = flutterArCoreNode.configuration.name
                     onAddNode(n, null)
                 }
                 result?.success(null)

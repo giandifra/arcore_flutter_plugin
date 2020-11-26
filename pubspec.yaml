@@ -4,7 +4,7 @@ version: 0.0.10
 homepage: https://github.com/giandifra/arcore_flutter_plugin
 
 environment:
-  sdk: '>=2.1.0 <3.0.0'
+  sdk: '>=2.7.0 <3.0.0'
   flutter: '>=1.10.0 <2.0.0'
 
 dependencies:

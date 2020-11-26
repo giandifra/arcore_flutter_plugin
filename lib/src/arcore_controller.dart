@@ -141,7 +141,7 @@ class ArCoreController {
     return _channel.invokeMethod('getTrackingState');
   }
 
-  addArCoreNodeToAugmentedImage(ArCoreNode node, int index,
+  Future<void> addArCoreNodeToAugmentedImage(ArCoreNode node, int index,
       {String parentNodeName}) {
     assert(node != null);
 
@@ -177,25 +177,71 @@ class ArCoreController {
   }
 
   void _addListeners(ArCoreNode node) {
-    node.position.addListener(() => _handlePositionChanged(node));
+    node.translationControllerNode
+        .addListener(() => _handlePositionConfigChanged(node));
+    node.scaleControllerNode.addListener(() => _handleScaleConfigChanged(node));
+    node.rotationControllerNode
+        .addListener(() => _handleRotationConfigChanged(node));
     node?.shape?.materials?.addListener(() => _updateMaterials(node));
 
-    if (node is ArCoreRotatingNode) {
-      node.degreesPerSecond.addListener(() => _handleRotationChanged(node));
-    }
+    // if (node is ArCoreRotatingNode) {
+    //   node.degreesPerSecond.addListener(() => _handleRotationChanged(node));
+    // }
+  }
+
+/*  void _handleScaleChanged(ArCoreNode node) {
+    print('_handleScaleChanged: ${node.name}');
+    _channel.invokeMethod<void>(
+        'scaleChanged',
+        _getHandlerParams(
+            node,
+            _getHandlerParams(node, <String, dynamic>{
+              'scale': convertVector3ToMap(node.scale.value)
+            })));
   }
 
   void _handlePositionChanged(ArCoreNode node) {
-    _channel.invokeMethod<void>('positionChanged',
-        _getHandlerParams(node, convertVector3ToMap(node.position.value)));
+    print('_handlePositionChanged: ${node.name}');
+    _channel.invokeMethod<void>(
+        'positionChanged',
+        _getHandlerParams(
+            node,
+            _getHandlerParams(node, <String, dynamic>{
+              'position': convertVector3ToMap(node.position.value)
+            })));
   }
 
-  void _handleRotationChanged(ArCoreRotatingNode node) {
-    _channel.invokeMethod<void>('rotationChanged',
-        {'name': node.name, 'degreesPerSecond': node.degreesPerSecond.value});
+  void _handleRotationChanged(ArCoreNode node) {
+    print('_handleRotationChanged: ${node.name}');
+    _channel.invokeMethod<void>(
+        'rotationChanged',
+        _getHandlerParams(node, <String, dynamic>{
+          'rotation': convertVector4ToMap(node.rotation.value)
+        }));
+  }*/
+
+  void _handleRotationConfigChanged(ArCoreNode node) {
+    print('_handleRotationGestureChanged: ${node.name}');
+    _channel.invokeMethod<void>('rotationConfigChanged',
+        _getHandlerParams(node, node.rotationControllerNode?.value?.toMap()));
+  }
+
+  void _handleScaleConfigChanged(ArCoreNode node) {
+    print('_handleScaleConfigChanged: ${node.name}');
+    _channel.invokeMethod<void>('scaleConfigChanged',
+        _getHandlerParams(node, node.scaleControllerNode?.value?.toMap()));
+  }
+
+  void _handlePositionConfigChanged(ArCoreNode node) {
+    print('_handlePositionConfigChanged: ${node.name}');
+    _channel.invokeMethod<void>(
+        'positionConfigChanged',
+        _getHandlerParams(
+            node, node.translationControllerNode?.value?.toMap()));
   }
 
   void _updateMaterials(ArCoreNode node) {
+    print('_updateMaterials: ${node.name}');
     _channel.invokeMethod<void>(
         'updateMaterials', _getHandlerParams(node, node.shape.toMap()));
   }
@@ -204,6 +250,7 @@ class ArCoreController {
       ArCoreNode node, Map<String, dynamic> params) {
     final Map<String, dynamic> values = <String, dynamic>{'name': node.name}
       ..addAll(params);
+    values.removeWhere((k, v) => v == null);
     return values;
   }
 
