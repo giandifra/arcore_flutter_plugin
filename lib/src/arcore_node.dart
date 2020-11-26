@@ -45,14 +45,40 @@ class ArCoreNode {
 
   final ValueNotifier<RotationControllerNode> rotationControllerNode;
 
-  void disableScaleGesture() {
-    scaleControllerNode.value =
-        scaleControllerNode.value.copyWith(enabled: false);
+  Vector3 get position => translationControllerNode.value.position;
+  bool get positionGestureEnabled => translationControllerNode.value.enabled;
+  set positionGestureEnabled(bool value) {
+    translationControllerNode.value =
+        translationControllerNode.value.copyWith(enabled: value);
   }
 
-  void enableScaleGesture() {
+  Vector4 get rotation => rotationControllerNode.value.rotation;
+  bool get rotationGestureEnabled => rotationControllerNode.value.enabled;
+  set rotationGestureEnabled(bool value) {
+    rotationControllerNode.value =
+        rotationControllerNode.value.copyWith(enabled: value);
+  }
+
+  Vector3 get scale => scaleControllerNode.value.scale;
+  bool get scaleGestureEnabled => scaleControllerNode.value.enabled;
+  set scaleGestureEnabled(bool value) {
     scaleControllerNode.value =
-        scaleControllerNode.value.copyWith(enabled: true);
+        scaleControllerNode.value.copyWith(enabled: value);
+  }
+
+  void changeRotation(Vector4 newRotation) {
+    rotationControllerNode.value =
+        rotationControllerNode.value.copyWith(rotation: newRotation);
+  }
+
+  void changePosition(Vector3 newPosition) {
+    translationControllerNode.value =
+        translationControllerNode.value.copyWith(position: newPosition);
+  }
+
+  void changeScale(Vector3 newScale) {
+    scaleControllerNode.value =
+        scaleControllerNode.value.copyWith(scale: newScale);
   }
 
   // factory ArCoreNode.fromMap(Map<String, dynamic> map) {
@@ -67,12 +93,6 @@ class ArCoreNode {
   Map<String, dynamic> toMap() => <String, dynamic>{
         'dartType': runtimeType.toString(),
         'shape': shape?.toMap(),
-        // 'position': convertVector3ToMap(position.value),
-        // 'scale': convertVector3ToMap(scale.value),
-        // 'rotation': convertVector4ToMap(rotation.value),
-        // 'scaleGestureEnabled': scaleGestureEnabled.value,
-        // 'translationGestureEnabled': translationGestureEnabled.value,
-        // 'rotationGestureEnabled': rotationGestureEnabled.value,
         'scaleControllerNode': scaleControllerNode?.value?.toMap(),
         'translationControllerNode': translationControllerNode?.value?.toMap(),
         'rotationControllerNode': rotationControllerNode?.value?.toMap(),
@@ -90,7 +110,7 @@ class ScaleControllerNode extends Equatable {
   final double maxScale;
 
   ScaleControllerNode({
-    this.scale,
+    @required this.scale,
     this.minScale = 0.25,
     this.maxScale = 5.0,
     this.enabled = true,
@@ -135,7 +155,7 @@ class TranslationControllerNode extends Equatable {
   final bool enabled;
 
   TranslationControllerNode({
-    this.position,
+    @required this.position,
     this.enabled = true,
   });
 
@@ -170,7 +190,7 @@ class RotationControllerNode extends Equatable {
   final bool enabled;
 
   RotationControllerNode({
-    this.rotation,
+    @required this.rotation,
     this.enabled = true,
   });
 

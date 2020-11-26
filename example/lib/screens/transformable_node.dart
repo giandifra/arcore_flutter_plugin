@@ -46,13 +46,17 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
                             onPressed: selectedNode != null
                                 ? () {
                                     if (nodesMap.containsKey(selectedNode)) {
-                                      final controller = nodesMap[selectedNode]
-                                          .scaleControllerNode;
-                                      controller.value = controller.value
-                                          .copyWith(
-                                              scale: controller.value.scale -
-                                                  vector.Vector3(
-                                                      1.0, 1.0, 1.0));
+                                      final node = nodesMap[selectedNode];
+                                      node.changeScale(node.scale -
+                                          vector.Vector3(1.0, 1.0, 1.0));
+
+                                      // final controller = nodesMap[selectedNode]
+                                      //     .scaleControllerNode;
+                                      // controller.value = controller.value
+                                      //     .copyWith(
+                                      //         scale: controller.value.scale -
+                                      //             vector.Vector3(
+                                      //                 1.0, 1.0, 1.0));
                                       setState(() {});
                                     }
                                   }
@@ -62,13 +66,16 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
                             onPressed: selectedNode != null
                                 ? () {
                                     if (nodesMap.containsKey(selectedNode)) {
-                                      final controller = nodesMap[selectedNode]
-                                          .scaleControllerNode;
-                                      controller.value = controller.value
-                                          .copyWith(
-                                              scale: controller.value.scale +
-                                                  vector.Vector3(
-                                                      1.0, 1.0, 1.0));
+                                      final node = nodesMap[selectedNode];
+                                      node.changeScale(node.scale +
+                                          vector.Vector3(1.0, 1.0, 1.0));
+                                      // final controller = nodesMap[selectedNode]
+                                      //     .scaleControllerNode;
+                                      // controller.value = controller.value
+                                      //     .copyWith(
+                                      //         scale: controller.value.scale +
+                                      //             vector.Vector3(
+                                      //                 1.0, 1.0, 1.0));
                                       setState(() {});
                                     }
                                   }
@@ -76,24 +83,14 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
                         if (selectedNode != null &&
                             nodesMap.containsKey(selectedNode)) ...[
                           Checkbox(
-                            value: nodesMap[selectedNode]
-                                .scaleControllerNode
-                                .value
-                                .enabled,
+                            value: nodesMap[selectedNode].scaleGestureEnabled,
                             onChanged: (value) {
-                              nodesMap[selectedNode].scaleControllerNode.value =
-                                  nodesMap[selectedNode]
-                                      .scaleControllerNode
-                                      .value
-                                      .copyWith(enabled: value);
+                              nodesMap[selectedNode].scaleGestureEnabled =
+                                  value;
                               setState(() {});
                             },
                           ),
-                          Text(nodesMap[selectedNode]
-                              .scaleControllerNode
-                              .value
-                              .scale
-                              .text),
+                          Text(nodesMap[selectedNode].scale.text),
                         ]
                       ],
                     ),
@@ -105,14 +102,18 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
                             onPressed: selectedNode != null
                                 ? () {
                                     if (nodesMap.containsKey(selectedNode)) {
-                                      final controller = nodesMap[selectedNode]
+                                      final node = nodesMap[selectedNode];
+                                      node.changePosition(node.position -
+                                          vector.Vector3(0.3, 0.0, 0.0));
+
+                                      /*  final controller = nodesMap[selectedNode]
                                           .translationControllerNode;
                                       controller.value = controller.value
                                           .copyWith(
                                               position:
                                                   controller.value.position -
                                                       vector.Vector3(
-                                                          0.3, 0.0, 0.0));
+                                                          0.3, 0.0, 0.0));*/
                                       setState(() {});
                                     }
                                   }
@@ -122,14 +123,18 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
                             onPressed: selectedNode != null
                                 ? () {
                                     if (nodesMap.containsKey(selectedNode)) {
-                                      final controller = nodesMap[selectedNode]
-                                          .translationControllerNode;
-                                      controller.value = controller.value
-                                          .copyWith(
-                                              position:
-                                                  controller.value.position +
-                                                      vector.Vector3(
-                                                          0.3, 0.0, 0.0));
+                                      final node = nodesMap[selectedNode];
+                                      node.changePosition(node.position +
+                                          vector.Vector3(0.3, 0.0, 0.0));
+
+                                      // final controller = nodesMap[selectedNode]
+                                      //     .translationControllerNode;
+                                      // controller.value = controller.value
+                                      //     .copyWith(
+                                      //         position:
+                                      //             controller.value.position +
+                                      //                 vector.Vector3(
+                                      //                     0.3, 0.0, 0.0));
                                       setState(() {});
                                     }
                                   }
@@ -137,26 +142,15 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
                         if (selectedNode != null &&
                             nodesMap.containsKey(selectedNode)) ...[
                           Checkbox(
-                            value: nodesMap[selectedNode]
-                                .translationControllerNode
-                                .value
-                                .enabled,
+                            value:
+                                nodesMap[selectedNode].positionGestureEnabled,
                             onChanged: (value) {
-                              nodesMap[selectedNode]
-                                      .translationControllerNode
-                                      .value =
-                                  nodesMap[selectedNode]
-                                      .translationControllerNode
-                                      .value
-                                      .copyWith(enabled: value);
+                              nodesMap[selectedNode].positionGestureEnabled =
+                                  value;
                               setState(() {});
                             },
                           ),
-                          Text(nodesMap[selectedNode]
-                              .translationControllerNode
-                              .value
-                              .position
-                              .text),
+                          Text(nodesMap[selectedNode].position.text),
                         ]
                       ],
                     ),
@@ -167,14 +161,19 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
                             icon: Icon(Icons.remove),
                             onPressed: selectedNode != null
                                 ? () {
-                                    final controller = nodesMap[selectedNode]
-                                        .rotationControllerNode;
-                                    controller.value = controller.value
-                                        .copyWith(
-                                            rotation:
-                                                controller.value.rotation -
-                                                    vector.Vector4(
-                                                        0.1, 0.1, 0.1, 0.1));
+                                    if (nodesMap.containsKey(selectedNode)) {
+                                      final node = nodesMap[selectedNode];
+                                      node.changeRotation(node.rotation -
+                                          vector.Vector4(0.1, 0.1, 0.1, 0.1));
+                                      setState(() {});
+                                      // final controller =
+                                      //     node.rotationControllerNode;
+                                      // controller.value = controller.value
+                                      //     .copyWith(
+                                      //         rotation: node.rotation -
+                                      //             vector.Vector4(
+                                      //                 0.1, 0.1, 0.1, 0.1));
+                                    }
                                   }
                                 : null),
                         IconButton(
@@ -182,38 +181,25 @@ class _TransformableNodeState extends State<TransformableNodeScreen> {
                             onPressed: selectedNode != null
                                 ? () {
                                     if (nodesMap.containsKey(selectedNode)) {
-                                      final controller = nodesMap[selectedNode]
-                                          .rotationControllerNode;
-                                      controller.value = RotationControllerNode(
-                                          rotation: controller.value.rotation +
-                                              vector.Vector4(
-                                                  0.1, 0.1, 0.1, 0.1));
+                                      final node = nodesMap[selectedNode];
+                                      node.changeRotation(node.rotation +
+                                          vector.Vector4(0.1, 0.1, 0.1, 0.1));
+                                      setState(() {});
                                     }
                                   }
                                 : null),
                         if (selectedNode != null &&
                             nodesMap.containsKey(selectedNode)) ...[
                           Checkbox(
-                            value: nodesMap[selectedNode]
-                                .rotationControllerNode
-                                .value
-                                .enabled,
+                            value:
+                                nodesMap[selectedNode].rotationGestureEnabled,
                             onChanged: (value) {
-                              nodesMap[selectedNode]
-                                      .rotationControllerNode
-                                      .value =
-                                  nodesMap[selectedNode]
-                                      .rotationControllerNode
-                                      .value
-                                      .copyWith(enabled: value);
+                              nodesMap[selectedNode].rotationGestureEnabled =
+                                  value;
                               setState(() {});
                             },
                           ),
-                          Text(nodesMap[selectedNode]
-                              .rotationControllerNode
-                              .value
-                              .rotation
-                              .text),
+                          Text(nodesMap[selectedNode].rotation.text),
                         ]
                       ],
                     ),

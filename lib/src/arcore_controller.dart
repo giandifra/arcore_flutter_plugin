@@ -141,7 +141,7 @@ class ArCoreController {
     return _channel.invokeMethod('getTrackingState');
   }
 
-  addArCoreNodeToAugmentedImage(ArCoreNode node, int index,
+  Future<void> addArCoreNodeToAugmentedImage(ArCoreNode node, int index,
       {String parentNodeName}) {
     assert(node != null);
 
