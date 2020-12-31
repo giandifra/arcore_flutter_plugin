@@ -32,6 +32,7 @@ import io.flutter.plugin.platform.PlatformView
 
 class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMessenger, id: Int, private val isAugmentedFaces: Boolean, private val debug: Boolean) : PlatformView, MethodChannel.MethodCallHandler {
     private val methodChannel: MethodChannel = MethodChannel(messenger, "arcore_flutter_plugin_$id")
+
     //       private val activity: Activity = (context.applicationContext as FlutterApplication).currentActivity
     lateinit var activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks
     private var installRequested: Boolean = false
@@ -213,6 +214,12 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 debugLog("2/3: Tracking state is " + trState.toString())
                 methodChannel.invokeMethod("getTrackingState", trState.toString())
             }
+            "performHitTestAtScreenPosition" -> {
+                performHitTestAtScreenPosition(call, result)
+            }
+            "getCameraPose" -> {
+                getCameraPose(call, result)
+            }
             else -> {
             }
         }
@@ -329,7 +336,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             debugLog(" The plane renderer (enablePlaneRenderer) is set to " + enablePlaneRenderer.toString())
             arSceneView!!.planeRenderer.isVisible = false
         }
-        
+
         result.success(null)
     }
 
@@ -509,7 +516,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     }
 
     fun onDestroy() {
-      if (arSceneView != null) {
+        if (arSceneView != null) {
             debugLog("Goodbye ARCore! Destroying the Activity now 7.")
 
             try {
@@ -520,9 +527,9 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 arSceneView?.destroy()
                 arSceneView = null
 
-            }catch (e : Exception){
+            } catch (e: Exception) {
                 e.printStackTrace();
-           }
+            }
         }
     }
 
@@ -559,4 +566,35 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
         result.success(null)
     }*/
+
+    private fun performHitTestAtScreenPosition(call: MethodCall, result: MethodChannel.Result) {
+        val xyPositionsMap = call.arguments as HashMap<String, Float>
+        val xPosition = (xyPositionsMap.get("xPosition") as Double).toFloat()
+        val yPosition = (xyPositionsMap.get("yPosition") as Double).toFloat()
+        val frame = arSceneView?.arFrame
+        if (frame != null) {
+            val hitList = frame.hitTest(xPosition, yPosition)
+            if (hitList.isNullOrEmpty()) {
+                result.success(null)
+                return
+            }
+            val hit = hitList.first()
+            val list = ArrayList<HashMap<String, Any>>()
+            val distance: Float = hit.distance
+            val translation = hit.hitPose.translation
+            val rotation = hit.hitPose.rotationQuaternion
+            val flutterArCoreHitTestResultHashMap = FlutterArCoreHitTestResult(distance, translation, rotation).toHashMap()
+            result.success(flutterArCoreHitTestResultHashMap)
+        } else {
+            result.success(null)
+        }
+    }
+
+    private fun getCameraPose(cal: MethodCall, result: MethodChannel.Result) {
+        val cameraPose = arSceneView?.arFrame?.camera?.getDisplayOrientedPose()
+        val cameraPoseTranslation = cameraPose?.getTranslation() as FloatArray
+        val cameraPoseRotation = cameraPose?.getRotationQuaternion() as FloatArray
+        val cameraPoseMap = FlutterArCorePose(cameraPoseTranslation,cameraPoseRotation).toHashMap()
+        result.success(cameraPoseMap)
+    }
 }
