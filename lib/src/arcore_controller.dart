@@ -237,6 +237,15 @@ class ArCoreController {
     _channel?.invokeMethod<void>('resume');
   }
 
+  Future<Map<dynamic, dynamic>> performHitTestAtScreenPosition(double xPosition, double yPosition) {
+    return _channel.invokeMethod('performHitTestAtScreenPosition', { 'xPosition': xPosition, 'yPosition': yPosition});
+  }
+
+
+  Future<Map<dynamic, dynamic>> getCameraPose(){
+    return _channel.invokeMethod('getCameraPose');
+  }
+
   Future<void> removeNodeWithIndex(int index) async {
     try {
       return await _channel.invokeMethod('removeARCoreNodeWithIndex', {
