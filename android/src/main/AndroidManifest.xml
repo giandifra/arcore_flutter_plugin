@@ -1,6 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.difrancescogianmarco.arcore_flutter_plugin">
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.difrancescogianmarco.arcore_flutter_plugin">
     <uses-permission android:name="android.permission.CAMERA" />
 
     <!-- Indicates that app requires ARCore ("AR Required"). Ensures app is only
