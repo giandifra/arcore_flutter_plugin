@@ -20,6 +20,7 @@ class NodeFactory {
             RenderableCustomFactory.makeRenderable(context, flutterNode) { renderable, t ->
                 if (renderable != null) {
                     node.renderable = renderable
+                    flutterNode.tryAnimation(renderable)
                     handler(node, null)
                 }else{
                     handler(null,t)

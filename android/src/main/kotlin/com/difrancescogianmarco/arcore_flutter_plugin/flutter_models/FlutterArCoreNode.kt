@@ -7,6 +7,12 @@ import com.google.ar.core.Pose
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.rendering.Renderable
+import com.google.ar.sceneform.rendering.ModelRenderable
+import com.google.ar.sceneform.rendering.AnimationData
+import com.google.ar.sceneform.animation.ModelAnimator
+
+import android.util.Log
 
 class FlutterArCoreNode(map: HashMap<String, *>) {
 
@@ -23,6 +29,10 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
             ?: Quaternion()
     val degreesPerSecond: Float? = getDegreesPerSecond((map["degreesPerSecond"] as? Double))
     var parentNodeName: String? = map["parentNodeName"] as? String
+    val animationIndex: Int? = map["animationIndex"] as? Int
+    val animationName: String? = map["animationName"] as? String
+    val animationRepeatNb: Int? = map["animationRepeatNb"] as? Int
+    lateinit var renderable : ModelRenderable
 
     val children: ArrayList<FlutterArCoreNode> = getChildrenFromMap(map["children"] as ArrayList<HashMap<String, *>>)
 
@@ -44,6 +54,37 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         node.localRotation = rotation
 
         return node
+    }
+
+    fun tryAnimation(renderable: Renderable) {
+        if(renderable != null) {
+            this.renderable = renderable as ModelRenderable
+            animate()
+        }
+    }
+
+    private fun animate() {
+        val data: AnimationData? = getAnimationData()
+        if(data != null) {
+            Log.i("FlutterArCoreNode", "Starting animation "+data.getName())
+            val animator: ModelAnimator = ModelAnimator(data, renderable)
+            animator.setRepeatCount(handleAnimNbRepeats())
+            animator.start()
+        }
+    }
+
+    private fun getAnimationData(): AnimationData? {
+        if(animationIndex != null) return renderable.getAnimationData(animationIndex)
+        if(animationName != null) return renderable.getAnimationData(animationName)
+        return null
+    }
+
+    private fun handleAnimNbRepeats(): Int {
+        if(animationRepeatNb != null){
+            if(animationRepeatNb < ModelAnimator.INFINITE) return ModelAnimator.INFINITE
+            return animationRepeatNb
+        }
+        return 0
     }
 
     fun getPosition(): FloatArray {
