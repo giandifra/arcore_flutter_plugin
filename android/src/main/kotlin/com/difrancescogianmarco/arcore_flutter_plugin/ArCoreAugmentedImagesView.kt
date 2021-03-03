@@ -175,7 +175,6 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                                 result.success(null)
                             } else if (throwable != null) {
                                 result.error("attachObjectToAugmentedImage error", throwable.localizedMessage, null)
-
                             }
                         }
                     } else {
@@ -193,7 +192,6 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     } catch (ex: Exception) {
                         result.error("removeARCoreNodeWithIndex", ex.localizedMessage, null)
                     }
-
                 }
                 "dispose" -> {
                     debugLog( " updateMaterials")
@@ -318,6 +316,9 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                         "The exception was thrown: " + ex?.toString())
                     }
                 }
+                if (augmentedImageDatabase?.getNumImages() == 0) {
+                    throw Exception("Could not setup augmented image database")
+                }
                 config.augmentedImageDatabase = augmentedImageDatabase
                 session.configure(config)
                 arSceneView?.setupSession(session)
@@ -328,13 +329,13 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
 
     private fun addImageToAugmentedImageDatabase(config: Config, bytes: ByteArray): Boolean {
         debugLog( "addImageToAugmentedImageDatabase")
-        try{
+        try {
             val augmentedImageBitmap = loadAugmentedImageBitmap(bytes) ?: return false
             val augmentedImageDatabase = AugmentedImageDatabase(arSceneView?.session)
             augmentedImageDatabase.addImage("image_name", augmentedImageBitmap)
             config.augmentedImageDatabase = augmentedImageDatabase
             return true
-        }catch (ex:Exception){
+        } catch (ex:Exception) {
             debugLog(ex.localizedMessage)
             return false
         }
