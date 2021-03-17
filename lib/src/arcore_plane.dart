@@ -11,7 +11,7 @@ class ArCorePlane {
     this.extendX = map["extendX"];
     this.extendZ = map["extendZ"];
     this.centerPose = ArCorePose.fromMap(map["centerPose"]);
-    this.type = ArCorePlaneType.values[map["tyoe"] ?? 0];
+    this.type = ArCorePlaneType.values[map["type"] ?? 0];
   }
 }
 
