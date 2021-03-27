@@ -137,6 +137,11 @@ class ArCoreController {
     return _channel.invokeMethod('addArCoreNode', params);
   }
 
+
+  Future<String> togglePlaneRenderer() async {
+    return _channel.invokeMethod('togglePlaneRenderer');
+  }
+
   Future<String> getTrackingState() async {
     return _channel.invokeMethod('getTrackingState');
   }
