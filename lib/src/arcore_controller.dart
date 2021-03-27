@@ -119,6 +119,13 @@ class ArCoreController {
             ArCoreAugmentedImage.fromMap(call.arguments);
         onTrackingImage(arCoreAugmentedImage);
         break;
+      case 'togglePlaneRenderer':
+        if (debug) {
+          print('Toggling Plane Renderer Visibility');
+        }
+        togglePlaneRenderer();
+        break;
+
       default:
         if (debug) {
           print('Unknown method ${call.method}');
