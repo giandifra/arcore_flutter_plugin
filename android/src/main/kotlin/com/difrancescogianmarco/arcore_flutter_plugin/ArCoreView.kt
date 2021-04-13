@@ -16,6 +16,7 @@ import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCo
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
+import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
 import com.google.ar.core.*
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
@@ -181,6 +182,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
             "positionChanged" -> {
                 debugLog(" positionChanged")
+                updatePosition(call,result)
 
             }
             "rotationChanged" -> {
@@ -557,10 +559,14 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
 
     }*/
 
-    /*    fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
+        fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
         val name = call.argument<String>("name")
         val node = arSceneView?.scene?.findByName(name)
+            Toast.makeText(activity, node?.localPosition.toString(), Toast.LENGTH_LONG)
+                    .show()
         node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
+            Toast.makeText(activity, node?.localPosition.toString(), Toast.LENGTH_LONG)
+                    .show()
         result.success(null)
-    }*/
+    }
 }
