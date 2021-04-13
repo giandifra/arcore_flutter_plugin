@@ -562,11 +562,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
         val name = call.argument<String>("name")
         val node = arSceneView?.scene?.findByName(name)
-            Toast.makeText(activity, node?.localPosition.toString(), Toast.LENGTH_LONG)
-                    .show()
         node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
-            Toast.makeText(activity, node?.localPosition.toString(), Toast.LENGTH_LONG)
-                    .show()
         result.success(null)
     }
 }
