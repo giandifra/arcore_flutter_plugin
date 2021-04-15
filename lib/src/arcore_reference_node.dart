@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import 'arcore_node.dart';
@@ -11,6 +12,9 @@ class ArCoreReferenceNode extends ArCoreNode {
   final String objectUrl;
 
   ArCoreReferenceNode({
+    ScaleControllerNode scaleControllerNode,
+    TranslationControllerNode translationControllerNode,
+    RotationControllerNode rotationControllerNode,
     String name,
     this.object3DFileName,
     this.objectUrl,
@@ -23,7 +27,10 @@ class ArCoreReferenceNode extends ArCoreNode {
             children: children,
             position: position,
             scale: scale,
-            rotation: rotation);
+            rotation: rotation,
+            scaleControllerNode: scaleControllerNode,
+            translationControllerNode: translationControllerNode,
+            rotationControllerNode: rotationControllerNode);
 
   @override
   Map<String, dynamic> toMap() => <String, dynamic>{
