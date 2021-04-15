@@ -394,9 +394,9 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                     onAddNode(n, null)
                 }
             }
-
+            result?.success(null)
         }
-        result?.success(null)
+        
     }
 
     fun attachNodeToParent(node: Node?, parentNodeName: String?) {
