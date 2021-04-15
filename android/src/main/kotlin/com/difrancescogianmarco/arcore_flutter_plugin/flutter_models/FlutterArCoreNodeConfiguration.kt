@@ -12,16 +12,20 @@ class FlutterArCoreNodeConfiguration(map: Map<String, *>) {
     val scaleEnabled = map["scaleGestureEnabled"] as? Boolean ?: true
     val minScale = map["minScale"] as? Float ?: 0.25F
     val maxScale = map["maxScale"] as? Float ?: 5.0F
-    val currentScale: Vector3 = DecodableUtils.parseVector3(map["scale"] as? HashMap<String, *>)
+
+    val scaleControllerNodeMap = map["scaleControllerNode"] as HashMap<String, *>
+    val currentScale: Vector3 = DecodableUtils.parseVector3(scaleControllerNodeMap["scale"] as? HashMap<String, *>)
             ?: Vector3(1.0F, 1.0F, 1.0F)
     
     //TranslationController
+    val translationControllerNodeMap = map["translationControllerNode"] as HashMap<String, *>
     val translationEnabled = map["translationGestureEnabled"] as? Boolean ?: true
-    val currentPosition: Vector3 = DecodableUtils.parseVector3(map["position"] as? HashMap<String, *>) ?: Vector3()
+    val currentPosition: Vector3 = DecodableUtils.parseVector3(translationControllerNodeMap["position"] as? HashMap<String, *>) ?: Vector3()
     
     //RotationController
+    val rotationControllerNode = map["rotationControllerNode"] as HashMap<String, *>
     val rotationEnabled = map["rotationGestureEnabled"] as? Boolean ?: true
-    val currentRotation: Quaternion = DecodableUtils.parseQuaternion(map["rotation"] as? HashMap<String, Double>)
+    val currentRotation: Quaternion = DecodableUtils.parseQuaternion(rotationControllerNode["rotation"] as? HashMap<String, Double>)
             ?: Quaternion()
 
 }
