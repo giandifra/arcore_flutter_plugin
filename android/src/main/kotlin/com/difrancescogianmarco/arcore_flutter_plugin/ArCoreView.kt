@@ -17,6 +17,7 @@ import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCo
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
+import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseQuaternion
 import com.google.ar.core.*
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
@@ -183,6 +184,11 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             "positionChanged" -> {
                 debugLog(" positionChanged")
                 updatePosition(call,result)
+
+            }
+            "nodeRotationChanged" -> {
+                debugLog(" nodeRotationChanged")
+                updateNodeRotation(call, result)
 
             }
             "rotationChanged" -> {
@@ -429,6 +435,21 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         result.success(null)
     }
 
+       val name = call.argument<String>("name")
+       val node = arSceneView?.scene?.findByName(name)
+       node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
+       result.success(null)
+    }
+   
+   fun updateNodeRotation(call: MethodCall, result: MethodChannel.Result) {
+       val name = call.argument<String>("name")
+       val node = arSceneView?.scene?.findByName(name)
+       node?.localRotation = parseQuaternion(call.arguments as? HashMap<String, Double>)
+                ?: Quaternion()
+       result.success(null)
+    }
+	
+
     fun updateMaterials(call: MethodCall, result: MethodChannel.Result) {
         val name = call.argument<String>("name")
         val materials = call.argument<ArrayList<HashMap<String, *>>>("materials")!!
@@ -558,11 +579,4 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         }
 
     }*/
-
-        fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
-        val name = call.argument<String>("name")
-        val node = arSceneView?.scene?.findByName(name)
-        node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
-        result.success(null)
-    }
 }
