@@ -20,6 +20,7 @@ import com.google.ar.sceneform.ux.AugmentedFaceNode
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import kotlin.collections.HashMap
 
 class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessenger, id: Int, debug: Boolean) : BaseArCoreView(activity, context, messenger, id, debug) {
 
@@ -36,7 +37,6 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                 if (faceMeshTexture == null) {
                     return@OnUpdateListener
                 }
-
                 val faceList = arSceneView?.session?.getAllTrackables(AugmentedFace::class.java)
 
                 faceList?.let {
@@ -48,6 +48,11 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                             faceNode.faceRegionsRenderable = faceRegionsRenderable
                             faceNode.faceMeshTexture = faceMeshTexture
                             faceNodeMap[face] = faceNode
+
+                            // change assets on runtime
+                        } else if(faceNodeMap[face]?.faceRegionsRenderable != faceRegionsRenderable  ||  faceNodeMap[face]?.faceMeshTexture != faceMeshTexture ){
+                            faceNodeMap[face]?.faceRegionsRenderable = faceRegionsRenderable
+                            faceNodeMap[face]?.faceMeshTexture = faceMeshTexture
                         }
                     }
 
