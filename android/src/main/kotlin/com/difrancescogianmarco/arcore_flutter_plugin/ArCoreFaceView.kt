@@ -22,7 +22,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlin.collections.HashMap
 
-class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessenger, id: Int) : BaseArCoreView(activity, context, messenger, id) {
+class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessenger, id: Int, debug: Boolean) : BaseArCoreView(activity, context, messenger, id) {
 
     private val TAG: String = ArCoreFaceView::class.java.name
     private var faceRegionsRenderable: ModelRenderable? = null
@@ -74,7 +74,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if(isSupportedDevice){
-            Log.i(TAG,call.method +"called on supported device")
+            debugLog(call.method +"called on supported device")
             when (call.method) {
                 "init" -> {
                     arScenViewInit(call, result)
@@ -86,7 +86,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                     loadMesh(textureBytes, skin3DModelFilename)
                 }
                 "dispose" -> {
-                    Log.i(TAG, " updateMaterials")
+                    debugLog( " updateMaterials")
                     dispose()
                 }
                 else -> {
@@ -94,7 +94,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                 }
             }
         }else{
-            Log.i(TAG,"Impossible call " + call.method + " method on unsupported device")
+            debugLog("Impossible call " + call.method + " method on unsupported device")
             result.error("Unsupported Device","",null)
         }
     }
