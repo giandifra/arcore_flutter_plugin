@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
-class AugmentedImagesPage extends StatefulWidget {
+class MultipleAugmentedImagesPage extends StatefulWidget {
   @override
-  _AugmentedImagesPageState createState() => _AugmentedImagesPageState();
+  _MultipleAugmentedImagesPageState createState() =>
+      _MultipleAugmentedImagesPageState();
 }
 
-class _AugmentedImagesPageState extends State<AugmentedImagesPage> {
+class _MultipleAugmentedImagesPageState
+    extends State<MultipleAugmentedImagesPage> {
   ArCoreController arCoreController;
   Map<String, ArCoreAugmentedImage> augmentedImagesMap = Map();
   Map<String, Uint8List> bytesMap = Map();
@@ -20,7 +22,7 @@ class _AugmentedImagesPageState extends State<AugmentedImagesPage> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('AugmentedPage'),
+          title: const Text('Multiple augmented images'),
         ),
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,

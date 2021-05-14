@@ -45,9 +45,9 @@ class HomeScreen extends StatelessWidget {
           ListTile(
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => AugmentedImagesPage()));
+                  builder: (context) => MultipleAugmentedImagesPage()));
             },
-            title: Text("AugmentedImagesPage"),
+            title: Text("Multiple augmented images"),
           ),
           ListTile(
             onTap: () {
