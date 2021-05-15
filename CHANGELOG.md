@@ -1,3 +1,9 @@
+## 0.0.11
+
+* Add ability to toggle Plane Renderer Visibility during runtime (@matwright)
+* Allow change Augmented Face assets on runtime (@francezu)
+* Load multiple images into a database on a background thread (@AlinaStepanova)
+
 ## 0.0.10
 
 * Fix debugLog error
