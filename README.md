@@ -144,3 +144,139 @@ See the `example` directory for a complete sample app.
 
 ## 3D Objects Credits 
 [Anonymous](https://poly.google.com/user/f8cGQY15_-g)
+
+---
+
+## Documentation 
+
+### Classes provided by the plugin
+
+**There are a total of 13 classes provided by this plugin until May 2020.**
+
+- ArCoreView
+- ArCoreController
+- ArCoreFaceView
+- ArCoreFaceContrller
+- ArCoreSphere
+- ArCoreCylinder
+- ArCoreCube
+- ArCoreNode
+- ArCoeMaterial
+- ArCoreHitTestResult
+- ArCoreRotatingNode
+- ArCorePlane
+- ArCoreReferenceNode
+
+---
+
+### ArCoreView
+
+This class returns the view type. There are two types of views in it.
+
+**AUGMENTEDFACE**
+**STANDARDVIEW**
+
+There are 4 properties in it:
+- onArCoreViewCreated
+- enableTapRecoginzer
+- enableUpdateListener
+- type
+
+---
+
+### onArCoreViewCreated
+
+This property takes a **ArCoreController**.
+
+---
+
+**enableTapRecoginzer**
+
+Initially, set to false. It is used as an argument by the MethodChannel.
+
+---
+
+**enableUpdateListener** 
+
+Initially, set to false. It is used as an argument by the MethodChannel.
+
+---
+
+**type**
+
+It is a view type, it is either **AUGMENTEDFACE, STANDARDVIEW***. It is set to **STANDARDVIEW** by default.
+
+---
+### ArCoreController
+
+This controller used to add a ArNode using addArCoreNode function, add a ArCoreNode with ancher using a addArCoreNodeWithAncher function and also remove node using removeNode function.
+
+---
+
+### ArCoreFaceView
+It is a stateful widget that returns a **ArCoreAndroidView**. It has two properties **enableAugmentedFaces, onArCoreViewCreated**.
+
+Initially, **enableAugmentedFaces** is set to false.
+**onArCoreViewCreated** takes a function with **ArCoreController** argument.
+
+---
+
+### ArCoreFaceController
+It used dispose and **loadMesh** method to control the **FaceView**.
+
+---
+
+### ArCoreSphere
+It is **ArCoreShape**, takes a **radius & ArCoreMaterial**.
+
+---
+
+### ArCoreCylender
+It is **ArCoreShape**, takes a **radius, height, & ArCoreMaterial**.
+
+---
+
+### ArCoreCube
+It is **ArCoreShape**, takes a size i.e. **Vector3 & ArCoreMaterial**.
+
+---
+
+### ArCoreNode
+This widget is used to provide the **position, shape, scale, rotation, name**.
+
+---
+
+### ArCoreMaterial
+It is used to describe the outlook of the virtual object created by the user.
+
+It has **color,textureBytes, metallic, roughness, reflection**.
+
+---
+
+### ArCoreRotatingNode
+It is an **ArCoreNode** with a **degreesPerSecond** *property* which is a double value.
+
+---
+
+### ArCorePlane
+It takes the **x, y** coordinate of the plane, **ArCorePose & ArCorePlaneType**.
+
+There are three types of plane:
+- **HORIZONTAL_UPWARD_FACING**
+- **HORIZONTAL_DOWNWARD_FACING**
+- **VERTICAL**
+
+---
+
+### ArCoreReferenceNode
+It is ArCoreNode, it has all the properties that the ArCoreNode has also it has objectUrl and object3DFileName.
+
+---
+
+### objectUrl
+URL of glft object for remote rendering.
+
+---
+
+### object3DFileName
+Filename of sfb object in assets folder.
