@@ -21,6 +21,15 @@ class _HelloWorldState extends State<HelloWorld> {
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
         ),
+         floatingActionButton:  FloatingActionButton(
+            onPressed: () async {
+              String path = await arCoreController.snapshot();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Photo saved on $path"),));
+
+            },
+            child: const Icon(Icons.photo),
+            backgroundColor: Colors.green,
+          ),
       ),
     );
   }
