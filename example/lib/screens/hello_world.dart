@@ -2,6 +2,7 @@ import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
+import 'dart:io';
 
 class HelloWorld extends StatefulWidget {
   @override
@@ -24,8 +25,6 @@ class _HelloWorldState extends State<HelloWorld> {
          floatingActionButton:  FloatingActionButton(
             onPressed: () async {
               String path = await arCoreController.snapshot();
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Photo saved on $path"),));
-
             },
             child: const Icon(Icons.photo),
             backgroundColor: Colors.green,
