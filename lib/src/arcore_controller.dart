@@ -32,19 +32,19 @@ class ArCoreController {
     return arcoreInstalled;
   }
 
-  ArCoreController(
-      {int id,
-      this.enableTapRecognizer,
-      this.enablePlaneRenderer,
-      this.enableUpdateListener,
-      this.debug = false
+  ArCoreController({this.id,
+    this.enableTapRecognizer,
+    this.enablePlaneRenderer,
+    this.enableUpdateListener,
+    this.debug = false
 //    @required this.onUnsupported,
-      }) {
+  }) {
     _channel = MethodChannel('arcore_flutter_plugin_$id');
     _channel.setMethodCallHandler(_handleMethodCalls);
     init();
   }
 
+  final int id;
   final bool enableUpdateListener;
   final bool enableTapRecognizer;
   final bool enablePlaneRenderer;
@@ -105,7 +105,7 @@ class ArCoreController {
         }
         break;
       case 'getTrackingState':
-        // TRACKING, PAUSED or STOPPED
+      // TRACKING, PAUSED or STOPPED
         trackingState = call.arguments;
         if (debug) {
           print('Latest tracking state received is: $trackingState');
@@ -116,7 +116,7 @@ class ArCoreController {
           print('flutter onTrackingImage');
         }
         final arCoreAugmentedImage =
-            ArCoreAugmentedImage.fromMap(call.arguments);
+        ArCoreAugmentedImage.fromMap(call.arguments);
         onTrackingImage(arCoreAugmentedImage);
         break;
       case 'togglePlaneRenderer':
@@ -190,11 +190,23 @@ class ArCoreController {
 
   void _addListeners(ArCoreNode node) {
     node.position.addListener(() => _handlePositionChanged(node));
+    node.rotation.addListener(() => _handleNodeRotationChanged(node));
+    node.scale.addListener(() => _handleScaleChanged(node));
     node?.shape?.materials?.addListener(() => _updateMaterials(node));
 
     if (node is ArCoreRotatingNode) {
       node.degreesPerSecond.addListener(() => _handleRotationChanged(node));
     }
+  }
+
+  void _handleNodeRotationChanged(ArCoreNode node) {
+    _channel.invokeMethod<void>('nodeRotationChanged',
+        _getHandlerParams(node, convertVector4ToMap(node.rotation.value)));
+  }
+
+  void _handleScaleChanged(ArCoreNode node) {
+    _channel.invokeMethod<void>('scaleChanged',
+        _getHandlerParams(node, convertVector3ToMap(node.scale.value)));
   }
 
   void _handlePositionChanged(ArCoreNode node) {
@@ -212,8 +224,8 @@ class ArCoreController {
         'updateMaterials', _getHandlerParams(node, node.shape.toMap()));
   }
 
-  Map<String, dynamic> _getHandlerParams(
-      ArCoreNode node, Map<String, dynamic> params) {
+  Map<String, dynamic> _getHandlerParams(ArCoreNode node,
+      Map<String, dynamic> params) {
     final Map<String, dynamic> values = <String, dynamic>{'name': node.name}
       ..addAll(params);
     return values;
