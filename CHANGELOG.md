@@ -1,3 +1,7 @@
+## 0.1.0-null-safety.0
+
+* Migrate to null-safety (@GTripathee)
+
 ## 0.0.11
 
 * Add ability to toggle Plane Renderer Visibility during runtime (@matwright)
