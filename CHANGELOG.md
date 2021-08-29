@@ -1,3 +1,7 @@
+## 0.1.0-null-safety.3
+
+* Bug fix (@shabbirAlam)
+
 ## 0.1.0-null-safety.2
 
 * Added "Screenshot feature" (@wiizarrrd)
