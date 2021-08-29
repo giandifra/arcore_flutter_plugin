@@ -1,3 +1,7 @@
+## 0.1.0-null-safety.2
+
+* Added "Screenshot feature" (@wiizarrrd)
+
 ## 0.1.0-null-safety.1
 
 * Fix null check operator
