@@ -33,7 +33,7 @@ class ArCoreController {
   }
 
   ArCoreController(
-      {int? id,
+      {required this.id,
       this.enableTapRecognizer,
       this.enablePlaneRenderer,
       this.enableUpdateListener,
@@ -45,6 +45,7 @@ class ArCoreController {
     init();
   }
 
+  final int id;
   final bool? enableUpdateListener;
   final bool? enableTapRecognizer;
   final bool? enablePlaneRenderer;
