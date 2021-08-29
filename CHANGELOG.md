@@ -1,3 +1,7 @@
+## 0.1.0-null-safety.1
+
+* Fix null check operator
+
 ## 0.1.0-null-safety.0
 
 * Migrate to null-safety (@GTripathee)

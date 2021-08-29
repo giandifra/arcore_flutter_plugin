@@ -16,9 +16,9 @@ class ArCoreNode {
     Vector4? rotation,
     this.children = const [],
   })  : name = name ?? random_string.randomString(),
-        position = ValueNotifier(position!),
-        scale = ValueNotifier(scale!),
-        rotation = ValueNotifier(rotation!),
+        position = position != null ? ValueNotifier(position) : null,
+        scale = scale != null ? ValueNotifier(scale) : null,
+        rotation = rotation != null ? ValueNotifier(rotation) : null,
         assert(!(shape != null && image != null));
 
   final List<ArCoreNode>? children;
@@ -38,12 +38,12 @@ class ArCoreNode {
   Map<String, dynamic> toMap() => <String, dynamic>{
         'dartType': runtimeType.toString(),
         'shape': shape?.toMap(),
-        'position': convertVector3ToMap(position!.value),
-        'scale': convertVector3ToMap(scale!.value),
-        'rotation': convertVector4ToMap(rotation!.value),
+        'position': convertVector3ToMap(position?.value),
+        'scale': convertVector3ToMap(scale?.value),
+        'rotation': convertVector4ToMap(rotation?.value),
         'name': name,
         'image': image?.toMap(),
         'children':
-            this.children!.map((arCoreNode) => arCoreNode.toMap()).toList(),
+            this.children?.map((arCoreNode) => arCoreNode.toMap()).toList(),
       }..removeWhere((String k, dynamic v) => v == null);
 }
