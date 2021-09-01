@@ -9,6 +9,7 @@ import android.util.Pair
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
+import com.difrancescogianmarco.arcore_flutter_plugin.utils.ScreenshotsUtils
 import com.google.ar.core.AugmentedImage
 import com.google.ar.core.AugmentedImageDatabase
 import com.google.ar.core.Config
@@ -138,6 +139,10 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 "init" -> {
                     debugLog( "INIT AUGMENTED IMAGES")
                     arScenViewInit(call, result)
+                }
+                "takeScreenshot" -> {
+                    debugLog(" Take screenshot...")
+                    ScreenshotsUtils.onGetSnapshot(arSceneView,result,activity)
                 }
                 "load_single_image_on_db" -> {
                     debugLog( "load_single_image_on_db")
