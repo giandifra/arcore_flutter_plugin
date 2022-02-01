@@ -156,6 +156,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                     val config = Config(session)
                     config.augmentedFaceMode = Config.AugmentedFaceMode.MESH3D
                     config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+                    ArCoreUtils.updateLightEstimationModeFromView(session, config, arSceneView)
                     session.configure(config)
                     arSceneView?.setSession(session)
                 }

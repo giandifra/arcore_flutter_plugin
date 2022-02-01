@@ -8,21 +8,22 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION_CODES
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
-import androidx.core.app.ActivityCompat
 import android.widget.Toast
 import androidx.annotation.Nullable
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.ar.core.exceptions.*
-import java.util.*
-import androidx.core.content.ContextCompat.getSystemService
-import android.os.Build.VERSION_CODES
 import com.google.ar.core.*
-import com.google.ar.core.CameraConfig
+import com.google.ar.core.exceptions.*
+import com.google.ar.sceneform.ArSceneView
+import com.gorisse.thomas.sceneform.light.LightEstimationConfig
+import com.gorisse.thomas.sceneform.lightEstimationConfig
+import java.util.*
 
 
 class ArCoreUtils {
@@ -90,6 +91,22 @@ class ArCoreUtils {
 
             }
             return session
+        }
+
+        fun updateLightEstimationModeFromView(
+            session: Session,
+            config: Config,
+            arSceneView: ArSceneView?
+        ) {
+            val lightEstimationConfig: LightEstimationConfig? = arSceneView?.lightEstimationConfig
+            if (lightEstimationConfig != null) {
+                config.lightEstimationMode = lightEstimationConfig.mode
+            }
+            if (session.cameraConfig.facingDirection == CameraConfig.FacingDirection.FRONT
+                && config.lightEstimationMode == Config.LightEstimationMode.ENVIRONMENTAL_HDR
+            ) {
+                config.lightEstimationMode = Config.LightEstimationMode.DISABLED
+            }
         }
 
         /** Check to see we have the necessary permissions for this app, and ask for them if we don't.  */

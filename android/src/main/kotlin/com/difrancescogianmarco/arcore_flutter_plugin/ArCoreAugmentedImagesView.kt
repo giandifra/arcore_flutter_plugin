@@ -13,8 +13,6 @@ import com.google.ar.core.*
 import com.google.ar.core.exceptions.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Scene
-import com.gorisse.thomas.sceneform.light.LightEstimationConfig
-import com.gorisse.thomas.sceneform.lightEstimationConfig
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -238,15 +236,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     val config = Config(session)
                     config.focusMode = Config.FocusMode.AUTO
                     config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
-                    val lightEstimationConfig: LightEstimationConfig? = arSceneView?.lightEstimationConfig
-                    if (lightEstimationConfig != null) {
-                        config.lightEstimationMode = lightEstimationConfig.mode
-                    }
-                    if (session.cameraConfig.facingDirection == CameraConfig.FacingDirection.FRONT
-                        && config.lightEstimationMode == Config.LightEstimationMode.ENVIRONMENTAL_HDR
-                    ) {
-                        config.lightEstimationMode = Config.LightEstimationMode.DISABLED
-                    }
+                    ArCoreUtils.updateLightEstimationModeFromView(session, config, arSceneView)
                     session.configure(config)
                     arSceneView?.setSession(session)
                 }
@@ -273,6 +263,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
             val config = Config(session)
             config.focusMode = Config.FocusMode.AUTO
             config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+            ArCoreUtils.updateLightEstimationModeFromView(session, config, arSceneView)
             bytes?.let {
                 if (useSingleImage) {
                     if (!addImageToAugmentedImageDatabase(config, bytes)) {
@@ -298,6 +289,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
             val config = Config(session)
             config.focusMode = Config.FocusMode.AUTO
             config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+            ArCoreUtils.updateLightEstimationModeFromView(session, config, arSceneView)
             bytesMap?.let {
                 addMultipleImagesToAugmentedImageDatabase(config, bytesMap, session)
             }

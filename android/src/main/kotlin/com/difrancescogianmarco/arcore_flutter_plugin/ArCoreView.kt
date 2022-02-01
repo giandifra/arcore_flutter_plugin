@@ -36,8 +36,6 @@ import android.os.Environment
 import android.view.PixelCopy
 import android.os.HandlerThread
 import android.content.ContextWrapper
-import com.gorisse.thomas.sceneform.light.LightEstimationConfig
-import com.gorisse.thomas.sceneform.lightEstimationConfig
 import java.io.FileOutputStream
 import java.io.File
 import java.io.IOException
@@ -549,16 +547,8 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                         config.augmentedFaceMode = Config.AugmentedFaceMode.MESH3D
                     }
                     config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
-                    config.focusMode = Config.FocusMode.AUTO;
-                    val lightEstimationConfig: LightEstimationConfig? = arSceneView?.lightEstimationConfig
-                    if (lightEstimationConfig != null) {
-                        config.lightEstimationMode = lightEstimationConfig.mode
-                    }
-                    if (session.cameraConfig.facingDirection == CameraConfig.FacingDirection.FRONT
-                        && config.lightEstimationMode == Config.LightEstimationMode.ENVIRONMENTAL_HDR
-                    ) {
-                        config.lightEstimationMode = Config.LightEstimationMode.DISABLED
-                    }
+                    config.focusMode = Config.FocusMode.AUTO
+                    ArCoreUtils.updateLightEstimationModeFromView(session, config, arSceneView)
                     session.configure(config)
                     arSceneView?.setSession(session)
                 }
