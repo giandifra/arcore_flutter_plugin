@@ -9,23 +9,19 @@ import android.util.Pair
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
-import com.google.ar.core.AugmentedImage
-import com.google.ar.core.AugmentedImageDatabase
-import com.google.ar.core.Config
-import com.google.ar.core.TrackingState
-import com.google.ar.core.exceptions.CameraNotAvailableException
-import com.google.ar.core.exceptions.UnavailableException
+import com.google.ar.core.*
+import com.google.ar.core.exceptions.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Scene
+import com.gorisse.thomas.sceneform.light.LightEstimationConfig
+import com.gorisse.thomas.sceneform.lightEstimationConfig
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.*
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.util.*
-import com.google.ar.core.exceptions.*
-import com.google.ar.core.*
-import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger: BinaryMessenger, id: Int, val useSingleImage: Boolean, debug: Boolean) : BaseArCoreView(activity, context, messenger, id, debug), CoroutineScope {
@@ -242,8 +238,17 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     val config = Config(session)
                     config.focusMode = Config.FocusMode.AUTO
                     config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+                    val lightEstimationConfig: LightEstimationConfig? = arSceneView?.lightEstimationConfig
+                    if (lightEstimationConfig != null) {
+                        config.lightEstimationMode = lightEstimationConfig.mode
+                    }
+                    if (session.cameraConfig.facingDirection == CameraConfig.FacingDirection.FRONT
+                        && config.lightEstimationMode == Config.LightEstimationMode.ENVIRONMENTAL_HDR
+                    ) {
+                        config.lightEstimationMode = Config.LightEstimationMode.DISABLED
+                    }
                     session.configure(config)
-                    arSceneView?.setupSession(session)
+                    arSceneView?.setSession(session)
                 }
             } catch (e: UnavailableException) {
                 ArCoreUtils.handleSessionException(activity, e)
@@ -280,7 +285,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 }
             }
             session.configure(config)
-            arSceneView?.setupSession(session)
+            arSceneView?.setSession(session)
         } catch (ex: Exception) {
             debugLog( ex.localizedMessage)
         }
@@ -321,7 +326,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 }
                 config.augmentedImageDatabase = augmentedImageDatabase
                 session.configure(config)
-                arSceneView?.setupSession(session)
+                arSceneView?.setSession(session)
             }
             operation.await()
         }

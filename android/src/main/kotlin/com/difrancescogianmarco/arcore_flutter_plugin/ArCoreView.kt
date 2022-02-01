@@ -16,6 +16,7 @@ import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCo
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
+import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
 import com.google.ar.core.*
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableException
@@ -35,6 +36,8 @@ import android.os.Environment
 import android.view.PixelCopy
 import android.os.HandlerThread
 import android.content.ContextWrapper
+import com.gorisse.thomas.sceneform.light.LightEstimationConfig
+import com.gorisse.thomas.sceneform.lightEstimationConfig
 import java.io.FileOutputStream
 import java.io.File
 import java.io.IOException
@@ -547,8 +550,17 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                     }
                     config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
                     config.focusMode = Config.FocusMode.AUTO;
+                    val lightEstimationConfig: LightEstimationConfig? = arSceneView?.lightEstimationConfig
+                    if (lightEstimationConfig != null) {
+                        config.lightEstimationMode = lightEstimationConfig.mode
+                    }
+                    if (session.cameraConfig.facingDirection == CameraConfig.FacingDirection.FRONT
+                        && config.lightEstimationMode == Config.LightEstimationMode.ENVIRONMENTAL_HDR
+                    ) {
+                        config.lightEstimationMode = Config.LightEstimationMode.DISABLED
+                    }
                     session.configure(config)
-                    arSceneView?.setupSession(session)
+                    arSceneView?.setSession(session)
                 }
             } catch (ex: UnavailableUserDeclinedInstallationException) {
                 // Display an appropriate message to the user zand return gracefully.
