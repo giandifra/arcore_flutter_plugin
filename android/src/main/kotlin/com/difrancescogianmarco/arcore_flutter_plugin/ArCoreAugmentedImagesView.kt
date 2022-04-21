@@ -6,6 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.util.Pair
+import android.view.GestureDetector
+import android.view.MotionEvent
+import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreHitTestResult
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
@@ -25,6 +28,7 @@ import java.io.IOException
 import java.util.*
 import com.google.ar.core.exceptions.*
 import com.google.ar.core.*
+import com.google.ar.sceneform.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -36,12 +40,25 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
     // the
     // database.
     private val augmentedImageMap = HashMap<Int, Pair<AugmentedImage, AnchorNode>>()
+    private val gestureDetector: GestureDetector
 
     private var job: Job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
     init {
+        gestureDetector = GestureDetector(
+                context,
+                object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onSingleTapUp(e: MotionEvent): Boolean {
+                        onSingleTap(e)
+                        return true
+                    }
+
+                    override fun onDown(e: MotionEvent): Boolean {
+                        return true
+                    }
+                })
 
         sceneUpdateListener = Scene.OnUpdateListener { frameTime ->
 
@@ -126,10 +143,34 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
          val maze_edge_size = 492.65f
          val max_image_edge = Math.max(image.extentX, image.extentZ)
          val maze_scale = max_image_edge / maze_edge_size
- 
+
          // Scale Y extra 10 times to lower the wall of maze
          mazeNode.localScale = Vector3(maze_scale, maze_scale * 0.1f, maze_scale)*//*
     }*/
+
+    private fun onSingleTap(tap: MotionEvent?) {
+        debugLog(" onSingleTap")
+        val frame = arSceneView?.arFrame
+        if (frame != null) {
+            if (tap != null && frame.camera.trackingState == TrackingState.TRACKING) {
+                val hitList = frame.hitTest(tap)
+                val list = ArrayList<HashMap<String, Any>>()
+                for (hit in hitList) {
+                    val trackable = hit.trackable
+                    if (trackable is Plane && trackable.isPoseInPolygon(hit.hitPose)) {
+                        hit.hitPose
+                        val distance: Float = hit.distance
+                        val translation = hit.hitPose.translation
+                        val rotation = hit.hitPose.rotationQuaternion
+                        val flutterArCoreHitTestResult = FlutterArCoreHitTestResult(distance, translation, rotation)
+                        val arguments = flutterArCoreHitTestResult.toHashMap()
+                        list.add(arguments)
+                    }
+                }
+                methodChannel.invokeMethod("onPlaneTap", list)
+            }
+        }
+    }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (isSupportedDevice) {
@@ -211,6 +252,29 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
 
     private fun arScenViewInit(call: MethodCall, result: MethodChannel.Result) {
         arSceneView?.scene?.addOnUpdateListener(sceneUpdateListener)
+        val enableTapRecognizer: Boolean? = call.argument("enableTapRecognizer")
+        if (enableTapRecognizer != null && enableTapRecognizer) {
+            arSceneView
+                    ?.scene
+                    ?.setOnTouchListener { hitTestResult: HitTestResult, event: MotionEvent? ->
+
+                        if (hitTestResult.node != null) {
+                            debugLog(" onNodeTap " + hitTestResult.node?.name)
+                            debugLog(hitTestResult.node?.localPosition.toString())
+                            debugLog(hitTestResult.node?.worldPosition.toString())
+                            methodChannel.invokeMethod("onNodeTap", hitTestResult.node?.name)
+                            return@setOnTouchListener true
+                        }
+                        return@setOnTouchListener gestureDetector.onTouchEvent(event)
+                    }
+        }
+
+        val enablePlaneRenderer: Boolean? = call.argument("enablePlaneRenderer")
+        if (enablePlaneRenderer != null && !enablePlaneRenderer) {
+            debugLog(" The plane renderer (enablePlaneRenderer) is set to " + enablePlaneRenderer.toString())
+            arSceneView!!.planeRenderer.isVisible = false
+        }
+
         onResume()
         result.success(null)
     }
