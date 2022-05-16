@@ -42,6 +42,8 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         node.localPosition = position
         node.localScale = scale
         node.localRotation = rotation
+        node.renderable?.isShadowReceiver = false
+        node.renderable?.isShadowCaster = false
 
         return node
     }
