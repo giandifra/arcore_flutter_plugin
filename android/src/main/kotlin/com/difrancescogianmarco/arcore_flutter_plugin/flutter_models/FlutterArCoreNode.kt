@@ -12,6 +12,8 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
 
     val dartType: String = map["dartType"] as String
     val name: String = map["name"] as String
+    val isShadowReceiver: Boolean = false
+    val isShadowCaster: Boolean = false
     val image: FlutterArCoreImage? = createArCoreImage(map["image"] as? HashMap<String, *>)
     val objectUrl: String? = map["objectUrl"] as? String
     val object3DFileName: String? = map["object3DFileName"] as? String
@@ -42,6 +44,9 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         node.localPosition = position
         node.localScale = scale
         node.localRotation = rotation
+        node.renderable?.isShadowReceiver = isShadowReceiver
+        node.renderable?.isShadowCaster = isShadowReceiver
+
         return node
     }
 
