@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.util.Log
 import android.util.Pair
 import android.view.GestureDetector
@@ -212,6 +213,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                             debugLog( "inserted ${node?.name}")
                             if (node != null) {
                                 node.setParent(anchorNode)
+                                arSceneView?.scene?.setLightEstimate(com.google.ar.sceneform.rendering.Color(255F, 255F, 255F), 0.0F)
                                 arSceneView?.scene?.addChild(anchorNode)
                                 result.success(null)
                             } else if (throwable != null) {
