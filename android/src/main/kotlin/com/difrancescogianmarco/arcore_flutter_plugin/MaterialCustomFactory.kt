@@ -1,13 +1,10 @@
 package com.difrancescogianmarco.arcore_flutter_plugin
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreMaterial
-import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.google.ar.sceneform.rendering.Color
 import com.google.ar.sceneform.rendering.Material
-import com.google.ar.sceneform.rendering.R
 import com.google.ar.sceneform.rendering.Texture
 import java.util.concurrent.CompletableFuture
 

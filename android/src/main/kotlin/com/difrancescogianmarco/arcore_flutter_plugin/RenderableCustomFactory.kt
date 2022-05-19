@@ -9,7 +9,6 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
-import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.Material
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Renderable
@@ -17,6 +16,7 @@ import com.google.ar.sceneform.rendering.ViewRenderable
 import java.util.function.Consumer
 
 import android.widget.RelativeLayout.LayoutParams;
+import com.google.ar.sceneform.assets.RenderableSource
 
 typealias MaterialHandler = (Material?, Throwable?) -> Unit
 typealias RenderableHandler = (Renderable?, Throwable?) -> Unit

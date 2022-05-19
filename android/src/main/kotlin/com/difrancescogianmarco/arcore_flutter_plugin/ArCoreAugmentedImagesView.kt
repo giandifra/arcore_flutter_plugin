@@ -243,7 +243,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                     config.focusMode = Config.FocusMode.AUTO
                     config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
                     session.configure(config)
-                    arSceneView?.setupSession(session)
+                    arSceneView?.setSession(session)
                 }
             } catch (e: UnavailableException) {
                 ArCoreUtils.handleSessionException(activity, e)
@@ -280,7 +280,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 }
             }
             session.configure(config)
-            arSceneView?.setupSession(session)
+            arSceneView?.setSession(session)
         } catch (ex: Exception) {
             debugLog( ex.localizedMessage)
         }
@@ -321,7 +321,7 @@ class ArCoreAugmentedImagesView(activity: Activity, context: Context, messenger:
                 }
                 config.augmentedImageDatabase = augmentedImageDatabase
                 session.configure(config)
-                arSceneView?.setupSession(session)
+                arSceneView?.setSession(session)
             }
             operation.await()
         }

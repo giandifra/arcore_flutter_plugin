@@ -126,7 +126,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
         if (enableAugmentedFaces != null && enableAugmentedFaces) {
             // This is important to make sure that the camera stream renders first so that
             // the face mesh occlusion works correctly.
-            arSceneView?.cameraStreamRenderPriority = Renderable.RENDER_PRIORITY_FIRST
+            arSceneView?.setCameraStreamRenderPriority(Renderable.RENDER_PRIORITY_FIRST)
             arSceneView?.scene?.addOnUpdateListener(faceSceneUpdateListener)
         }
 
@@ -157,7 +157,7 @@ class ArCoreFaceView(activity:Activity,context: Context, messenger: BinaryMessen
                     config.augmentedFaceMode = Config.AugmentedFaceMode.MESH3D
                     config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
                     session.configure(config)
-                    arSceneView?.setupSession(session)
+                    arSceneView?.setSession(session)
                 }
             } catch (e: UnavailableException) {
                 ArCoreUtils.handleSessionException(activity, e)
