@@ -5,14 +5,14 @@ import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
 import 'package:flutter/services.dart';
 
 class AugmentedFacesScreen extends StatefulWidget {
-  const AugmentedFacesScreen({Key key}) : super(key: key);
+  const AugmentedFacesScreen({Key? key}) : super(key: key);
 
   @override
   _AugmentedFacesScreenState createState() => _AugmentedFacesScreenState();
 }
 
 class _AugmentedFacesScreenState extends State<AugmentedFacesScreen> {
-  ArCoreFaceController arCoreFaceController;
+  ArCoreFaceController? arCoreFaceController;
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +38,14 @@ class _AugmentedFacesScreenState extends State<AugmentedFacesScreen> {
     final ByteData textureBytes =
         await rootBundle.load('assets/fox_face_mesh_texture.png');
 
-    arCoreFaceController.loadMesh(
+    arCoreFaceController?.loadMesh(
         textureBytes: textureBytes.buffer.asUint8List(),
         skin3DModelFilename: 'fox_face.sfb');
   }
 
   @override
   void dispose() {
-    arCoreFaceController.dispose();
+    arCoreFaceController?.dispose();
     super.dispose();
   }
 }

@@ -9,7 +9,7 @@ class HelloWorld extends StatefulWidget {
 }
 
 class _HelloWorldState extends State<HelloWorld> {
-  ArCoreController arCoreController;
+  ArCoreController? arCoreController;
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +28,12 @@ class _HelloWorldState extends State<HelloWorld> {
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
 
-    _addSphere(arCoreController);
-    _addCylindre(arCoreController);
-    _addCube(arCoreController);
+    _addSphere();
+    _addCylindre();
+    _addCube();
   }
 
-  Future _addSphere(ArCoreController controller) async {
+  Future _addSphere() async {
     final ByteData textureBytes = await rootBundle.load('assets/earth.jpg');
 
     final material = ArCoreMaterial(
@@ -47,10 +47,10 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
-    controller.addArCoreNode(node);
+    arCoreController?.addArCoreNode(node);
   }
 
-  void _addCylindre(ArCoreController controller) {
+  void _addCylindre() {
     final material = ArCoreMaterial(
       color: Colors.red,
       reflectance: 1.0,
@@ -64,10 +64,10 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: cylindre,
       position: vector.Vector3(0.0, -0.5, -2.0),
     );
-    controller.addArCoreNode(node);
+    arCoreController?.addArCoreNode(node);
   }
 
-  void _addCube(ArCoreController controller) {
+  void _addCube() {
     final material = ArCoreMaterial(
       color: Color.fromARGB(120, 66, 134, 244),
       metallic: 1.0,
@@ -80,12 +80,12 @@ class _HelloWorldState extends State<HelloWorld> {
       shape: cube,
       position: vector.Vector3(-0.5, 0.5, -3.5),
     );
-    controller.addArCoreNode(node);
+    arCoreController?.addArCoreNode(node);
   }
 
   @override
   void dispose() {
-    arCoreController.dispose();
+    arCoreController?.dispose();
     super.dispose();
   }
 }

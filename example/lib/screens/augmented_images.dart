@@ -8,7 +8,7 @@ class AugmentedPage extends StatefulWidget {
 }
 
 class _AugmentedPageState extends State<AugmentedPage> {
-  ArCoreController arCoreController;
+  ArCoreController? arCoreController;
   Map<int, ArCoreAugmentedImage> augmentedImagesMap = Map();
 
   @override
@@ -28,7 +28,7 @@ class _AugmentedPageState extends State<AugmentedPage> {
 
   void _onArCoreViewCreated(ArCoreController controller) async {
     arCoreController = controller;
-    arCoreController.onTrackingImage = _handleOnTrackingImage;
+    arCoreController?.onTrackingImage = _handleOnTrackingImage;
     //loadSingleImage();
     //OR
     loadImagesDatabase();
@@ -37,13 +37,13 @@ class _AugmentedPageState extends State<AugmentedPage> {
   loadSingleImage() async {
     final ByteData bytes =
         await rootBundle.load('assets/earth_augmented_image.jpg');
-    arCoreController.loadSingleAugmentedImage(
+    arCoreController?.loadSingleAugmentedImage(
         bytes: bytes.buffer.asUint8List());
   }
 
   loadImagesDatabase() async {
     final ByteData bytes = await rootBundle.load('assets/myimages.imgdb');
-    arCoreController.loadAugmentedImagesDatabase(
+    arCoreController?.loadAugmentedImagesDatabase(
         bytes: bytes.buffer.asUint8List());
   }
 
@@ -68,12 +68,12 @@ class _AugmentedPageState extends State<AugmentedPage> {
     final node = ArCoreNode(
       shape: sphere,
     );
-    arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
+    arCoreController?.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
   }
 
   @override
   void dispose() {
-    arCoreController.dispose();
+    arCoreController?.dispose();
     super.dispose();
   }
 }

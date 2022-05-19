@@ -1,3 +1,8 @@
+## 0.1.0-null-safety.4
+
+* Upgraded dart constaint to 2.14
+* Migrate example to null-safety
+
 ## 0.1.0-null-safety.3
 
 * Bug fix (@shabbirAlam)

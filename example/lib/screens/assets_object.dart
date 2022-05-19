@@ -7,9 +7,9 @@ class AssetsObject extends StatefulWidget {
 }
 
 class _AssetsObjectState extends State<AssetsObject> {
-  ArCoreController arCoreController;
+  ArCoreController? arCoreController;
 
-  String objectSelected;
+  String? objectSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +40,8 @@ class _AssetsObjectState extends State<AssetsObject> {
 
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
-    arCoreController.onNodeTap = (name) => onTapHandler(name);
-    arCoreController.onPlaneTap = _handleOnPlaneTap;
+    arCoreController?.onNodeTap = (name) => onTapHandler(name);
+    arCoreController?.onPlaneTap = _handleOnPlaneTap;
   }
 
   void _addToucano(ArCoreHitTestResult plane) {
@@ -53,7 +53,7 @@ class _AssetsObjectState extends State<AssetsObject> {
           position: plane.pose.translation,
           rotation: plane.pose.rotation);
 
-      arCoreController.addArCoreNodeWithAnchor(toucanoNode);
+      arCoreController?.addArCoreNodeWithAnchor(toucanoNode);
     } else {
       showDialog<void>(
         context: context,
@@ -81,7 +81,7 @@ class _AssetsObjectState extends State<AssetsObject> {
                   Icons.delete,
                 ),
                 onPressed: () {
-                  arCoreController.removeNode(nodeName: name);
+                  arCoreController?.removeNode(nodeName: name);
                   Navigator.pop(context);
                 })
           ],
@@ -92,13 +92,13 @@ class _AssetsObjectState extends State<AssetsObject> {
 
   @override
   void dispose() {
-    arCoreController.dispose();
+    arCoreController?.dispose();
     super.dispose();
   }
 }
 
 class ListObjectSelection extends StatefulWidget {
-  final Function onTap;
+  final Function? onTap;
 
   ListObjectSelection({this.onTap});
 
@@ -119,7 +119,7 @@ class _ListObjectSelectionState extends State<ListObjectSelection> {
     'artic_fox.sfb',
   ];
 
-  String selected;
+  String? selected;
 
   @override
   void initState() {
@@ -138,7 +138,7 @@ class _ListObjectSelectionState extends State<ListObjectSelection> {
             onTap: () {
               setState(() {
                 selected = gifs[index];
-                widget.onTap(objectsFileName[index]);
+                widget.onTap?.call(objectsFileName[index]);
               });
             },
             child: Card(

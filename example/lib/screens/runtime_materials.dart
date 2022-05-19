@@ -10,8 +10,8 @@ class RuntimeMaterials extends StatefulWidget {
 }
 
 class _RuntimeMaterialsState extends State<RuntimeMaterials> {
-  ArCoreController arCoreController;
-  ArCoreNode sphereNode;
+  ArCoreController? arCoreController;
+  ArCoreNode? sphereNode;
 
   double metallic = 0.0;
   double roughness = 0.4;
@@ -57,10 +57,10 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
 
-    _addSphere(arCoreController);
+    _addSphere();
   }
 
-  void _addSphere(ArCoreController controller) {
+  void _addSphere() {
     final material = ArCoreMaterial(
       color: Colors.yellow,
     );
@@ -72,7 +72,7 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
       shape: sphere,
       position: vector.Vector3(0, 0, -1.5),
     );
-    controller.addArCoreNode(sphereNode);
+    arCoreController?.addArCoreNode(sphereNode!);
   }
 
   onColorChange(Color newColor) {
@@ -115,28 +115,28 @@ class _RuntimeMaterialsState extends State<RuntimeMaterials> {
       roughness: roughness,
       reflectance: reflectance,
     );
-    sphereNode.shape.materials.value = [material];
+    sphereNode?.shape?.materials.value = [material];
   }
 
   @override
   void dispose() {
-    arCoreController.dispose();
+    arCoreController?.dispose();
     super.dispose();
   }
 }
 
 class SphereControl extends StatefulWidget {
-  final double initialRoughnessValue;
-  final double initialReflectanceValue;
-  final double initialMetallicValue;
-  final Color initialColor;
-  final ValueChanged<Color> onColorChange;
-  final ValueChanged<double> onMetallicChange;
-  final ValueChanged<double> onRoughnessChange;
-  final ValueChanged<double> onReflectanceChange;
+  final double? initialRoughnessValue;
+  final double? initialReflectanceValue;
+  final double? initialMetallicValue;
+  final Color? initialColor;
+  final ValueChanged<Color>? onColorChange;
+  final ValueChanged<double>? onMetallicChange;
+  final ValueChanged<double>? onRoughnessChange;
+  final ValueChanged<double>? onReflectanceChange;
 
   const SphereControl(
-      {Key key,
+      {Key? key,
       this.initialRoughnessValue,
       this.initialReflectanceValue,
       this.initialMetallicValue,
@@ -152,16 +152,16 @@ class SphereControl extends StatefulWidget {
 }
 
 class _SphereControlState extends State<SphereControl> {
-  double metallicValue;
-  double roughnessValue;
-  double reflectanceValue;
-  Color color;
+  late double metallicValue;
+  late double roughnessValue;
+  late double reflectanceValue;
+  Color? color;
 
   @override
   void initState() {
-    roughnessValue = widget.initialRoughnessValue;
-    reflectanceValue = widget.initialReflectanceValue;
-    roughnessValue = widget.initialRoughnessValue;
+    roughnessValue = widget.initialRoughnessValue ?? 0.0;
+    reflectanceValue = widget.initialReflectanceValue ?? 0.0;
+    roughnessValue = widget.initialRoughnessValue ?? 0.0;
     color = widget.initialColor;
     super.initState();
   }
@@ -179,7 +179,7 @@ class _SphereControlState extends State<SphereControl> {
                 child: Text("Random Color"),
                 onPressed: () {
                   final newColor = Colors.accents[Random().nextInt(14)];
-                  widget.onColorChange(newColor);
+                  widget.onColorChange?.call(newColor);
                   setState(() {
                     color = newColor;
                   });
@@ -200,8 +200,8 @@ class _SphereControlState extends State<SphereControl> {
               Checkbox(
                 value: metallicValue == 1.0,
                 onChanged: (value) {
-                  metallicValue = value ? 1.0 : 0.0;
-                  widget.onMetallicChange(metallicValue);
+                  metallicValue = (value ?? false) ? 1.0 : 0.0;
+                  widget.onMetallicChange?.call(metallicValue);
                   setState(() {});
                 },
               )
@@ -216,7 +216,7 @@ class _SphereControlState extends State<SphereControl> {
                   divisions: 10,
                   onChangeEnd: (value) {
                     roughnessValue = value;
-                    widget.onRoughnessChange(roughnessValue);
+                    widget.onRoughnessChange?.call(roughnessValue);
                   },
                   onChanged: (double value) {
                     setState(() {
@@ -236,7 +236,7 @@ class _SphereControlState extends State<SphereControl> {
                   divisions: 10,
                   onChangeEnd: (value) {
                     reflectanceValue = value;
-                    widget.onReflectanceChange(reflectanceValue);
+                    widget.onReflectanceChange?.call(reflectanceValue);
                   },
                   onChanged: (double value) {
                     setState(() {

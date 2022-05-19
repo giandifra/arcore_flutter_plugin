@@ -10,7 +10,7 @@ class Matrix3DRenderingPage extends StatefulWidget {
 }
 
 class _Matrix3DRenderingPageState extends State<Matrix3DRenderingPage> {
-  ArCoreController arCoreController;
+  ArCoreController? arCoreController;
 
   @override
   Widget build(BuildContext context) {
@@ -29,19 +29,19 @@ class _Matrix3DRenderingPageState extends State<Matrix3DRenderingPage> {
 
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
-    arCoreController.onNodeTap = (name) => onTapHandler(name);
-    arCoreController.onPlaneTap = _handleOnPlaneTap;
+    arCoreController?.onNodeTap = (name) => onTapHandler(name);
+    arCoreController?.onPlaneTap = _handleOnPlaneTap;
   }
 
   @override
   void dispose() {
-    arCoreController.dispose();
+    arCoreController?.dispose();
     super.dispose();
   }
 
   void _handleOnPlaneTap(List<ArCoreHitTestResult> hits) {
     final hit = hits.first;
-    _addMatrix3D(arCoreController, hit);
+    _addMatrix3D(hit);
   }
 
   void onTapHandler(String name) {
@@ -53,8 +53,7 @@ class _Matrix3DRenderingPageState extends State<Matrix3DRenderingPage> {
     );
   }
 
-  void _addMatrix3D(
-      ArCoreController arCoreController, ArCoreHitTestResult hit) {
+  void _addMatrix3D(ArCoreHitTestResult hit) {
     final List<ArCoreNode> list = [];
     for (int i = 0; i < 8; i++) {
       for (int z = 0; z < 8; z++) {
@@ -69,7 +68,7 @@ class _Matrix3DRenderingPageState extends State<Matrix3DRenderingPage> {
       children: list,
     );
 
-    arCoreController.addArCoreNodeWithAnchor(node);
+    arCoreController?.addArCoreNodeWithAnchor(node);
   }
 
   createNode(ArCoreCube shape, int i, int z) {
