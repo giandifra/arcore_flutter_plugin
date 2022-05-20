@@ -13,7 +13,7 @@ class MultipleAugmentedImagesPage extends StatefulWidget {
 
 class _MultipleAugmentedImagesPageState
     extends State<MultipleAugmentedImagesPage> {
-  ArCoreController arCoreController;
+  ArCoreController? arCoreController;
   Map<String, ArCoreAugmentedImage> augmentedImagesMap = Map();
   Map<String, Uint8List> bytesMap = Map();
 
@@ -34,7 +34,7 @@ class _MultipleAugmentedImagesPageState
 
   void _onArCoreViewCreated(ArCoreController controller) async {
     arCoreController = controller;
-    arCoreController.onTrackingImage = _handleOnTrackingImage;
+    arCoreController?.onTrackingImage = _handleOnTrackingImage;
     loadMultipleImage();
   }
 
@@ -47,7 +47,7 @@ class _MultipleAugmentedImagesPageState
     bytesMap["prova_texture"] = bytes2.buffer.asUint8List();
     bytesMap["umano_digitale"] = bytes3.buffer.asUint8List();
 
-    arCoreController.loadMultipleAugmentedImage(bytesMap: bytesMap);
+    arCoreController?.loadMultipleAugmentedImage(bytesMap: bytesMap);
   }
 
   _handleOnTrackingImage(ArCoreAugmentedImage augmentedImage) {
@@ -81,7 +81,7 @@ class _MultipleAugmentedImagesPageState
     final node = ArCoreNode(
       shape: sphere,
     );
-    arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
+    arCoreController?.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
   }
 
   void _addCube(ArCoreAugmentedImage augmentedImage) {
@@ -97,7 +97,7 @@ class _MultipleAugmentedImagesPageState
     final node = ArCoreNode(
       shape: cube,
     );
-    arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
+    arCoreController?.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
   }
 
   void _addCylindre(ArCoreAugmentedImage augmentedImage) {
@@ -113,12 +113,12 @@ class _MultipleAugmentedImagesPageState
     final node = ArCoreNode(
       shape: cylindre,
     );
-    arCoreController.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
+    arCoreController?.addArCoreNodeToAugmentedImage(node, augmentedImage.index);
   }
 
   @override
   void dispose() {
-    arCoreController.dispose();
+    arCoreController?.dispose();
     super.dispose();
   }
 }

@@ -1,3 +1,24 @@
+## 0.1.0-null-safety.4
+
+* Upgraded dart constaint to 2.14
+* Migrate example to null-safety
+
+## 0.1.0-null-safety.3
+
+* Bug fix (@shabbirAlam)
+
+## 0.1.0-null-safety.2
+
+* Added "Screenshot feature" (@wiizarrrd)
+
+## 0.1.0-null-safety.1
+
+* Fix null check operator
+
+## 0.1.0-null-safety.0
+
+* Migrate to null-safety (@GTripathee)
+
 ## 0.0.11
 
 * Add ability to toggle Plane Renderer Visibility during runtime (@matwright)

@@ -11,9 +11,9 @@ class ObjectWithTextureAndRotation extends StatefulWidget {
 
 class _ObjectWithTextureAndRotationState
     extends State<ObjectWithTextureAndRotation> {
-  ArCoreController arCoreController;
+  ArCoreController? arCoreController;
 
-  ArCoreRotatingNode node;
+  ArCoreRotatingNode? node;
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +41,10 @@ class _ObjectWithTextureAndRotationState
 
   void _onArCoreViewCreated(ArCoreController controller) {
     arCoreController = controller;
-    _addSphere(arCoreController);
+    _addSphere();
   }
 
-  Future _addSphere(ArCoreController controller) async {
+  Future _addSphere() async {
     final ByteData textureBytes = await rootBundle.load('assets/italia.png');
 
     final material = ArCoreMaterial(
@@ -60,7 +60,7 @@ class _ObjectWithTextureAndRotationState
       position: vector.Vector3(0, 0, -1.5),
       rotation: vector.Vector4(0, 0, 0, 0),
     );
-    controller.addArCoreNode(node);
+    arCoreController?.addArCoreNode(node!);
   }
 
   onDegreesPerSecondChange(double value) {
@@ -68,9 +68,9 @@ class _ObjectWithTextureAndRotationState
       return;
     }
     debugPrint("onDegreesPerSecondChange");
-    if (node.degreesPerSecond.value != value) {
+    if (node?.degreesPerSecond.value != value) {
       debugPrint("onDegreesPerSecondChange: $value");
-      node.degreesPerSecond.value = value;
+      node?.degreesPerSecond.value = value;
     }
   }
 
@@ -83,11 +83,11 @@ class _ObjectWithTextureAndRotationState
 
 class RotationSlider extends StatefulWidget {
   final double degreesPerSecondInitialValue;
-  final ValueChanged<double> onDegreesPerSecondChange;
+  final ValueChanged<double>? onDegreesPerSecondChange;
 
   const RotationSlider(
-      {Key key,
-      this.degreesPerSecondInitialValue,
+      {Key? key,
+      this.degreesPerSecondInitialValue = 0.0,
       this.onDegreesPerSecondChange})
       : super(key: key);
 
@@ -96,7 +96,7 @@ class RotationSlider extends StatefulWidget {
 }
 
 class _RotationSliderState extends State<RotationSlider> {
-  double degreesPerSecond;
+  late double degreesPerSecond;
 
   @override
   void initState() {
@@ -117,7 +117,7 @@ class _RotationSliderState extends State<RotationSlider> {
             max: 360.0,
             onChangeEnd: (value) {
               degreesPerSecond = value;
-              widget.onDegreesPerSecondChange(degreesPerSecond);
+              widget.onDegreesPerSecondChange?.call(degreesPerSecond);
             },
             onChanged: (double value) {
               setState(() {
