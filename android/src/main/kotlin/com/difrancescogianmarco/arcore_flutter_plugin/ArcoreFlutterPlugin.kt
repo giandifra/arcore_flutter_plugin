@@ -29,7 +29,7 @@ class ArcoreFlutterPlugin : FlutterPlugin, ActivityAware {
         fun registerWith(registrar: Registrar) {
             registrar
                     .platformViewRegistry()
-                    .registerViewFactory(CHANNEL_NAME, ArCoreViewFactory(registrar.activity(), registrar.messenger()))
+                    .registerViewFactory(CHANNEL_NAME, ArCoreViewFactory(registrar.activity()!!, registrar.messenger()))
         }
     }
 
