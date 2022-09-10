@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.util.Base64
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -38,6 +39,7 @@ import android.content.ContextWrapper
 import java.io.FileOutputStream
 import java.io.File
 import java.io.IOException
+import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -206,13 +208,17 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
             "takeScreenshot" -> {
                 debugLog(" takeScreenshot")
-                takeScreenshot(call, result)
+                takeScreenshot()
 
             }
             "loadMesh" -> {
                 val map = call.arguments as HashMap<String, Any>
                 val textureBytes = map["textureBytes"] as ByteArray
                 loadMesh(textureBytes)
+            }
+            "getView" -> {
+                debugLog("Get ARcore View")
+                getView()
             }
             "dispose" -> {
                 debugLog("Disposing ARCore now")
@@ -319,35 +325,59 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         }
     }
 
-    private fun takeScreenshot(call: MethodCall, result: MethodChannel.Result) {
-        try {
-            // create bitmap screen capture
+    // private fun takeScreenshot(call: MethodCall, result: MethodChannel.Result) {
+    //     try {
+    //         // create bitmap screen capture
 
-            // Create a bitmap the size of the scene view.
+    //         // Create a bitmap the size of the scene view.
+    //         val bitmap: Bitmap = Bitmap.createBitmap(arSceneView!!.getWidth(), arSceneView!!.getHeight(),
+    //                 Bitmap.Config.ARGB_8888)
+
+    //         // Create a handler thread to offload the processing of the image.
+    //         val handlerThread = HandlerThread("PixelCopier")
+    //         handlerThread.start()
+    //         // Make the request to copy.
+    //         // Make the request to copy.
+    //         PixelCopy.request(arSceneView!!, bitmap, { copyResult ->
+    //             if (copyResult === PixelCopy.SUCCESS) {
+    //                 try {
+    //                     saveBitmapToDisk(bitmap)
+    //                 } catch (e: IOException) {
+    //                     e.printStackTrace();
+    //                 }
+    //             }
+    //             handlerThread.quitSafely()
+    //         }, Handler(handlerThread.getLooper()))
+
+    //     } catch (e: Throwable) {
+    //         // Several error may come out with file handling or DOM
+    //         e.printStackTrace()
+    //     }
+    //     result.success(null)
+    // }
+
+    private fun takeScreenshot(): String? {
+        try {
             val bitmap: Bitmap = Bitmap.createBitmap(arSceneView!!.getWidth(), arSceneView!!.getHeight(),
                     Bitmap.Config.ARGB_8888)
 
-            // Create a handler thread to offload the processing of the image.
-            val handlerThread = HandlerThread("PixelCopier")
-            handlerThread.start()
-            // Make the request to copy.
-            // Make the request to copy.
-            PixelCopy.request(arSceneView!!, bitmap, { copyResult ->
-                if (copyResult === PixelCopy.SUCCESS) {
-                    try {
-                        saveBitmapToDisk(bitmap)
-                    } catch (e: IOException) {
-                        e.printStackTrace();
-                    }
-                }
-                handlerThread.quitSafely()
-            }, Handler(handlerThread.getLooper()))
+            val baseImg = encodeImage(bitmap)
+
+            return baseImg
 
         } catch (e: Throwable) {
             // Several error may come out with file handling or DOM
             e.printStackTrace()
         }
-        result.success(null)
+
+        return null
+    }
+
+    fun encodeImage(bitmap: Bitmap): String? {
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val b = baos.toByteArray()
+        return Base64.encodeToString(b, Base64.DEFAULT)
     }
 
     @Throws(IOException::class)
