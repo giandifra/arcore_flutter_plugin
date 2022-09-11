@@ -239,6 +239,10 @@ class ArCoreController {
     });
   }
 
+  Future<dynamic> getLog() async {
+    return await _channel.invokeMethod('log');
+  }
+
   Future<dynamic> getView() {
     return _channel.invokeMethod('getView');
   }

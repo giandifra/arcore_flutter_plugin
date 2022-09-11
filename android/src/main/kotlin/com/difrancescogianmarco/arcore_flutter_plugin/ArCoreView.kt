@@ -207,7 +207,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
 
             }
             "takeScreenshot" -> {
-                debugLog(" takeScreenshot")
+                debugLog("takeScreenshot")
                 takeScreenshot()
 
             }
@@ -215,6 +215,10 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 val map = call.arguments as HashMap<String, Any>
                 val textureBytes = map["textureBytes"] as ByteArray
                 loadMesh(textureBytes)
+            }
+            "log" -> {
+                debugLog("Get logs")
+                log(result)
             }
             "getView" -> {
                 debugLog("Get ARcore View")
@@ -536,6 +540,10 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             node.renderable?.material = material
         }
         result.success(null)
+    }
+
+    fun log(result: MethodChannel.Result) {
+        result.success("Log da Função")
     }
 
     override fun getView(): View {
