@@ -161,7 +161,7 @@ class _SphereControlState extends State<SphereControl> {
   void initState() {
     roughnessValue = widget.initialRoughnessValue ?? 0.0;
     reflectanceValue = widget.initialReflectanceValue ?? 0.0;
-    roughnessValue = widget.initialRoughnessValue ?? 0.0;
+    metallicValue = widget.initialRoughnessValue ?? 0.0;
     color = widget.initialColor;
     super.initState();
   }
@@ -175,7 +175,7 @@ class _SphereControlState extends State<SphereControl> {
         children: <Widget>[
           Row(
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 child: Text("Random Color"),
                 onPressed: () {
                   final newColor = Colors.accents[Random().nextInt(14)];
