@@ -1,6 +1,6 @@
 ## 0.1.0-null-safety.4
 
-* Upgraded dart constaint to 2.14
+* Upgraded dart constraint to 2.14
 * Migrate example to null-safety
 * Migrate to new android plugin api
 
