@@ -9,7 +9,7 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
-import com.google.ar.sceneform.assets.RenderableSource
+//import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.Material
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Renderable
@@ -28,7 +28,11 @@ class RenderableCustomFactory {
         val TAG = "RenderableCustomFactory"
 
         @SuppressLint("ShowToast")
-        fun makeRenderable(context: Context, flutterArCoreNode: FlutterArCoreNode, handler: RenderableHandler) {
+        fun makeRenderable(
+            context: Context,
+            flutterArCoreNode: FlutterArCoreNode,
+            handler: RenderableHandler
+        ) {
 
             if (flutterArCoreNode.dartType == "ArCoreReferenceNode") {
 
@@ -38,6 +42,7 @@ class RenderableCustomFactory {
                 if (localObject != null) {
                     val builder = ModelRenderable.builder()
                     builder.setSource(context, Uri.parse(localObject))
+                        .setIsFilamentGltf(true)
                     builder.build().thenAccept { renderable ->
                         handler(renderable, null)
                     }.exceptionally { throwable ->
@@ -46,52 +51,56 @@ class RenderableCustomFactory {
                         return@exceptionally null
                     }
                 } else if (url != null) {
-                    val modelRenderableBuilder = ModelRenderable.builder()
-                    val renderableSourceBuilder = RenderableSource.builder()
-                    if(url.endsWith(".glb")){
-                        renderableSourceBuilder
-                            .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLB)
-                            .setScale(0.5f)
-                            .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                    } else {
-                        renderableSourceBuilder
-                            .setSource(context, Uri.parse(url), RenderableSource.SourceType.GLTF2)
-                            .setScale(0.5f)
-                            .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                    }
-
-                    modelRenderableBuilder
-                            .setSource(context, renderableSourceBuilder.build())
-                            .setRegistryId(url)
-                            .build()
-                            .thenAccept { renderable ->
-                                handler(renderable, null)
-                            }
-                            .exceptionally { throwable ->
-                                handler(null, throwable)
-                                Log.e(TAG, "renderable error ${throwable.localizedMessage}")
-                                null
-                            }
+                    ModelRenderable.builder()
+                        .setSource(context, Uri.parse(url))
+                        .setIsFilamentGltf(true)
+                        .setAsyncLoadEnabled(false)
+                        //.setRegistryId(url)
+                        .build()
+                        .thenAccept { renderable ->
+                            handler(renderable, null)
+                        }
+                        .exceptionally { throwable ->
+                            handler(null, throwable)
+                            Log.e(TAG, "renderable error ${throwable.localizedMessage}")
+                            null
+                        }
                 }
 
             } else {
 
                 if (flutterArCoreNode.image != null) {
                     val image = ImageView(context);
-                    image.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-                    val bmp = BitmapFactory.decodeByteArray(flutterArCoreNode.image.bytes, 0, flutterArCoreNode.image.bytes.size)
+                    image.layoutParams =
+                        LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+                    val bmp = BitmapFactory.decodeByteArray(
+                        flutterArCoreNode.image.bytes,
+                        0,
+                        flutterArCoreNode.image.bytes.size
+                    )
 
-                    image.setImageBitmap(Bitmap.createScaledBitmap(bmp, flutterArCoreNode.image.width,
-                            flutterArCoreNode.image.height, false))
+                    image.setImageBitmap(
+                        Bitmap.createScaledBitmap(
+                            bmp, flutterArCoreNode.image.width,
+                            flutterArCoreNode.image.height, false
+                        )
+                    )
 
                     ViewRenderable.builder().setView(context, image)
-                            .build()
-                            .thenAccept(Consumer { renderable: ViewRenderable -> handler(renderable, null) })
-                            .exceptionally { throwable ->
-                                Log.e(TAG, "Unable to load image renderable.", throwable);
-                                handler(null, throwable)
-                                return@exceptionally null
-                            }
+                        .build()
+                        .thenAccept(Consumer { renderable: ViewRenderable ->
+                            handler(
+                                renderable,
+                                null
+                            )
+                        })
+                        .exceptionally { throwable ->
+                            Log.e(TAG, "Unable to load image renderable.", throwable);
+                            handler(null, throwable)
+                            return@exceptionally null
+                        }
+                } else if (flutterArCoreNode.video != null) {
+
                 } else {
                     makeMaterial(context, flutterArCoreNode) { material, throwable ->
                         if (throwable != null) {
@@ -118,7 +127,11 @@ class RenderableCustomFactory {
             }
         }
 
-        private fun makeMaterial(context: Context, flutterArCoreNode: FlutterArCoreNode, handler: MaterialHandler) {
+        private fun makeMaterial(
+            context: Context,
+            flutterArCoreNode: FlutterArCoreNode,
+            handler: MaterialHandler
+        ) {
 //            val texture = flutterArCoreNode.shape?.materials?.first()?.texture
             val textureBytes = flutterArCoreNode.shape?.materials?.first()?.textureBytes
             val color = flutterArCoreNode.shape?.materials?.first()?.color
@@ -130,7 +143,12 @@ class RenderableCustomFactory {
 //                builder.setSource(context, Uri.parse(texture))
                 builder.setSource(BitmapFactory.decodeByteArray(textureBytes, 0, textureBytes.size))
                 builder.build().thenAccept { texture ->
-                    MaterialCustomFactory.makeWithTexture(context, texture, isPng, flutterArCoreNode.shape.materials[0])?.thenAccept { material ->
+                    MaterialCustomFactory.makeWithTexture(
+                        context,
+                        texture,
+                        isPng,
+                        flutterArCoreNode.shape.materials[0]
+                    )?.thenAccept { material ->
                         handler(material, null)
                     }?.exceptionally { throwable ->
                         Log.e(TAG, "texture error ${throwable}")
@@ -140,13 +158,13 @@ class RenderableCustomFactory {
                 }
             } else if (color != null) {
                 MaterialCustomFactory.makeWithColor(context, flutterArCoreNode.shape.materials[0])
-                        ?.thenAccept { material: Material ->
-                            handler(material, null)
-                        }?.exceptionally { throwable ->
-                            Log.e(TAG, "material error ${throwable}")
-                            handler(null, throwable)
-                            return@exceptionally null
-                        }
+                    ?.thenAccept { material: Material ->
+                        handler(material, null)
+                    }?.exceptionally { throwable ->
+                        Log.e(TAG, "material error ${throwable}")
+                        handler(null, throwable)
+                        return@exceptionally null
+                    }
             } else {
                 handler(null, null)
             }

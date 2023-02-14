@@ -21,6 +21,7 @@ class _AugmentedPageState extends State<AugmentedPage> {
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
           type: ArCoreViewType.AUGMENTEDIMAGES,
+          debug: true,
         ),
       ),
     );
@@ -29,9 +30,11 @@ class _AugmentedPageState extends State<AugmentedPage> {
   void _onArCoreViewCreated(ArCoreController controller) async {
     arCoreController = controller;
     arCoreController?.onTrackingImage = _handleOnTrackingImage;
-    //loadSingleImage();
-    //OR
-    loadImagesDatabase();
+    Future.delayed(Duration(seconds: 3)).then((value) {
+      // loadSingleImage();
+      //OR
+      //loadImagesDatabase();
+    });
   }
 
   loadSingleImage() async {

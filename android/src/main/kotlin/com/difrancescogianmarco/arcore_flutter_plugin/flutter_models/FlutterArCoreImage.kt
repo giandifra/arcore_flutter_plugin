@@ -7,3 +7,7 @@ class FlutterArCoreImage(map: HashMap<String, *>) {
     val bytes: ByteArray = map["bytes"] as ByteArray
 
 }
+
+class FlutterArCoreVideo(map: HashMap<String, *>) {
+    val bytes: ByteArray = map["bytes"] as ByteArray
+}

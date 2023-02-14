@@ -1,5 +1,6 @@
 package com.difrancescogianmarco.arcore_flutter_plugin.flutter_models
 
+import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.models.RotatingNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseQuaternion
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.DecodableUtils.Companion.parseVector3
@@ -7,24 +8,28 @@ import com.google.ar.core.Pose
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.ux.VideoNode
+
 
 class FlutterArCoreNode(map: HashMap<String, *>) {
 
     val dartType: String = map["dartType"] as String
     val name: String = map["name"] as String
     val image: FlutterArCoreImage? = createArCoreImage(map["image"] as? HashMap<String, *>)
+    val video: FlutterArCoreVideo? = createArCoreVideo(map["video"] as? HashMap<String, *>)
     val objectUrl: String? = map["objectUrl"] as? String
     val object3DFileName: String? = map["object3DFileName"] as? String
     val shape: FlutterArCoreShape? = getShape(map["shape"] as? HashMap<String, *>)
     val position: Vector3 = parseVector3(map["position"] as? HashMap<String, *>) ?: Vector3()
     val scale: Vector3 = parseVector3(map["scale"] as? HashMap<String, *>)
-            ?: Vector3(1.0F, 1.0F, 1.0F)
+        ?: Vector3(1.0F, 1.0F, 1.0F)
     val rotation: Quaternion = parseQuaternion(map["rotation"] as? HashMap<String, Double>)
-            ?: Quaternion()
+        ?: Quaternion()
     val degreesPerSecond: Float? = getDegreesPerSecond((map["degreesPerSecond"] as? Double))
     var parentNodeName: String? = map["parentNodeName"] as? String
 
-    val children: ArrayList<FlutterArCoreNode> = getChildrenFromMap(map["children"] as ArrayList<HashMap<String, *>>)
+    val children: ArrayList<FlutterArCoreNode> =
+        getChildrenFromMap(map["children"] as ArrayList<HashMap<String, *>>)
 
     private fun getChildrenFromMap(list: ArrayList<HashMap<String, *>>): ArrayList<FlutterArCoreNode> {
         return ArrayList(list.map { map -> FlutterArCoreNode(map) })
@@ -72,11 +77,22 @@ class FlutterArCoreNode(map: HashMap<String, *>) {
         return null;
     }
 
+    private fun createArCoreVideo(map: HashMap<String, *>?): FlutterArCoreVideo? {
+        if (map != null)
+            return FlutterArCoreVideo(map);
+
+        return null;
+    }
+
     private fun getShape(map: HashMap<String, *>?): FlutterArCoreShape? {
         if (map != null) {
             return FlutterArCoreShape(map)
         }
         return null
+    }
+
+    fun isVideoNode(): Boolean {
+        return video != null
     }
 
     override fun toString(): String {

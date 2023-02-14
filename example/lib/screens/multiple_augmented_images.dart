@@ -27,15 +27,19 @@ class _MultipleAugmentedImagesPageState
         body: ArCoreView(
           onArCoreViewCreated: _onArCoreViewCreated,
           type: ArCoreViewType.AUGMENTEDIMAGES,
+          debug: true,
         ),
       ),
     );
   }
 
   void _onArCoreViewCreated(ArCoreController controller) async {
+    print('AugmentedImages _onArCoreViewCreated');
     arCoreController = controller;
-    arCoreController?.onTrackingImage = _handleOnTrackingImage;
-    loadMultipleImage();
+    //arCoreController?.onTrackingImage = _handleOnTrackingImage;
+    Future.delayed(Duration(seconds: 5)).then((value) {
+      loadMultipleImage();
+    });
   }
 
   loadMultipleImage() async {
