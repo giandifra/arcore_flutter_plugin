@@ -12,13 +12,15 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+  path:
+  path_provider:
+  http:
+  arcore_flutter_plugin:
+    path: ../
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  arcore_flutter_plugin:
-    path: ../
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
@@ -46,6 +48,7 @@ flutter:
     - assets/umano_digitale.png
     - assets/myimages.imgdb
     - assets/topolino.jpg
+    - assets/sintel.mp4
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

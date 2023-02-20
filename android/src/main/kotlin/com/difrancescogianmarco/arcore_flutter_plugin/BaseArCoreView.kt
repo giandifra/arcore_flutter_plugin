@@ -17,6 +17,7 @@ import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCo
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ArCoreUtils
 import com.google.ar.core.*
 import com.google.ar.core.exceptions.*
+import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.ArSceneView
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.rendering.ModelRenderable
@@ -346,6 +347,23 @@ open class BaseArCoreView(
             } else if (throwable != null) {
                 result?.error("onAddNode", throwable.localizedMessage, null)
             }
+        }
+    }
+
+    fun addVideoNode(anchorNode: AnchorNode, byteArray: ByteArray?) {
+        try{
+            val player = MediaPlayer()
+            NodeFactory.createVideoNode(
+                activity,
+                arSceneView,
+                anchorNode,
+                player,
+                getTransformationSystem(),
+                byteArray,
+            )
+            mediaPlayers.add(player)
+        }catch (ex:Exception){
+            debugLog(ex.toString())
         }
     }
 

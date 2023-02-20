@@ -1,26 +1,33 @@
 package com.difrancescogianmarco.arcore_flutter_plugin
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.MediaPlayer
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import android.util.Pair
+import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
 import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Scene
-import com.google.ar.sceneform.math.Vector3
-import com.google.ar.sceneform.ux.ArFragment
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.*
+import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
@@ -32,7 +39,8 @@ class ArCoreAugmentedImagesView(
     id: Int,
     val useSingleImage: Boolean,
     debug: Boolean
-) : BaseArCoreView(activity, context, messenger, id, debug), CoroutineScope, OnSessionConfigurationListener {
+) : BaseArCoreView(activity, context, messenger, id, debug), CoroutineScope,
+    OnSessionConfigurationListener {
 
     private val TAG: String = ArCoreAugmentedImagesView::class.java.name
     private var onAugmentedImageTrackingUpdate: Scene.OnUpdateListener
@@ -69,10 +77,17 @@ class ArCoreAugmentedImagesView(
                     }
 
                     TrackingState.TRACKING -> {
-                        debugLog("${augmentedImage.name} ${augmentedImage.trackingMethod}")
+                        debugLog("TRACKING: ${augmentedImage.name} ${augmentedImage.trackingMethod}")
+                        if (!augmentedImageMap.containsKey(augmentedImage.index)) {
+                            debugLog("${augmentedImage.name} is not attached")
+                            val anchorNode =
+                                AnchorNode(augmentedImage.createAnchor(augmentedImage.centerPose))
+                            augmentedImageMap[augmentedImage.index] =
+                                Pair.create(augmentedImage, anchorNode)
+                        }
+                        /*
                         if (!augmentedImageMap.containsKey(augmentedImage.index)) {
 
-                            // Setting anchor to the center of Augmented Image
                             // Setting anchor to the center of Augmented Image
                             val anchorNode =
                                 AnchorNode(augmentedImage.createAnchor(augmentedImage.centerPose))
@@ -82,21 +97,10 @@ class ArCoreAugmentedImagesView(
                                     1.0f,
                                     augmentedImage.extentZ,
                                 )
-                            val player = MediaPlayer()
-                            NodeFactory.createVideoNode(
-                                activity,
-                                arSceneView,
-                                anchorNode,
-                                player,
-                                getTransformationSystem(),
-                                augmentedImage
-                            )
-                            mediaPlayers.add(player)
-                            //val anchorNode = AnchorNode()
-                            //anchorNode.anchor = centerPoseAnchor
+                            addVideoNode()
                             augmentedImageMap[augmentedImage.index] =
                                 Pair.create(augmentedImage, anchorNode)
-                        }
+                        }*/
                         sendAugmentedImageToFlutter(augmentedImage)
                     }
 
@@ -128,23 +132,17 @@ class ArCoreAugmentedImagesView(
                 "init" -> {
                     arSceneViewInit(call, result)
                 }
-                "load_single_image_on_db" -> {
-                    debugLog("load_single_image_on_db")
-                    val map = call.arguments as HashMap<String, Any>
-                    val singleImageBytes = map["bytes"] as? ByteArray
-                    setupSession(singleImageBytes, true)
-                }
-                "load_multiple_images_on_db" -> {
+                "load_images_on_db" -> {
                     debugLog("load_multiple_image_on_db")
                     val map = call.arguments as HashMap<String, Any>
                     val dbByteMap = map["bytesMap"] as? Map<String, ByteArray>
-                    setupSession(dbByteMap)
+                    setupExistingImageDatabase(dbByteMap)
                 }
                 "load_augmented_images_database" -> {
                     debugLog("LOAD DB")
                     val map = call.arguments as HashMap<String, Any>
                     val dbByteArray = map["bytes"] as? ByteArray
-                    setupSession(dbByteArray, false)
+                    setupExistingImageDatabase(dbByteArray)
                 }
                 "attachObjectToAugmentedImage" -> {
                     debugLog("attachObjectToAugmentedImage")
@@ -152,26 +150,37 @@ class ArCoreAugmentedImagesView(
                     val flutterArCoreNode = FlutterArCoreNode(map["node"] as HashMap<String, Any>)
                     val index = map["index"] as Int
                     if (augmentedImageMap.containsKey(index)) {
-//                        val augmentedImage = augmentedImageMap[index]!!.first
+                        //val augmentedImage = augmentedImageMap[index]!!.first
                         val anchorNode = augmentedImageMap[index]!!.second
-//                        setImage(augmentedImage, anchorNode)
-//                        onAddNode(flutterArCoreNode, result)
-                        NodeFactory.makeNode(
-                            activity.applicationContext,
-                            flutterArCoreNode,
-                            debug
-                        ) { node, throwable ->
-                            debugLog("inserted ${node?.name}")
-                            if (node != null) {
-                                node.parent = anchorNode
-                                arSceneView?.scene?.addChild(anchorNode)
-                                result.success(null)
-                            } else if (throwable != null) {
-                                result.error(
-                                    "attachObjectToAugmentedImage error",
-                                    throwable.localizedMessage,
-                                    null
-                                )
+                        anchorNode.worldScale = flutterArCoreNode.scale
+                        /*anchorNode.worldScale =
+                            Vector3(
+                                flutterArCoreNode.sc,
+                                1.0f,
+                                augmentedImage.extentZ,
+                         )*/
+
+                        if (flutterArCoreNode.isVideoNode()) {
+                            addVideoNode(anchorNode, flutterArCoreNode.video?.bytes)
+                            result.success(null)
+                        } else {
+                            NodeFactory.makeNode(
+                                activity.applicationContext,
+                                flutterArCoreNode,
+                                debug
+                            ) { node, throwable ->
+                                debugLog("inserted ${node?.name}")
+                                if (node != null) {
+                                    node.parent = anchorNode
+                                    arSceneView.scene?.addChild(anchorNode)
+                                    result.success(null)
+                                } else if (throwable != null) {
+                                    result.error(
+                                        "attachObjectToAugmentedImage error",
+                                        throwable.localizedMessage,
+                                        null
+                                    )
+                                }
                             }
                         }
                     } else {
@@ -230,32 +239,26 @@ class ArCoreAugmentedImagesView(
         }
     }
 
-    private fun setupSession(bytes: ByteArray?, useSingleImage: Boolean) {
-        debugLog("setupSession()")
+    private fun setupExistingImageDatabase(bytes: ByteArray?) {
+        debugLog("setupExistingImageDatabase()")
         try {
-            val session = arSceneView?.session ?: return
+            val session = arSceneView.session ?: return
             val config = Config(session)
             config.focusMode = Config.FocusMode.AUTO
             config.updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
             bytes?.let {
-                if (useSingleImage) {
-                    if (!addImageToAugmentedImageDatabase(config, bytes)) {
-                        throw Exception("Could not setup augmented image database")
-                    }
-                } else {
-                    if (!useExistingAugmentedImageDatabase(config, bytes)) {
-                        throw Exception("Could not setup augmented image database")
-                    }
+                if (!useExistingAugmentedImageDatabase(config, bytes)) {
+                    throw Exception("Could not setup augmented image database")
                 }
             }
             session.configure(config)
-            arSceneView?.session = session
+            arSceneView.session = session
         } catch (ex: Exception) {
-            debugLog(ex.localizedMessage)
+            debugLog(ex.toString())
         }
     }
 
-    private fun setupSession(bytesMap: Map<String, ByteArray>?) {
+    private fun setupExistingImageDatabase(bytesMap: Map<String, ByteArray>?) {
         debugLog("setupSession()")
         try {
             val session = arSceneView.session ?: return
@@ -280,12 +283,18 @@ class ArCoreAugmentedImagesView(
             val operation = async(Dispatchers.Default) {
                 for ((key, value) in bytesMap) {
                     val augmentedImageBitmap = loadAugmentedImageBitmap(value)
-                    try {
-                        augmentedImageDatabase.addImage(key, augmentedImageBitmap)
-                    } catch (ex: Exception) {
+                    if (augmentedImageBitmap != null) {
+                        try {
+                            augmentedImageDatabase.addImage(key, augmentedImageBitmap)
+                        } catch (ex: Exception) {
+                            debugLog(
+                                "Image with the title $key cannot be added to the database. " +
+                                        "The exception was thrown: " + ex.toString()
+                            )
+                        }
+                    } else {
                         debugLog(
-                            "Image with the title $key cannot be added to the database. " +
-                                    "The exception was thrown: " + ex.toString()
+                            "augmentedImageBitmap is null"
                         )
                     }
                 }
@@ -300,20 +309,6 @@ class ArCoreAugmentedImagesView(
                 //arSceneView.session = session
             }
             operation.await()
-        }
-    }
-
-    private fun addImageToAugmentedImageDatabase(config: Config, bytes: ByteArray): Boolean {
-        debugLog("addImageToAugmentedImageDatabase")
-        try {
-            val augmentedImageBitmap = loadAugmentedImageBitmap(bytes) ?: return false
-            val augmentedImageDatabase = AugmentedImageDatabase(arSceneView?.session)
-            augmentedImageDatabase.addImage("image_name", augmentedImageBitmap)
-            config.augmentedImageDatabase = augmentedImageDatabase
-            return true
-        } catch (ex: Exception) {
-            debugLog(ex.localizedMessage)
-            return false
         }
     }
 
@@ -349,35 +344,43 @@ class ArCoreAugmentedImagesView(
             istr = assetManager.open(filePath!!)
             bitmap = BitmapFactory.decodeStream(istr)
         } catch (e: IOException) {
-            // handle exception
+            debugLog(e.toString())
         }
         return bitmap
     }
 
     override fun onSessionConfiguration(session: Session, config: Config) {
-        // Disable plane detection
-        // Disable plane detection
         config.planeFindingMode = Config.PlaneFindingMode.DISABLED
-
-        // Images to be detected by our AR need to be added in AugmentedImageDatabase
-        // This is how database is created at runtime
-        // You can also prebuild database in you computer and load it directly (see: https://developers.google.com/ar/develop/java/augmented-images/guide#database)
-
-
-        // Images to be detected by our AR need to be added in AugmentedImageDatabase
-        // This is how database is created at runtime
-        // You can also prebuild database in you computer and load it directly (see: https://developers.google.com/ar/develop/java/augmented-images/guide#database)
-        /*database = AugmentedImageDatabase(session)
-
-        val matrixImage = BitmapFactory.decodeResource(getResources(), R.drawable.matrix)
-        val rabbitImage = BitmapFactory.decodeResource(getResources(), R.drawable.rabbit)
-        // Every image has to have its own unique String identifier
-        // Every image has to have its own unique String identifier
-        database!!.addImage("matrix", matrixImage)
-        database!!.addImage("rabbit", rabbitImage)
-
-        config!!.setAugmentedImageDatabase(database)*/
-
         arSceneView.scene?.addOnUpdateListener(onAugmentedImageTrackingUpdate)
     }
+
+    // Function to establish connection and load image
+    private fun mLoad(string: String): Bitmap? {
+        val url: URL = mStringToURL(string)!!
+        val connection: HttpURLConnection?
+        try {
+            connection = url.openConnection() as HttpURLConnection
+            connection.connect()
+            val inputStream: InputStream = connection.inputStream
+            val bufferedInputStream = BufferedInputStream(inputStream)
+            return BitmapFactory.decodeStream(bufferedInputStream)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            debugLog(e.toString())
+            Toast.makeText(activity, "Error", Toast.LENGTH_LONG).show()
+        }
+        return null
+    }
+
+    // Function to convert string to URL
+    private fun mStringToURL(string: String): URL? {
+        try {
+            return URL(string)
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
+            debugLog(e.toString())
+        }
+        return null
+    }
+
 }

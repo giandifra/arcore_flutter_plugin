@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:arcore_flutter_plugin/src/arcore_image.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import 'arcore_node.dart';
@@ -30,4 +33,21 @@ class ArCoreReferenceNode extends ArCoreNode {
         'object3DFileName': this.object3DFileName,
         'objectUrl': this.objectUrl,
       }..addAll(super.toMap());
+}
+
+class ArCoreVideoNode extends ArCoreReferenceNode {
+  final ArCoreVideo video;
+
+  ArCoreVideoNode({
+    required this.video,
+    String? name,
+    Vector3? position,
+    Vector3? scale,
+    Vector4? rotation,
+  }) : super(name: name, position: position, scale: scale, rotation: rotation);
+
+  @override
+  Map<String, dynamic> toMap() => <String, dynamic>{
+    'video': this.video.toMap(),
+  }..addAll(super.toMap());
 }

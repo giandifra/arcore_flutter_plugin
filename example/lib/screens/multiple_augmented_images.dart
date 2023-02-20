@@ -36,10 +36,11 @@ class _MultipleAugmentedImagesPageState
   void _onArCoreViewCreated(ArCoreController controller) async {
     print('AugmentedImages _onArCoreViewCreated');
     arCoreController = controller;
-    //arCoreController?.onTrackingImage = _handleOnTrackingImage;
-    Future.delayed(Duration(seconds: 5)).then((value) {
-      loadMultipleImage();
-    });
+    arCoreController?.onTrackingImage = _handleOnTrackingImage;
+    loadMultipleImage();
+    // Future.delayed(Duration(seconds: 5)).then((value) {
+    //
+    // });
   }
 
   loadMultipleImage() async {
@@ -51,7 +52,7 @@ class _MultipleAugmentedImagesPageState
     bytesMap["prova_texture"] = bytes2.buffer.asUint8List();
     bytesMap["umano_digitale"] = bytes3.buffer.asUint8List();
 
-    arCoreController?.loadMultipleAugmentedImage(bytesMap: bytesMap);
+    arCoreController?.loadAugmentedImages(bytesMap: bytesMap);
   }
 
   _handleOnTrackingImage(ArCoreAugmentedImage augmentedImage) {

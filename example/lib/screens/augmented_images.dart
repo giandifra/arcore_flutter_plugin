@@ -40,8 +40,8 @@ class _AugmentedPageState extends State<AugmentedPage> {
   loadSingleImage() async {
     final ByteData bytes =
         await rootBundle.load('assets/earth_augmented_image.jpg');
-    arCoreController?.loadSingleAugmentedImage(
-        bytes: bytes.buffer.asUint8List());
+    arCoreController?.loadAugmentedImages(
+        bytesMap: {'earth_augmented_image': bytes.buffer.asUint8List()});
   }
 
   loadImagesDatabase() async {

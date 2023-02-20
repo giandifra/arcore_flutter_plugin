@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 class ArCoreImage {
   ArCoreImage({
-    this.bytes,
+    required this.bytes,
     this.width,
     this.height,
   })  : assert(bytes != null),
@@ -17,5 +17,17 @@ class ArCoreImage {
         'bytes': bytes,
         'width': width,
         'height': height
+      }..removeWhere((String k, dynamic v) => v == null);
+}
+
+class ArCoreVideo {
+  ArCoreVideo({
+    this.bytes,
+  }) : assert(bytes != null);
+
+  final Uint8List? bytes;
+
+  Map<String, dynamic> toMap() => <String, dynamic>{
+        'bytes': bytes,
       }..removeWhere((String k, dynamic v) => v == null);
 }
