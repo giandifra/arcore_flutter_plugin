@@ -10,6 +10,7 @@ class DecodableUtils {
     companion object {
         fun parseVector3(vector: HashMap<String, *>?): Vector3? {
             if (vector != null) {
+                Log.i("FlutterArCoreUtils vectore3", vector.toString());
                 val x: Float = (vector["x"] as Double).toFloat()
                 val y: Float = (vector["y"] as Double).toFloat()
                 val z: Float = (vector["z"] as Double).toFloat()
@@ -20,6 +21,7 @@ class DecodableUtils {
 
         fun parseQuaternion(vector: HashMap<String, Double>?): Quaternion? {
             if (vector != null) {
+                Log.i("FlutterArCoreUtils quaternion", vector.toString());
                 val x: Float = (vector["x"] as Double).toFloat()
                 val y: Float = (vector["y"] as Double).toFloat()
                 val z: Float = (vector["z"] as Double).toFloat()

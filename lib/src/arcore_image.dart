@@ -23,11 +23,14 @@ class ArCoreImage {
 class ArCoreVideo {
   ArCoreVideo({
     this.bytes,
+    this.loop = true,
   }) : assert(bytes != null);
 
+  final bool loop;
   final Uint8List? bytes;
 
   Map<String, dynamic> toMap() => <String, dynamic>{
         'bytes': bytes,
+        'loop': loop,
       }..removeWhere((String k, dynamic v) => v == null);
 }

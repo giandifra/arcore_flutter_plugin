@@ -1,34 +1,37 @@
 package com.difrancescogianmarco.arcore_flutter_plugin
 
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
+import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.util.Log
 import android.util.Pair
 import android.widget.Toast
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCoreNode
 import com.difrancescogianmarco.arcore_flutter_plugin.flutter_models.FlutterArCorePose
+import com.google.android.filament.Engine
+import com.google.android.filament.filamat.MaterialBuilder
+import com.google.android.filament.filamat.MaterialPackage
 import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Scene
+import com.google.ar.sceneform.math.Quaternion
+import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.rendering.*
+import com.google.ar.sceneform.ux.TransformableNode
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.*
-import java.io.BufferedInputStream
-import java.io.ByteArrayInputStream
-import java.io.IOException
-import java.io.InputStream
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
-import java.util.*
+import java.nio.ByteBuffer
+import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
 import kotlin.coroutines.CoroutineContext
 
 
@@ -37,7 +40,6 @@ class ArCoreAugmentedImagesView(
     context: Context,
     messenger: BinaryMessenger,
     id: Int,
-    val useSingleImage: Boolean,
     debug: Boolean
 ) : BaseArCoreView(activity, context, messenger, id, debug), CoroutineScope,
     OnSessionConfigurationListener {
@@ -49,6 +51,9 @@ class ArCoreAugmentedImagesView(
     // the
     // database.
     private val augmentedImageMap = HashMap<Int, Pair<AugmentedImage, AnchorNode>>()
+    private var plainVideoModel: Renderable? = null
+    private var plainVideoMaterial: Material? = null
+    private val futures: MutableList<CompletableFuture<Void>> = ArrayList()
 
     private var job: Job = Job()
     override val coroutineContext: CoroutineContext
@@ -150,18 +155,41 @@ class ArCoreAugmentedImagesView(
                     val flutterArCoreNode = FlutterArCoreNode(map["node"] as HashMap<String, Any>)
                     val index = map["index"] as Int
                     if (augmentedImageMap.containsKey(index)) {
-                        //val augmentedImage = augmentedImageMap[index]!!.first
-                        val anchorNode = augmentedImageMap[index]!!.second
-                        anchorNode.worldScale = flutterArCoreNode.scale
-                        /*anchorNode.worldScale =
-                            Vector3(
-                                flutterArCoreNode.sc,
-                                1.0f,
-                                augmentedImage.extentZ,
-                         )*/
+                        val augmentedImage = augmentedImageMap[index]!!.first
+                        val augmentedAnchorNode = augmentedImageMap[index]!!.second
 
                         if (flutterArCoreNode.isVideoNode()) {
-                            addVideoNode(anchorNode, flutterArCoreNode.video?.bytes)
+                            debugLog(flutterArCoreNode.position.toString())
+                            debugLog(flutterArCoreNode.rotation.toString())
+                            debugLog(flutterArCoreNode.scale.toString())
+                            debugLog(augmentedImage.extentX.toString())
+                            debugLog(augmentedImage.extentZ.toString())
+                            //addVideoNode(augmentedAnchorNode, flutterArCoreNode.video?.bytes)
+                            try {
+                                val player = MediaPlayer()
+                                attachVideo(
+                                    augmentedImage,
+                                    player,
+                                    flutterArCoreNode.video?.bytes!!,
+                                    flutterArCoreNode.rotation
+                                )
+                                /*NodeFactory.createVideoNode(
+                                    activity,
+                                    arSceneView,
+                                    augmentedAnchorNode,
+                                    player,
+                                    getTransformationSystem(),
+                                    flutterArCoreNode.video?.bytes,
+                                    augmentedImage.extentX,
+                                    augmentedImage.extentZ,
+                                    flutterArCoreNode.position,
+                                    flutterArCoreNode.rotation,
+                                    flutterArCoreNode.scale,
+                                )*/
+                                mediaPlayers.add(player)
+                            } catch (ex: Exception) {
+                                debugLog(ex.toString())
+                            }
                             result.success(null)
                         } else {
                             NodeFactory.makeNode(
@@ -171,8 +199,8 @@ class ArCoreAugmentedImagesView(
                             ) { node, throwable ->
                                 debugLog("inserted ${node?.name}")
                                 if (node != null) {
-                                    node.parent = anchorNode
-                                    arSceneView.scene?.addChild(anchorNode)
+                                    node.parent = augmentedAnchorNode
+                                    arSceneView.scene?.addChild(augmentedAnchorNode)
                                     result.success(null)
                                 } else if (throwable != null) {
                                     result.error(
@@ -222,6 +250,8 @@ class ArCoreAugmentedImagesView(
     private fun arSceneViewInit(call: MethodCall, result: MethodChannel.Result) {
         debugLog("arSceneViewInit")
         initializeSession()
+        loadMatrixModel()
+        loadMatrixMaterial()
         result.success(null)
         debugLog("arSceneViewInit complete")
     }
@@ -381,6 +411,128 @@ class ArCoreAugmentedImagesView(
             debugLog(e.toString())
         }
         return null
+    }
+
+    private var matrixDetected = false
+    private var rabbitDetected = false
+
+    private fun attachVideo(
+        augmentedImage: AugmentedImage,
+        mediaPlayer: MediaPlayer,
+        byteArray: ByteArray,
+        rotation: Quaternion
+    ) {
+        // Setting anchor to the center of Augmented Image
+        val anchorNode = AnchorNode(augmentedImage.createAnchor(augmentedImage.centerPose))
+
+        // AnchorNode placed to the detected tag and set it to the real size of the tag
+        // This will cause deformation if your AR tag has different aspect ratio than your video
+        anchorNode.worldScale =
+            Vector3(augmentedImage.extentX, 1f, augmentedImage.extentZ)
+        arSceneView.scene.addChild(anchorNode)
+        val videoNode = TransformableNode(getTransformationSystem())
+        // For some reason it is shown upside down so this will rotate it correctly
+        //videoNode.localRotation = rotation
+        videoNode.localRotation = Quaternion.axisAngle(Vector3(-1f, 0f, 0f), 180f)
+        anchorNode.addChild(videoNode)
+
+        // Setting texture
+        val externalTexture = ExternalTexture()
+        val renderableInstance = videoNode.setRenderable(plainVideoModel)
+        renderableInstance.material = plainVideoMaterial
+
+        // Setting MediaPLayer
+        renderableInstance.material.setExternalTexture("videoTexture", externalTexture)
+
+        // From bytes
+        val filename = "video_" + anchorNode.name
+        Log.i(NodeFactory.TAG, "temp file: $filename")
+        val temp = File.createTempFile(filename, "mp4", activity.cacheDir)
+        temp.deleteOnExit()
+        val fos = FileOutputStream(temp)
+        fos.write(byteArray)
+        fos.close()
+
+        val file = FileInputStream(temp)
+        mediaPlayer.setDataSource(file.fd)
+        mediaPlayer.isLooping = true
+        mediaPlayer.setSurface(externalTexture.surface)
+        mediaPlayer.prepare();
+        mediaPlayer.start();
+    }
+
+    private fun loadMatrixModel() {
+        futures.add(
+            ModelRenderable.builder()
+                .setSource(activity, Uri.parse("Video.glb"))
+                /*.setSource(activity) {
+                    val filename = "video_" + "anchorNode.name"
+                    Log.i(NodeFactory.TAG, "temp file: $filename")
+                    val temp = File.createTempFile(filename, "mp4", activity.cacheDir)
+                    temp.deleteOnExit()
+                    val fos = FileOutputStream(temp)
+                    fos.write(byteArray)
+                    fos.close()
+                    val file = FileInputStream(temp)
+                    file
+                }*/
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept { model: ModelRenderable ->
+                    //removing shadows for this Renderable
+                    debugLog("loadMatrixModel complete")
+                    model.isShadowCaster = false
+                    model.isShadowReceiver = true
+                    plainVideoModel = model
+                }
+                .exceptionally { throwable: Throwable? ->
+                    null
+                })
+    }
+
+    private fun loadMatrixMaterial() {
+        val filamentEngine: Engine = EngineInstance.getEngine().filamentEngine
+        MaterialBuilder.init()
+        val materialBuilder: MaterialBuilder = MaterialBuilder()
+            .platform(MaterialBuilder.Platform.MOBILE)
+            .name("External Video Material")
+            .require(MaterialBuilder.VertexAttribute.UV0)
+            .shading(MaterialBuilder.Shading.UNLIT)
+            .doubleSided(true)
+            .samplerParameter(
+                MaterialBuilder.SamplerType.SAMPLER_EXTERNAL,
+                MaterialBuilder.SamplerFormat.FLOAT,
+                MaterialBuilder.ParameterPrecision.DEFAULT,
+                "videoTexture"
+            )
+            .optimization(MaterialBuilder.Optimization.NONE)
+        val plainVideoMaterialPackage: MaterialPackage = materialBuilder
+            .blending(MaterialBuilder.BlendingMode.OPAQUE)
+            .material(
+                """void material(inout MaterialInputs material) {
+    prepareMaterial(material);
+    material.baseColor = texture(materialParams_videoTexture, getUV0()).rgba;
+}
+"""
+            )
+            .build(filamentEngine)
+        if (plainVideoMaterialPackage.isValid) {
+            val buffer: ByteBuffer = plainVideoMaterialPackage.buffer
+            futures.add(
+                Material.builder()
+                    .setSource(buffer)
+                    .build()
+                    .thenAccept { material: Material ->
+                        debugLog("loadMatrixMaterial complete")
+                        plainVideoMaterial = material
+                    }
+                    .exceptionally { throwable: Throwable? ->
+                        debugLog(throwable.toString())
+                        null
+                    }
+            )
+        }
+        MaterialBuilder.shutdown()
     }
 
 }

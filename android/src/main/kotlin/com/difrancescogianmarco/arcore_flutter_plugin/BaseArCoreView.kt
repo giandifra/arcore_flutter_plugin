@@ -349,9 +349,9 @@ open class BaseArCoreView(
             }
         }
     }
-
+/*
     fun addVideoNode(anchorNode: AnchorNode, byteArray: ByteArray?) {
-        try{
+        try {
             val player = MediaPlayer()
             NodeFactory.createVideoNode(
                 activity,
@@ -362,11 +362,11 @@ open class BaseArCoreView(
                 byteArray,
             )
             mediaPlayers.add(player)
-        }catch (ex:Exception){
+        } catch (ex: Exception) {
             debugLog(ex.toString())
         }
     }
-
+*/
     fun removeNode(name: String, result: MethodChannel.Result?) {
         val node = arSceneView?.scene?.findByName(name)
         if (node != null) {

@@ -24,8 +24,7 @@ class ArCoreViewFactory(val activity: Activity, val messenger: BinaryMessenger) 
         if (type == "faces") {
             return ArCoreFaceView(activity, context, messenger, id, debug)
         } else if (type == "augmented") {
-            val useSingleImage = params["useSingleImage"] as? Boolean ?: true
-            return ArCoreAugmentedImagesView(activity, context, messenger, id, useSingleImage, debug)
+            return ArCoreAugmentedImagesView(activity, context, messenger, id, debug)
         }
         return ArCoreView(activity, context, messenger, id, type == "faces", debug)
     }
