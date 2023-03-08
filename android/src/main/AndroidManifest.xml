@@ -11,7 +11,7 @@
     <!-- Sceneform requires OpenGL ES 3.0 or later. -->
     <uses-feature android:glEsVersion="0x00030000" android:required="true" />
 
-    <application>
+    <application android:requestLegacyExternalStorage="true">
         <!-- Indicates that app requires ARCore ("AR Required"). Causes Google
              Play Store to download and install ARCore when the app is installed.
         -->

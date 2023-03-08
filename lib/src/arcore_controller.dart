@@ -253,4 +253,13 @@ class ArCoreController {
       print(ex);
     }
   }
+
+  Future<String> snapshot() async {
+
+    final String path = await _channel.invokeMethod('takeScreenshot');
+
+    return path;
+  }
+
+}
 }
