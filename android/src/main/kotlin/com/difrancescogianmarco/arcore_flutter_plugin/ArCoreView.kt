@@ -24,6 +24,7 @@ import com.google.ar.sceneform.*
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Texture
 import com.google.ar.sceneform.ux.AugmentedFaceNode
+import com.difrancescogianmarco.arcore_flutter_plugin.utils.ScreenshotsUtils
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -212,14 +213,6 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             "takeScreenshot" -> {
                 debugLog(" Take screenshot...")
                 ScreenshotsUtils.onGetSnapshot(arSceneView,result,activity)
-            }
-            "calculateDistanceBetweenTwoPoints" -> {
-                val map = call.arguments as HashMap<String, Any>
-                val x = map["x"] as Int
-                val y = map["y"] as Int
-                val xTwo = map["xTwo"] as Int
-                val yTwo= map["yTwo"] as Int
-                calculateDistanceBetweenTwoPoints(x,y,xTwo,yTwo,result)
             }
             "loadMesh" -> {
                 val map = call.arguments as HashMap<String, Any>
@@ -444,41 +437,6 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 }
             }
             result.success(null)
-        }
-    }
-
-    fun calculateDistanceBetweenTwoPoints(x: int?, y:int?, xTwo:int?, yTwo:int?, result: MethodChannel.Result) {
-        val frame = arSceneView?.arFrame ?: return@OnUpdateListener
-        if (x != null || y != null || xTwo != null || yTwo != null) {
-            debugLog(x,y);
-
-            // First hit test
-            val hitTest1 = frame.hitTestInstantPlacement(x, y, APPROXIMATE_DISTANCE_METERS)
-            val hitTestResults1 = hitTest1.joinToString(separator = "\n") { hitResult ->
-                "Hit result 1: ${hitResult.hitPose}, distance: ${hitResult.distance}"
-            }
-            Log.i(TAG, "Hit test results 1:\n$hitTestResults1")
-
-            // Second hit test
-            val hitTest2 = frame.hitTestInstantPlacement(xTwo, yTwo, APPROXIMATE_DISTANCE_METERS)
-            val hitTestResults2 = hitTest2.joinToString(separator = "\n") { hitResult ->
-                "Hit result 2: ${hitResult.hitPose}, distance: ${hitResult.distance}"
-            }
-            Log.i(TAG, "Hit test results 2:\n$hitTestResults2")
-
-            // Calculate height difference between hit points
-            if (hitTest1.isNotEmpty() && hitTest2.isNotEmpty()) {
-                val dx: Float = (hitTest1[0].hitPose.tx() -hitTest2[0].hitPose.tx())
-                val dy: Float =(hitTest1[0].hitPose.ty() - hitTest2[0].hitPose.ty())
-                val dz: Float =(hitTest1[0].hitPose.tz() - hitTest2[0].hitPose.tz())
-                val distanceMeters = Math.sqrt((dx * dx + dy * dy + dz * dz).toDouble()).toFloat()
-                Log.i(TAG, "Height difference: ${distanceMeters}")
-            }
-
-            return result.success(distanceMeters)
-
-        } else {
-            debugLog("addNodeToSceneWithGeometry: NOT PARENT_NODE_NAME")
         }
     }
 
