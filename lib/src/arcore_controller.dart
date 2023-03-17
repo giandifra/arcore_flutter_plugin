@@ -261,5 +261,18 @@ class ArCoreController {
     return path;
   }
 
+
+  Future<double> calculateDistanceBetweenTwoPoints(
+      {required int x, required int y,required int xTwo, required int yTwo}) async {
+    assert(x > 0 && y > 0);
+    final results = await _channel.invokeMethod('calculateDistanceBetweenTwoPoints', {'x': x, 'y': y,'xTwo': xTwo,'yTwo': yTwo});
+    if (results == null) {
+      return 0;
+    } else {
+      final distance = results;
+      return distance;
+    }
+  }
+
 }
 
