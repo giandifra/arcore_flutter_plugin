@@ -206,15 +206,15 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 updateMaterials(call, result)
 
             }
-//            "takeScreenshot" -> {
-//                debugLog(" takeScreenshot")
-//                takeScreenshot(call, result)
-//
-//            }
             "takeScreenshot" -> {
-                debugLog(" Take screenshot...")
-                ScreenshotsUtils.onGetSnapshot(arSceneView,result,activity)
+                debugLog(" takeScreenshot")
+                takeScreenshot(call, result)
+
             }
+//            "takeScreenshot" -> {
+//                debugLog(" Take screenshot...")
+//                ScreenshotsUtils.onGetSnapshot(arSceneView,result,activity)
+//            }
             "loadMesh" -> {
                 val map = call.arguments as HashMap<String, Any>
                 val textureBytes = map["textureBytes"] as ByteArray
