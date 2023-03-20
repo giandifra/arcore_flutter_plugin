@@ -421,9 +421,9 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     }
 
     fun hitTest(x: Int,y:Int,result: MethodChannel.Result) {
-        val frame = arSceneView?.arFrame ?: return@OnUpdateListener
+        val frame = arSceneView?.arFrame
         val APPROXIMATE_DISTANCE_METERS = 2.0f
-        if (x != null || y != null) {
+        if (x != null || x != null) {
             Log.i(TAG, "X and Y results 1:\n$x \n$y")
 
             // First hit test
