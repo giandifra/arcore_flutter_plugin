@@ -264,15 +264,15 @@ class ArCoreController {
     return path;
   }
 
-  // Future<List<ArCoreHitTestResult>> hitTest(int x, int y) async {
-  //   assert(x > 0 && y > 0);
-  //   final results = await _channel.invokeListMethod('hitTest', {'x': x, 'y': y});
-  //   if (results == null) {
-  //     return [];
-  //   } else {
-  //     final objects = (results as List).map((e) => ArCoreHitTestResult.fromMap(e)).toList();
-  //     return objects;
-  //   }
-  // }
+  Future<List<ArCoreHitTestResult>> hitTest(int x, int y) async {
+    assert(x > 0 && y > 0);
+    final results = await _channel.invokeListMethod('hitTest', {'x': x, 'y': y});
+    if (results == null) {
+      return [];
+    } else {
+      final objects = (results as List).map((e) => ArCoreHitTestResult.fromMap(e)).toList();
+      return objects;
+    }
+  }
 }
 
