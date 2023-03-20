@@ -257,6 +257,9 @@ class ArCoreController {
   Future<String> snapshot() async {
 
     final String path = await _channel.invokeMethod('takeScreenshot');
+    print('path>>>>>>>>$path');
+    print('invokedmethod>>>>>>>>${_channel.invokeMethod('takeScreenshot')}');
+
 
     return path;
   }
