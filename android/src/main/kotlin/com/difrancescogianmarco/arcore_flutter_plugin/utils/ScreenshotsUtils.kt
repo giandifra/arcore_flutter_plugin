@@ -106,7 +106,7 @@ class ScreenshotsUtils {
         } 
 
 
-        fun onGetSnapshot(arSceneView: arFragment.ArSceneView?, result: MethodChannel.Result,activity: Activity){
+        fun onGetSnapshot(arSceneView: ArSceneView?, result: MethodChannel.Result,activity: Activity){
 
             if( !permissionToWrite(activity) ) {
                 Log.i("Sreenshot", "Permission to write files missing!");

@@ -26,7 +26,7 @@ import com.google.ar.sceneform.rendering.Texture
 import com.google.ar.sceneform.ux.AugmentedFaceNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ScreenshotsUtils
 import com.google.gson.Gson
-import com.google.ar.core.Frame
+import com.google.ar.core.Session
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -207,16 +207,17 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 updateMaterials(call, result)
 
             }
-//            "takeScreenshot" -> {
-//                debugLog(" takeScreenshot")
-//                takeScreenshot(call, result)
-//
-//            }
             "takeScreenshot" -> {
-                debugLog(" Take screenshot...")
-                ScreenshotsUtils.onGetSnapshot(arSceneView,result,activity)
-                debugLog("arSceneView::${arSceneView},result::$result,activity:::$activity")
+                debugLog(" takeScreenshot")
+                takeScreenshot(call, result)
+                debugLog("call::>>$call,result::>>$result")
+
             }
+//            "takeScreenshot" -> {
+//                debugLog(" Take screenshot...")
+//                ScreenshotsUtils.onGetSnapshot(arSceneView,result,activity)
+//                debugLog("arSceneView::${arSceneView},result::$result,activity:::$activity")
+//            }
             "loadMesh" -> {
                 val map = call.arguments as HashMap<String, Any>
                 val textureBytes = map["textureBytes"] as ByteArray
@@ -422,7 +423,15 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     }
 
     fun hitTest(x: Int,y:Int,result: MethodChannel.Result) {
-        val frame = arSceneView?.arFrame
+        val session = session ?: return
+        val frame =
+                try {
+                    session.update()
+                } catch (e: CameraNotAvailableException) {
+                    Log.e(TAG, "Camera not available during onDrawFrame", e)
+                    showError("Camera not available. Try restarting the app.")
+                    return
+                }
         val APPROXIMATE_DISTANCE_METERS = 2.0f
         if (x != null || x != null) {
             Log.i(TAG, "X and Y results 1:\n$x \n$y")
