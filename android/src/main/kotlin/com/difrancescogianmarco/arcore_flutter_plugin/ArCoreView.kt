@@ -26,6 +26,7 @@ import com.google.ar.sceneform.rendering.Texture
 import com.google.ar.sceneform.ux.AugmentedFaceNode
 import com.difrancescogianmarco.arcore_flutter_plugin.utils.ScreenshotsUtils
 import com.google.gson.Gson
+import com.google.ar.core.Frame
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall

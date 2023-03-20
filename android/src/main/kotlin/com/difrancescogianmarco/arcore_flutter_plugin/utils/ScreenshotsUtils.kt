@@ -18,6 +18,7 @@ import android.app.Activity
 import android.util.Log
 import io.flutter.plugin.common.MethodChannel
 import com.google.ar.sceneform.ArSceneView
+import kotlin.concurrent.HandlerThread
 
 class ScreenshotsUtils {
 
@@ -105,7 +106,7 @@ class ScreenshotsUtils {
         } 
 
 
-        fun onGetSnapshot(arSceneView: ArSceneView?, result: MethodChannel.Result,activity: Activity){
+        fun onGetSnapshot(arSceneView: arFragment.ArSceneView?, result: MethodChannel.Result,activity: Activity){
 
             if( !permissionToWrite(activity) ) {
                 Log.i("Sreenshot", "Permission to write files missing!");
@@ -122,12 +123,10 @@ class ScreenshotsUtils {
 
                 return;
             }
-     
-           
             try {
 
-                //val view = arSceneView!!
-                val view: ArSceneView = arFragment.getArSceneView()
+                val view = arSceneView!!
+               // val view: ArSceneView = arFragment.getArSceneView()
 
                 val bitmapImage: Bitmap = Bitmap.createBitmap(
                                 view.getWidth(),
@@ -135,9 +134,6 @@ class ScreenshotsUtils {
                                 Bitmap.Config.ARGB_8888
                         );
                 Log.i("Sreenshot", "PixelCopy requesting now...");
-                final HandlerThread handlerThread = new HandlerThread("PixelCopier");
-                handlerThread.start();
-                Log.i("Sreenshot", "handlerThread $handlerThread");
                 PixelCopy.request(view, bitmapImage, { copyResult -> 
                       if (copyResult == PixelCopy.SUCCESS) {
                         Log.i("Sreenshot", "PixelCopy request SUCESS. ${copyResult}");
