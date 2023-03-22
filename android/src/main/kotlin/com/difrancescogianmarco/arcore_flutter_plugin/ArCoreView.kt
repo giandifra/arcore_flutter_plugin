@@ -428,20 +428,18 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
     }
 
     private fun screenShot() {
-
+        val view = arSceneView!!
         // Next, create a Bitmap to hold the snapshot
-        val bitmap = Bitmap.createBitmap(arSceneView.width, arSceneView.height, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
 
 // Finally, call the ArSceneView's `getSnapshot()` method to capture the current frame
-        arSceneView.getSnapshot { snapshot ->
+        view.getSnapshot { snapshot ->
             // When the snapshot is ready, save it to the Bitmap
             snapshot?.let {
                 val buffer = snapshot.buffer
                 buffer.rewind()
                 bitmap.copyPixelsFromBuffer(buffer)
                 debugLog(" bitmap ${ bitmap.copyPixelsFromBuffer(buffer)}")
-
-
             }
 
         }
