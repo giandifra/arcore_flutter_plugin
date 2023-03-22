@@ -354,6 +354,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                        // saveBitmapToDisk(bitmap)
                         pathSaved = saveBitmapToDisk(bitmap)
                         result.success(pathSaved)
+                        debugLog("pathsaved $pathSaved")
 
                     } catch (e: IOException) {
                         e.printStackTrace();
@@ -361,7 +362,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 }
                 handlerThread.quitSafely()
             }, Handler(handlerThread.getLooper()))
-
+            result.success(pathSaved)
         } catch (e: Throwable) {
             // Several error may come out with file handling or DOM
             e.printStackTrace()
