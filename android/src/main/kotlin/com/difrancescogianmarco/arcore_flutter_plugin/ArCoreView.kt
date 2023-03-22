@@ -209,8 +209,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
             "takeScreenshot" -> {
                 debugLog(" takeScreenshot")
-               // takeScreenshot(call, result)
-                screenShot()
+               takeScreenshot(call, result)
                 debugLog("call::>>$call,result::>>$result")
 
             }
@@ -343,7 +342,6 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             // Create a bitmap the size of the scene view.
             val bitmap: Bitmap = Bitmap.createBitmap(arSceneView!!.getWidth(), arSceneView!!.getHeight(),
                     Bitmap.Config.ARGB_8888)
-
             // Create a handler thread to offload the processing of the image.
             val handlerThread = HandlerThread("PixelCopier")
             handlerThread.start()
@@ -352,23 +350,18 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             PixelCopy.request(arSceneView!!, bitmap, { copyResult ->
                 if (copyResult === PixelCopy.SUCCESS) {
                     try {
-                       // saveBitmapToDisk(bitmap)
-                        val  pathSaved = saveBitmapToDisk(bitmap)
-                        result.success(pathSaved)
-                        debugLog("pathsaved $pathSaved")
-
+                        saveBitmapToDisk(bitmap)
                     } catch (e: IOException) {
                         e.printStackTrace();
                     }
                 }
                 handlerThread.quitSafely()
             }, Handler(handlerThread.getLooper()))
-            //result.success(pathSaved)
         } catch (e: Throwable) {
             // Several error may come out with file handling or DOM
             e.printStackTrace()
         }
-       // result.success(pathSaved)
+        result.success(null)
     }
 
     @Throws(IOException::class)
@@ -427,23 +420,23 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         result.success(null)
     }
 
-    private fun screenShot() {
-        val view = arSceneView!!
-        // Next, create a Bitmap to hold the snapshot
-        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
-
-// Finally, call the ArSceneView's `getSnapshot()` method to capture the current frame
-        view.getSnapshot { snapshot ->
-            // When the snapshot is ready, save it to the Bitmap
-            snapshot?.let {
-                val buffer = snapshot.buffer
-                buffer.rewind()
-                bitmap.copyPixelsFromBuffer(buffer)
-                debugLog(" bitmap ${ bitmap.copyPixelsFromBuffer(buffer)}")
-            }
-
-        }
-    }
+//    private fun screenShot() {
+//        val view = arSceneView!!
+//        // Next, create a Bitmap to hold the snapshot
+//        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+//
+//// Finally, call the ArSceneView's `getSnapshot()` method to capture the current frame
+//        view.getSnapshot { snapshot ->
+//            // When the snapshot is ready, save it to the Bitmap
+//            snapshot?.let {
+//                val buffer = snapshot.buffer
+//                buffer.rewind()
+//                bitmap.copyPixelsFromBuffer(buffer)
+//                debugLog(" bitmap ${ bitmap.copyPixelsFromBuffer(buffer)}")
+//            }
+//
+//        }
+//    }
 
 //    fun hitTest(x: Int,y:Int,result: MethodChannel.Result) {
 //        val session = session ?: return
