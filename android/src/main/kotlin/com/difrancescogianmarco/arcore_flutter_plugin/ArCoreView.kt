@@ -24,6 +24,9 @@ import com.google.ar.sceneform.*
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Texture
 import com.google.ar.sceneform.ux.AugmentedFaceNode
+import com.difrancescogianmarco.arcore_flutter_plugin.utils.ScreenshotsUtils
+import com.google.gson.Gson
+import com.google.ar.core.Session
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -206,9 +209,15 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
             "takeScreenshot" -> {
                 debugLog(" takeScreenshot")
-                takeScreenshot(call, result)
+               takeScreenshot(call, result)
+                debugLog("call::>>$call,result::>>$result")
 
             }
+//            "takeScreenshot" -> {
+//                debugLog(" Take screenshot...")
+//                ScreenshotsUtils.onGetSnapshot(arSceneView,result,activity)
+//                debugLog("arSceneView::${arSceneView},result::$result,activity:::$activity")
+//            }
             "loadMesh" -> {
                 val map = call.arguments as HashMap<String, Any>
                 val textureBytes = map["textureBytes"] as ByteArray
@@ -222,6 +231,13 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 debugLog("Resuming ARCore now")
                 onResume()
             }
+
+//            "hitTest" -> {
+//                val map = call.arguments as HashMap<String, Any>
+//                val x = map["x"] as Int
+//                val y = map["y"] as Int
+//                hitTest(x,y,result)
+//            }
             "getTrackingState" -> {
                 debugLog("1/3: Requested tracking state, returning that back to Flutter now")
 
@@ -326,7 +342,6 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             // Create a bitmap the size of the scene view.
             val bitmap: Bitmap = Bitmap.createBitmap(arSceneView!!.getWidth(), arSceneView!!.getHeight(),
                     Bitmap.Config.ARGB_8888)
-
             // Create a handler thread to offload the processing of the image.
             val handlerThread = HandlerThread("PixelCopier")
             handlerThread.start()
@@ -335,19 +350,27 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             PixelCopy.request(arSceneView!!, bitmap, { copyResult ->
                 if (copyResult === PixelCopy.SUCCESS) {
                     try {
-                        saveBitmapToDisk(bitmap)
+                        val  pathSaved = saveBitmapToDisk(bitmap)
+                        result.success(pathSaved)
+                        debugLog("pathsaved $pathSaved")
                     } catch (e: IOException) {
+                        result.success(null)
+                        debugLog("error ${e.toString()}")
                         e.printStackTrace();
                     }
+                } else {
+                    result.success(null)
+                    debugLog("error PixelCopy failed")
                 }
                 handlerThread.quitSafely()
             }, Handler(handlerThread.getLooper()))
-
         } catch (e: Throwable) {
             // Several error may come out with file handling or DOM
+            debugLog("takeScreenshot tryCatch ${e.toString()}")
             e.printStackTrace()
+            result.success(null)
         }
-        result.success(null)
+        //result.success(null)
     }
 
     @Throws(IOException::class)
@@ -405,6 +428,50 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         
         result.success(null)
     }
+
+//    private fun screenShot() {
+//        val view = arSceneView!!
+//        // Next, create a Bitmap to hold the snapshot
+//        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+//
+//// Finally, call the ArSceneView's `getSnapshot()` method to capture the current frame
+//        view.getSnapshot { snapshot ->
+//            // When the snapshot is ready, save it to the Bitmap
+//            snapshot?.let {
+//                val buffer = snapshot.buffer
+//                buffer.rewind()
+//                bitmap.copyPixelsFromBuffer(buffer)
+//                debugLog(" bitmap ${ bitmap.copyPixelsFromBuffer(buffer)}")
+//            }
+//
+//        }
+//    }
+
+//    fun hitTest(x: Int,y:Int,result: MethodChannel.Result) {
+//        val session = session ?: return
+//        val frame =
+//                try {
+//                    session.update()
+//                } catch (e: CameraNotAvailableException) {
+//                    Log.e(TAG, "Camera not available during onDrawFrame", e)
+//                    showError("Camera not available. Try restarting the app.")
+//                    return
+//                }
+//        val APPROXIMATE_DISTANCE_METERS = 2.0f
+//        if (x != null || x != null) {
+//            Log.i(TAG, "X and Y results 1:\n$x \n$y")
+//
+//            // First hit test
+//            val hitTest1 = frame.hitTestInstantPlacement(x, y, APPROXIMATE_DISTANCE_METERS)
+//            Log.i(TAG, "Hit test results 1:\n$hitTest1")
+//            val gson = Gson()
+//            val json = gson.toJson(hitTest1)
+//            return result.success(json)
+//
+//        } else {
+//            debugLog("No hit Test")
+//        }
+//    }
 
     fun addNodeWithAnchor(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result) {
 

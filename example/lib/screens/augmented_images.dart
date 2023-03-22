@@ -22,6 +22,15 @@ class _AugmentedPageState extends State<AugmentedPage> {
           onArCoreViewCreated: _onArCoreViewCreated,
           type: ArCoreViewType.AUGMENTEDIMAGES,
         ),
+        floatingActionButton:  FloatingActionButton(
+          onPressed: () async {
+            String? path = await arCoreController?.snapshot();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Photo saved on $path"),));
+
+          },
+          child: const Icon(Icons.photo),
+          backgroundColor: Colors.green,
+        ),
       ),
     );
   }

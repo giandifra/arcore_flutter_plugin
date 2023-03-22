@@ -253,4 +253,26 @@ class ArCoreController {
       print(ex);
     }
   }
+
+  Future<String?> snapshot() async {
+    print('path1>>>..');
+    final String? path = await _channel.invokeMethod('takeScreenshot');
+    print('path>>>>>>>>$path');
+    //print('invokedmethod>>>>>>>>${_channel.invokeMethod('takeScreenshot')}');
+
+
+    return path;
+  }
+
+  // Future<List<ArCoreHitTestResult>> hitTest(int x, int y) async {
+  //   assert(x > 0 && y > 0);
+  //   final results = await _channel.invokeListMethod('hitTest', {'x': x, 'y': y});
+  //   if (results == null) {
+  //     return [];
+  //   } else {
+  //     final objects = (results as List).map((e) => ArCoreHitTestResult.fromMap(e)).toList();
+  //     return objects;
+  //   }
+  // }
 }
+
