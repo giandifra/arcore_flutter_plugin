@@ -350,18 +350,27 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             PixelCopy.request(arSceneView!!, bitmap, { copyResult ->
                 if (copyResult === PixelCopy.SUCCESS) {
                     try {
-                        saveBitmapToDisk(bitmap)
+                        val  pathSaved = saveBitmapToDisk(bitmap)
+                        result.success(pathSaved)
+                        debugLog("pathsaved $pathSaved")
                     } catch (e: IOException) {
+                        result.success(null)
+                        debugLog("error ${e.toString()}")
                         e.printStackTrace();
                     }
+                } else {
+                    result.success(null)
+                    debugLog("error PixelCopy failed")
                 }
                 handlerThread.quitSafely()
             }, Handler(handlerThread.getLooper()))
         } catch (e: Throwable) {
             // Several error may come out with file handling or DOM
+            debugLog("takeScreenshot tryCatch ${e.toString()}")
             e.printStackTrace()
+            result.success(null)
         }
-        result.success(null)
+        //result.success(null)
     }
 
     @Throws(IOException::class)
