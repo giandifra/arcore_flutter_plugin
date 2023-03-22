@@ -232,12 +232,12 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 onResume()
             }
 
-            "hitTest" -> {
-                val map = call.arguments as HashMap<String, Any>
-                val x = map["x"] as Int
-                val y = map["y"] as Int
-                hitTest(x,y,result)
-            }
+//            "hitTest" -> {
+//                val map = call.arguments as HashMap<String, Any>
+//                val x = map["x"] as Int
+//                val y = map["y"] as Int
+//                hitTest(x,y,result)
+//            }
             "getTrackingState" -> {
                 debugLog("1/3: Requested tracking state, returning that back to Flutter now")
 
@@ -422,31 +422,31 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         result.success(null)
     }
 
-    fun hitTest(x: Int,y:Int,result: MethodChannel.Result) {
-        val session = session ?: return
-        val frame =
-                try {
-                    session.update()
-                } catch (e: CameraNotAvailableException) {
-                    Log.e(TAG, "Camera not available during onDrawFrame", e)
-                    showError("Camera not available. Try restarting the app.")
-                    return
-                }
-        val APPROXIMATE_DISTANCE_METERS = 2.0f
-        if (x != null || x != null) {
-            Log.i(TAG, "X and Y results 1:\n$x \n$y")
-
-            // First hit test
-            val hitTest1 = frame.hitTestInstantPlacement(x, y, APPROXIMATE_DISTANCE_METERS)
-            Log.i(TAG, "Hit test results 1:\n$hitTest1")
-            val gson = Gson()
-            val json = gson.toJson(hitTest1)
-            return result.success(json)
-
-        } else {
-            debugLog("No hit Test")
-        }
-    }
+//    fun hitTest(x: Int,y:Int,result: MethodChannel.Result) {
+//        val session = session ?: return
+//        val frame =
+//                try {
+//                    session.update()
+//                } catch (e: CameraNotAvailableException) {
+//                    Log.e(TAG, "Camera not available during onDrawFrame", e)
+//                    showError("Camera not available. Try restarting the app.")
+//                    return
+//                }
+//        val APPROXIMATE_DISTANCE_METERS = 2.0f
+//        if (x != null || x != null) {
+//            Log.i(TAG, "X and Y results 1:\n$x \n$y")
+//
+//            // First hit test
+//            val hitTest1 = frame.hitTestInstantPlacement(x, y, APPROXIMATE_DISTANCE_METERS)
+//            Log.i(TAG, "Hit test results 1:\n$hitTest1")
+//            val gson = Gson()
+//            val json = gson.toJson(hitTest1)
+//            return result.success(json)
+//
+//        } else {
+//            debugLog("No hit Test")
+//        }
+//    }
 
     fun addNodeWithAnchor(flutterArCoreNode: FlutterArCoreNode, result: MethodChannel.Result) {
 

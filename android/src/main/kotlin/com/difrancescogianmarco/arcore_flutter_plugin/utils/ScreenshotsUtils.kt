@@ -18,7 +18,6 @@ import android.app.Activity
 import android.util.Log
 import io.flutter.plugin.common.MethodChannel
 import com.google.ar.sceneform.ArSceneView
-import kotlin.concurrent.HandlerThread
 
 class ScreenshotsUtils {
 
