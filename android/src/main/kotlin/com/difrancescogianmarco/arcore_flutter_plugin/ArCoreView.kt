@@ -342,7 +342,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             // Create a bitmap the size of the scene view.
             val bitmap: Bitmap = Bitmap.createBitmap(arSceneView!!.getWidth(), arSceneView!!.getHeight(),
                     Bitmap.Config.ARGB_8888)
-            var pathSaved: String
+            var pathSaved: String = ''
             // Create a handler thread to offload the processing of the image.
             val handlerThread = HandlerThread("PixelCopier")
             handlerThread.start()
