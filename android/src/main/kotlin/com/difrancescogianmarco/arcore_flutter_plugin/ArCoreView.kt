@@ -342,7 +342,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             // Create a bitmap the size of the scene view.
             val bitmap: Bitmap = Bitmap.createBitmap(arSceneView!!.getWidth(), arSceneView!!.getHeight(),
                     Bitmap.Config.ARGB_8888)
-            val pathSaved
+
             // Create a handler thread to offload the processing of the image.
             val handlerThread = HandlerThread("PixelCopier")
             handlerThread.start()
@@ -352,7 +352,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 if (copyResult === PixelCopy.SUCCESS) {
                     try {
                        // saveBitmapToDisk(bitmap)
-                        pathSaved = saveBitmapToDisk(bitmap)
+                        val  pathSaved = saveBitmapToDisk(bitmap)
                         result.success(pathSaved)
                         debugLog("pathsaved $pathSaved")
 
@@ -362,7 +362,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                 }
                 handlerThread.quitSafely()
             }, Handler(handlerThread.getLooper()))
-            result.success(pathSaved)
+            //result.success(pathSaved)
         } catch (e: Throwable) {
             // Several error may come out with file handling or DOM
             e.printStackTrace()
