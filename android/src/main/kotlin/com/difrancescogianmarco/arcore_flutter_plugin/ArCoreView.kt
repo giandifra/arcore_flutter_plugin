@@ -353,6 +353,8 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
                     try {
                        // saveBitmapToDisk(bitmap)
                         pathSaved = saveBitmapToDisk(bitmap)
+                        result.success(pathSaved)
+
                     } catch (e: IOException) {
                         e.printStackTrace();
                     }
@@ -364,7 +366,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             // Several error may come out with file handling or DOM
             e.printStackTrace()
         }
-        result.success(pathSaved)
+       // result.success(pathSaved)
     }
 
     @Throws(IOException::class)
