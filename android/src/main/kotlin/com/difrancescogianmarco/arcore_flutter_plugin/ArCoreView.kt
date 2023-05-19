@@ -192,7 +192,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
             }
             "positionChanged" -> {
                 debugLog(" positionChanged")
-
+                updatePosition(call, result)
             }
             "rotationChanged" -> {
                 debugLog(" rotationChanged")
@@ -483,6 +483,13 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         result.success(null)
     }
 
+    fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
+        val name = call.argument<String>("name")
+        val node = arSceneView?.scene?.findByName(name) as Node
+        node.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
+        result.success(null)
+    }
+
     fun updateRotation(call: MethodCall, result: MethodChannel.Result) {
         val name = call.argument<String>("name")
         val node = arSceneView?.scene?.findByName(name) as RotatingNode
@@ -626,10 +633,5 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
 
     }*/
 
-    /*    fun updatePosition(call: MethodCall, result: MethodChannel.Result) {
-        val name = call.argument<String>("name")
-        val node = arSceneView?.scene?.findByName(name)
-        node?.localPosition = parseVector3(call.arguments as HashMap<String, Any>)
-        result.success(null)
-    }*/
+    
 }
