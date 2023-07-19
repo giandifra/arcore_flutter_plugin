@@ -1,11 +1,12 @@
-import 'package:arcore_flutter_plugin_example/screens/augmented_faces.dart';
-import 'package:arcore_flutter_plugin_example/screens/augmented_images.dart';
-import 'package:arcore_flutter_plugin_example/screens/image_object.dart';
-import 'package:arcore_flutter_plugin_example/screens/matri_3d.dart';
-import 'package:arcore_flutter_plugin_example/screens/multiple_augmented_images.dart';
+
 import 'package:flutter/material.dart';
+import 'screens/augmented_faces.dart';
+import 'screens/augmented_images.dart';
 import 'screens/hello_world.dart';
 import 'screens/custom_object.dart';
+import 'screens/image_object.dart';
+import 'screens/matri_3d.dart';
+import 'screens/multiple_augmented_images.dart';
 import 'screens/runtime_materials.dart';
 import 'screens/texture_and_rotation.dart';
 import 'screens/assets_object.dart';

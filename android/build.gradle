@@ -2,7 +2,7 @@ group 'com.difrancescogianmarco.arcore_flutter_plugin'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.3.50'
+    ext.kotlin_version = '1.6.0'
     repositories {
         google()
         jcenter()
@@ -25,7 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 33
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -53,11 +53,11 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.ar:core:1.13.0'
-    implementation 'com.google.ar.sceneform:core:1.13.0'
-    implementation 'com.google.ar.sceneform:assets:1.13.0'
-    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.13.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.ar:core:1.38.0'
+    implementation 'com.google.ar.sceneform:core:1.17.1'
+    implementation 'com.google.ar.sceneform:assets:1.17.1'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.17.1'
     implementation 'androidx.core:core-ktx:1.3.0-alpha01'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.6'
 }
