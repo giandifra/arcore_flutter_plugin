@@ -1,23 +1,20 @@
-## 0.1.0-null-safety.4
+## 0.2.0-alpha
+
+* Upgraded dart constraint >= 3.0.0 < 4.0.0
+* Upgraded gradle to 7.3.1
+* Upgraded kotlin to 1.7.20
+* Upgraded compileSdk to 34
+* Upgraded AR Core to 1.17.1
+* Upgraded Sceneform to 1.17.1
+
+## 0.1.0
 
 * Upgraded dart constraint to 2.14
 * Migrate example to null-safety
 * Migrate to new android plugin api
-
-## 0.1.0-null-safety.3
-
 * Bug fix (@shabbirAlam)
-
-## 0.1.0-null-safety.2
-
 * Added "Screenshot feature" (@wiizarrrd)
-
-## 0.1.0-null-safety.1
-
 * Fix null check operator
-
-## 0.1.0-null-safety.0
-
 * Migrate to null-safety (@GTripathee)
 
 ## 0.0.11

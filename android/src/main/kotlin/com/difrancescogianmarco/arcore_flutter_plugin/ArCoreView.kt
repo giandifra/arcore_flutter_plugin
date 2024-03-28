@@ -378,7 +378,7 @@ class ArCoreView(val activity: Activity, context: Context, messenger: BinaryMess
         if (enableTapRecognizer != null && enableTapRecognizer) {
             arSceneView
                     ?.scene
-                    ?.setOnTouchListener { hitTestResult: HitTestResult, event: MotionEvent? ->
+                    ?.setOnTouchListener { hitTestResult: HitTestResult, event: MotionEvent ->
 
                         if (hitTestResult.node != null) {
                             debugLog(" onNodeTap " + hitTestResult.node?.name)
